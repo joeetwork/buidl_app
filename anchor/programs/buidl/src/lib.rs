@@ -1,11 +1,14 @@
 use anchor_lang::prelude::*;
 use anchor_spl::associated_token::AssociatedToken;
 use anchor_spl::token::{self, CloseAccount, Mint, Token, TokenAccount, TransferChecked};
+use anchor_spl::metadata::MetadataAccount;
 
 declare_id!("EuNCzKegGAUCkmSGMtMxe3znUdx4tY82v56mHfaTywZ2");
 
 #[program]
 pub mod anchor_escrow {
+    use std::str::FromStr;
+
     use super::*;
 
     const AUTHORITY_SEED: &[u8] = b"authority";
@@ -15,6 +18,7 @@ pub mod anchor_escrow {
         random_seed: u64,
         initializer_amount: u64,
         taker_amount: u64,
+        validator_total_count: u64
     ) -> Result<()> {
         ctx.accounts.escrow_state.initializer_key = *ctx.accounts.initializer.key;
         ctx.accounts.escrow_state.initializer_deposit_token_account = *ctx
@@ -30,6 +34,9 @@ pub mod anchor_escrow {
         ctx.accounts.escrow_state.initializer_amount = initializer_amount;
         ctx.accounts.escrow_state.taker_amount = taker_amount;
         ctx.accounts.escrow_state.random_seed = random_seed;
+        ctx.accounts.escrow_state.validator_total_count = validator_total_count;
+        ctx.accounts.escrow_state.validator_count = 0;
+        ctx.accounts.escrow_state.verified_account = Pubkey::from_str("F17gXajNLmVdMXtCPVpJ8enhwoxtscmDf7fLoJE8vUgw").unwrap();
 
         let (_vault_authority, vault_authority_bump) =
             Pubkey::find_program_address(&[AUTHORITY_SEED], ctx.program_id);
@@ -41,6 +48,15 @@ pub mod anchor_escrow {
             ctx.accounts.mint.decimals,
         )?;
 
+        Ok(())
+    }
+
+    pub fn initialize_user(
+        ctx: Context<InitializeUser>,
+        username: String
+    ) -> Result<()> {
+        ctx.accounts.user_state.initializer_key = *ctx.accounts.initializer.key;
+        ctx.accounts.user_state.username = username;
         Ok(())
     }
 
@@ -65,6 +81,47 @@ pub mod anchor_escrow {
         )?;
 
         Ok(())
+    }
+
+    pub fn validate_work(ctx: Context<ValidateWork>) -> Result<()> {
+
+        // let nft_token_account = &ctx.accounts.nft_token_account;
+
+        // let user = &ctx.accounts.user;
+
+        // let nft_mint_account = &ctx.accounts.nft_mint;
+
+
+        // assert_eq!(nft_token_account.owner, user.key());
+
+        // assert_eq!(nft_token_account.mint, nft_mint_account.key());
+
+        // assert_eq!(nft_token_account.amount, 1);
+
+        // let (metadata, _) = Pubkey::find_program_address(
+        //     &[
+        //         mpl_token_metadata::accounts::Metadata::PREFIX,
+        //         mpl_token_metadata::ID.as_ref(),
+        //         nft_token_account.mint.as_ref(),
+        //     ],
+        //     &mpl_token_metadata::ID,
+        // );
+        //  metadata;
+
+        //  let mint_metadata= mpl_token_metadata::accounts::Metadata::try_from(&ctx.accounts.metadata_account.to_account_info())?; 
+
+        //  if mint_metadata.collection.is_some() {
+        //     let collection = mint_metadata.collection.unwrap();
+        //     if collection.verified && collection.key ==  ctx.accounts.escrow_state.verified_account {
+        //         ctx.accounts.escrow_state.validator_count = ctx.accounts.escrow_state.validator_count.checked_add(1)
+        //         .unwrap();
+        //     }
+        // } 
+
+        ctx.accounts.escrow_state.validator_count = ctx.accounts.escrow_state.validator_count.checked_add(1)
+        .unwrap();
+
+            Ok(())
     }
 
     pub fn exchange(ctx: Context<Exchange>) -> Result<()> {
@@ -128,7 +185,7 @@ pub struct Initialize<'info> {
         seeds = [b"state".as_ref(), &escrow_seed.to_le_bytes()],
         bump,
         payer = initializer,
-        space = EscrowState::space()
+        space = std::mem::size_of::<EscrowState>() + 8
     )]
     pub escrow_state: Box<Account<'info, EscrowState>>,
     /// CHECK: This is not dangerous because we don't read or write from this account
@@ -138,6 +195,25 @@ pub struct Initialize<'info> {
     pub token_program: Program<'info, Token>,
     /// CHECK: This is not dangerous because we don't read or write from this account
     pub associated_token_program: Program<'info, AssociatedToken>,
+}
+
+#[derive(Accounts)]
+#[instruction(username: String)]
+pub struct InitializeUser<'info> {
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    pub initializer: Signer<'info>,
+
+    #[account(
+        init,
+        seeds = [b"user".as_ref(), initializer.key().as_ref()],
+        bump,
+        payer = initializer,
+        space = std::mem::size_of::<UserState>() + 8
+    )]
+    pub user_state: Box<Account<'info, UserState>>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    pub system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]
@@ -168,6 +244,42 @@ pub struct Cancel<'info> {
 }
 
 #[derive(Accounts)]
+pub struct ValidateWork<'info> {
+
+    pub user: Signer<'info>,
+
+    pub nft_mint: Account<'info, Mint>,
+
+    pub nft_token_account: Account<'info, TokenAccount>, 
+
+    #[account(
+        seeds = [
+            b"metadata", 
+            mpl_token_metadata::ID.as_ref(), 
+            nft_mint.key().as_ref()
+        ],
+        seeds::program = mpl_token_metadata::ID,
+        bump,
+        constraint = metadata_account.collection.as_ref().unwrap().verified,
+        constraint = metadata_account.collection.as_ref().unwrap().key ==
+        escrow_state.verified_account.key(),
+        constraint = nft_token_account.owner == user.key(),
+        constraint = nft_token_account.mint == nft_mint.key(),
+        constraint = nft_token_account.amount == 1
+    )]
+    pub metadata_account: Account<'info, MetadataAccount>,
+
+    #[account(
+        mut,
+        constraint = metadata_account.collection.as_ref().unwrap().key ==
+        escrow_state.verified_account.key()
+    )]
+    pub escrow_state: Box<Account<'info, EscrowState>>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
 pub struct Exchange<'info> {
     /// CHECK: This is not dangerous because we don't read or write from this account
     pub taker: Signer<'info>,
@@ -190,6 +302,7 @@ pub struct Exchange<'info> {
         constraint = escrow_state.initializer_deposit_token_account == *initializer_deposit_token_account.to_account_info().key,
         constraint = escrow_state.initializer_receive_token_account == *initializer_receive_token_account.to_account_info().key,
         constraint = escrow_state.initializer_key == *initializer.key,
+        constraint = escrow_state.validator_total_count == escrow_state.validator_count,
         close = initializer
     )]
     pub escrow_state: Box<Account<'info, EscrowState>>,
@@ -206,6 +319,12 @@ pub struct Exchange<'info> {
 }
 
 #[account]
+pub struct UserState {
+    pub initializer_key: Pubkey,
+    pub username: String,
+}
+
+#[account]
 pub struct EscrowState {
     pub random_seed: u64,
     pub initializer_key: Pubkey,
@@ -214,6 +333,9 @@ pub struct EscrowState {
     pub initializer_amount: u64,
     pub taker_amount: u64,
     pub vault_authority_bump: u8,
+    pub verified_account: Pubkey,
+    pub validator_total_count: u64,
+    pub validator_count: u64
 }
 
 impl EscrowState {
