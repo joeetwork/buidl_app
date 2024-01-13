@@ -2,22 +2,22 @@
 
 import { useWallet } from '@solana/wallet-adapter-react';
 
-
 import { ExplorerLink } from '../cluster/cluster-ui';
-import { useCounterProgram } from './counter-data-access';
-import { CounterCreate, CounterList } from './counter-ui';
+
 import { AppHero } from '../shared/app-hero';
 import { WalletButton } from '../shared/wallet-button';
 import { ellipsify } from '../shared/ellipsify';
+import { useEscrowProgram } from './escrow-data-access';
+import { EscrowCreate, EscrowList } from './escrow-ui';
 
 export default function CounterFeature() {
   const { publicKey } = useWallet();
-  const { programId } = useCounterProgram();
+  const { programId } = useEscrowProgram();
 
   return publicKey ? (
     <div>
       <AppHero
-        title="Counter"
+        title="Escrow"
         subtitle={
           'You can create a new counter by clicking the "Create" button. The state of a counter is stored on-chain and can be manipulated by calling the program\'s methods (increment, decrement, set, and close).'
         }
@@ -28,9 +28,9 @@ export default function CounterFeature() {
             label={ellipsify(programId.toString())}
           />
         </p>
-        <CounterCreate />
+        <EscrowCreate />
       </AppHero>
-      <CounterList />
+      <EscrowList />
     </div>
   ) : (
     <div className="max-w-4xl mx-auto">

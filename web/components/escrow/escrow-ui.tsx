@@ -1,17 +1,16 @@
 'use client';
 
 import { Keypair, PublicKey } from '@solana/web3.js';
-import { useMemo } from 'react';
 
 import { ExplorerLink } from '../cluster/cluster-ui';
-import {
-  useCounterProgram,
-  useCounterProgramAccount,
-} from './counter-data-access';
 import { ellipsify } from '../shared/ellipsify';
+import {
+  useEscrowProgram,
+  useEscrowProgramAccount,
+} from './escrow-data-access';
 
-export function CounterCreate() {
-  const { initialize } = useCounterProgram();
+export function EscrowCreate() {
+  const { initialize } = useEscrowProgram();
 
   return (
     <button
@@ -24,8 +23,8 @@ export function CounterCreate() {
   );
 }
 
-export function CounterList() {
-  const { accounts, getProgramAccount } = useCounterProgram();
+export function EscrowList() {
+  const { escrowAccounts, getProgramAccount } = useEscrowProgram();
 
   if (getProgramAccount.isLoading) {
     return <span className="loading loading-spinner loading-lg"></span>;
@@ -42,14 +41,14 @@ export function CounterList() {
   }
   return (
     <div className={'space-y-6'}>
-      {accounts.isLoading ? (
+      {escrowAccounts.isLoading ? (
         <span className="loading loading-spinner loading-lg"></span>
-      ) : accounts.data?.length ? (
+      ) : escrowAccounts.data?.length ? (
         <div className="grid md:grid-cols-2 gap-4">
-          {accounts.data?.map((account) => (
-            <CounterCard
+          {escrowAccounts.data?.map((account) => (
+            <EscrowCard
               key={account.publicKey.toString()}
-              counter={account.publicKey}
+              vault={account.publicKey}
             />
           ))}
         </div>
@@ -63,13 +62,10 @@ export function CounterList() {
   );
 }
 
-function CounterCard({ counter }: { counter: PublicKey }) {
-  const { account, increment, set, decrement, close } =
-    useCounterProgramAccount({
-      counter,
-    });
-
-  const count = useMemo(() => account.data?.count ?? 0, [account.data?.count]);
+function EscrowCard({ vault }: { vault: PublicKey }) {
+  const { account, exchange, close } = useEscrowProgramAccount({
+    vault,
+  });
 
   return account.isLoading ? (
     <span className="loading loading-spinner loading-lg"></span>
@@ -77,53 +73,27 @@ function CounterCard({ counter }: { counter: PublicKey }) {
     <div className="card card-bordered border-base-300 border-4 text-neutral-content">
       <div className="card-body items-center text-center">
         <div className="space-y-6">
-          <h2
-            className="card-title justify-center text-3xl cursor-pointer"
-            onClick={() => account.refetch()}
-          >
-            {count}
-          </h2>
           <div className="card-actions justify-around">
             <button
               className="btn btn-xs lg:btn-md btn-outline"
-              onClick={() => increment.mutateAsync()}
-              disabled={increment.isPending}
+              onClick={() => exchange.mutateAsync()}
+              disabled={exchange.isPending}
             >
-              Increment
+              Exchange
             </button>
             <button
               className="btn btn-xs lg:btn-md btn-outline"
-              onClick={() => {
-                const value = window.prompt(
-                  'Set value to:',
-                  count.toString() ?? '0'
-                );
-                if (
-                  !value ||
-                  parseInt(value) === count ||
-                  isNaN(parseInt(value))
-                ) {
-                  return;
-                }
-                return set.mutateAsync(parseInt(value));
-              }}
-              disabled={set.isPending}
+              onClick={() => close.mutateAsync()}
+              disabled={close.isPending}
             >
-              Set
-            </button>
-            <button
-              className="btn btn-xs lg:btn-md btn-outline"
-              onClick={() => decrement.mutateAsync()}
-              disabled={decrement.isPending}
-            >
-              Decrement
+              Close
             </button>
           </div>
           <div className="text-center space-y-4">
             <p>
               <ExplorerLink
-                path={`account/${counter}`}
-                label={ellipsify(counter.toString())}
+                path={`account/${vault}`}
+                label={ellipsify(vault.toString())}
               />
             </p>
             <button
