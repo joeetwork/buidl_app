@@ -10,7 +10,7 @@ import { ellipsify } from '../shared/ellipsify';
 import { useEscrowProgram } from './escrow-data-access';
 import { EscrowCreate, EscrowList } from './escrow-ui';
 
-export default function CounterFeature() {
+export default function EscrowFeature() {
   const { publicKey } = useWallet();
   const { programId } = useEscrowProgram();
 

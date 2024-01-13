@@ -13,6 +13,8 @@ export function Navbar() {
     { label: 'Account', path: '/account' },
 
     { label: 'Clusters', path: '/clusters' },
+
+    { label: 'Escrow', path: '/escrow' },
   ];
 
   return (
