@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { AppHero } from '../ui/ui-layout';
+
 import { ClusterUiModal } from './cluster-ui';
 import { ClusterUiTable } from './cluster-ui';
+import { AppHero } from '../shared/app-hero';
 
 export default function ClusterFeature() {
   const [showModal, setShowModal] = useState(false);

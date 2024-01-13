@@ -1,5 +1,5 @@
 import './global.css';
-import { UiLayout } from '@/components/ui/ui-layout';
+import { UiLayout } from '@/components/shared/ui-layout';
 import { ClusterProvider } from '@/components/cluster/cluster-data-access';
 import { SolanaProvider } from '@/components/solana/solana-provider';
 import { Provider } from './provider';

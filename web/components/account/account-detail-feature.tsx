@@ -6,13 +6,15 @@ import { useMemo } from 'react';
 import { useParams } from 'next/navigation';
 
 import { ExplorerLink } from '../cluster/cluster-ui';
-import { AppHero, ellipsify } from '../ui/ui-layout';
+
 import {
   AccountBalance,
   AccountButtons,
   AccountTokens,
   AccountTransactions,
 } from './account-ui';
+import { AppHero } from '../shared/app-hero';
+import { ellipsify } from '../shared/ellipsify';
 
 export default function AccountDetailFeature() {
   const params = useParams();

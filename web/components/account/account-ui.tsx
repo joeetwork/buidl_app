@@ -5,7 +5,6 @@ import { LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
 import { IconRefresh } from '@tabler/icons-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
-import { AppModal, ellipsify } from '../ui/ui-layout';
 import { useCluster } from '../cluster/cluster-data-access';
 import { ExplorerLink } from '../cluster/cluster-ui';
 import {
@@ -16,6 +15,8 @@ import {
   useRequestAirdrop,
   useTransferSol,
 } from './account-data-access';
+import { AppModal } from '../shared/app-modal';
+import { ellipsify } from '../shared/ellipsify';
 
 export function AccountBalance({ address }: { address: PublicKey }) {
   const query = useGetBalance({ address });
