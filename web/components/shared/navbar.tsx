@@ -1,7 +1,10 @@
+'use client';
+
 import Link from 'next/link';
 import React from 'react';
-import { WalletButton } from '../solana/solana-provider';
+
 import { ClusterUiSelect } from '../cluster/cluster-ui';
+import { WalletButton } from './wallet-button';
 
 export function Navbar() {
   const pathname = 'TODO: implement me';

@@ -1,3 +1,5 @@
+'use client';
+
 export function ellipsify(str = '', len = 4) {
     if (str.length > 30) {
       return (
