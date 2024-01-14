@@ -17,7 +17,6 @@ pub mod anchor_escrow {
         ctx: Context<Initialize>,
         random_seed: u64,
         initializer_amount: u64,
-        taker_amount: u64,
         validator_total_count: u64
     ) -> Result<()> {
         ctx.accounts.escrow_state.initializer_key = *ctx.accounts.initializer.key;
@@ -26,13 +25,7 @@ pub mod anchor_escrow {
             .initializer_deposit_token_account
             .to_account_info()
             .key;
-        ctx.accounts.escrow_state.initializer_receive_token_account = *ctx
-            .accounts
-            .initializer_receive_token_account
-            .to_account_info()
-            .key;
         ctx.accounts.escrow_state.initializer_amount = initializer_amount;
-        ctx.accounts.escrow_state.taker_amount = taker_amount;
         ctx.accounts.escrow_state.random_seed = random_seed;
         ctx.accounts.escrow_state.validator_total_count = validator_total_count;
         ctx.accounts.escrow_state.validator_count = 0;
@@ -131,12 +124,6 @@ pub mod anchor_escrow {
         ];
 
         token::transfer_checked(
-            ctx.accounts.into_transfer_to_initializer_context(),
-            ctx.accounts.escrow_state.taker_amount,
-            ctx.accounts.taker_deposit_token_mint.decimals,
-        )?;
-
-        token::transfer_checked(
             ctx.accounts
                 .into_transfer_to_taker_context()
                 .with_signer(&[&authority_seeds[..]]),
@@ -179,7 +166,7 @@ pub struct Initialize<'info> {
         constraint = initializer_deposit_token_account.amount >= initializer_amount
     )]
     pub initializer_deposit_token_account: Account<'info, TokenAccount>,
-    pub initializer_receive_token_account: Account<'info, TokenAccount>,
+
     #[account(
         init,
         seeds = [b"state".as_ref(), &escrow_seed.to_le_bytes()],
@@ -284,23 +271,16 @@ pub struct Exchange<'info> {
     /// CHECK: This is not dangerous because we don't read or write from this account
     pub taker: Signer<'info>,
     pub initializer_deposit_token_mint: Account<'info, Mint>,
-    pub taker_deposit_token_mint: Account<'info, Mint>,
-    #[account(mut)]
-    pub taker_deposit_token_account: Box<Account<'info, TokenAccount>>,
     #[account(mut)]
     pub taker_receive_token_account: Box<Account<'info, TokenAccount>>,
     #[account(mut)]
     pub initializer_deposit_token_account: Box<Account<'info, TokenAccount>>,
-    #[account(mut)]
-    pub initializer_receive_token_account: Box<Account<'info, TokenAccount>>,
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
     pub initializer: AccountInfo<'info>,
     #[account(
         mut,
-        constraint = escrow_state.taker_amount <= taker_deposit_token_account.amount,
         constraint = escrow_state.initializer_deposit_token_account == *initializer_deposit_token_account.to_account_info().key,
-        constraint = escrow_state.initializer_receive_token_account == *initializer_receive_token_account.to_account_info().key,
         constraint = escrow_state.initializer_key == *initializer.key,
         constraint = escrow_state.validator_total_count == escrow_state.validator_count,
         close = initializer
@@ -329,9 +309,7 @@ pub struct EscrowState {
     pub random_seed: u64,
     pub initializer_key: Pubkey,
     pub initializer_deposit_token_account: Pubkey,
-    pub initializer_receive_token_account: Pubkey,
     pub initializer_amount: u64,
-    pub taker_amount: u64,
     pub vault_authority_bump: u8,
     pub verified_account: Pubkey,
     pub validator_total_count: u64,
@@ -382,18 +360,6 @@ impl<'info> Cancel<'info> {
 }
 
 impl<'info> Exchange<'info> {
-    fn into_transfer_to_initializer_context(
-        &self,
-    ) -> CpiContext<'_, '_, '_, 'info, TransferChecked<'info>> {
-        let cpi_accounts = TransferChecked {
-            from: self.taker_deposit_token_account.to_account_info(),
-            mint: self.taker_deposit_token_mint.to_account_info(),
-            to: self.initializer_receive_token_account.to_account_info(),
-            authority: self.taker.to_account_info(),
-        };
-        CpiContext::new(self.token_program.to_account_info(), cpi_accounts)
-    }
-
     fn into_transfer_to_taker_context(
         &self,
     ) -> CpiContext<'_, '_, '_, 'info, TransferChecked<'info>> {

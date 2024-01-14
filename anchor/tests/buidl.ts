@@ -51,12 +51,9 @@ describe('anchor-escrow', () => {
     );
     const program = new anchor.Program(IDL, programId, provider);
 
-    let mintA = null as PublicKey;
-    let mintB = null as PublicKey;
-    let initializerTokenAccountA = null as PublicKey;
-    let initializerTokenAccountB = null as PublicKey;
-    let takerTokenAccountA = null as PublicKey;
-    let takerTokenAccountB = null as PublicKey;
+    let mint = null as PublicKey;
+    let initializerTokenAccount = null as PublicKey;
+    let takerTokenAccount = null as PublicKey;
 
     const takerAmount = 1000;
     const initializerAmount = 500;
@@ -134,16 +131,9 @@ describe('anchor-escrow', () => {
             `https://solana.fm/tx/${result}?cluster=http%253A%252F%252Flocalhost%253A8899%252F`
         );
 
-        // 3. Create dummy token mints: mintA and mintB
-        mintA = await createMint(
+        // 3. Create dummy token mints: mint
+        mint = await createMint(
             connection,
-            payer,
-            mintAuthority.publicKey,
-            null,
-            0
-        );
-        mintB = await createMint(
-            provider.connection,
             payer,
             mintAuthority.publicKey,
             null,
@@ -151,62 +141,37 @@ describe('anchor-escrow', () => {
         );
 
         // 4. Create token accounts for dummy token mints and both main roles
-        initializerTokenAccountA = await createAccount(
+        initializerTokenAccount = await createAccount(
             connection,
             initializer,
-            mintA,
+            mint,
             initializer.publicKey
         );
-        initializerTokenAccountB = await createAccount(
-            connection,
-            initializer,
-            mintB,
-            initializer.publicKey
-        );
-        takerTokenAccountA = await createAccount(
+        takerTokenAccount = await createAccount(
             connection,
             taker,
-            mintA,
-            taker.publicKey
-        );
-        takerTokenAccountB = await createAccount(
-            connection,
-            taker,
-            mintB,
+            mint,
             taker.publicKey
         );
 
-        // 5. Mint dummy tokens to initializerTokenAccountA and takerTokenAccountB
+        // 5. Mint dummy tokens to initializerTokenAccount
         await mintTo(
             connection,
             initializer,
-            mintA,
-            initializerTokenAccountA,
+            mint,
+            initializerTokenAccount,
             mintAuthority,
             initializerAmount
         );
-        await mintTo(
-            connection,
-            taker,
-            mintB,
-            takerTokenAccountB,
-            mintAuthority,
-            takerAmount
-        );
 
-        const fetchedInitializerTokenAccountA = await getAccount(
+        const fetchedInitializerTokenAccount = await getAccount(
             connection,
-            initializerTokenAccountA
-        );
-        const fetchedTakerTokenAccountB = await getAccount(
-            connection,
-            takerTokenAccountB
+            initializerTokenAccount
         );
 
         assert.ok(
-            Number(fetchedInitializerTokenAccountA.amount) == initializerAmount
+            Number(fetchedInitializerTokenAccount.amount) == initializerAmount
         );
-        assert.ok(Number(fetchedTakerTokenAccountB.amount) == takerAmount);
     });
 
     it('Initialize escrow', async () => {
@@ -214,7 +179,7 @@ describe('anchor-escrow', () => {
             [
                 vaultAuthorityKey.toBuffer(),
                 TOKEN_PROGRAM_ID.toBuffer(),
-                mintA.toBuffer(),
+                mint.toBuffer(),
             ],
             ASSOCIATED_TOKEN_PROGRAM_ID
         )[0];
@@ -224,16 +189,14 @@ describe('anchor-escrow', () => {
             .initialize(
                 randomSeed,
                 new anchor.BN(initializerAmount),
-                new anchor.BN(takerAmount),
-                new anchor.BN(1)
+                new anchor.BN(0)
             )
             .accounts({
                 initializer: initializer.publicKey,
                 vaultAuthority: vaultAuthorityKey,
                 vault: vaultKey,
-                mint: mintA,
-                initializerDepositTokenAccount: initializerTokenAccountA,
-                initializerReceiveTokenAccount: initializerTokenAccountB,
+                mint: mint,
+                initializerDepositTokenAccount: initializerTokenAccount,
                 escrowState: escrowStateKey,
                 systemProgram: anchor.web3.SystemProgram.programId,
                 rent: anchor.web3.SYSVAR_RENT_PUBKEY,
@@ -260,68 +223,47 @@ describe('anchor-escrow', () => {
         assert.ok(
             fetchedEscrowState.initializerAmount.toNumber() == initializerAmount
         );
-        assert.ok(fetchedEscrowState.takerAmount.toNumber() == takerAmount);
         assert.ok(
             fetchedEscrowState.initializerDepositTokenAccount.equals(
-                initializerTokenAccountA
-            )
-        );
-        assert.ok(
-            fetchedEscrowState.initializerReceiveTokenAccount.equals(
-                initializerTokenAccountB
+                initializerTokenAccount
             )
         );
     });
 
-    // it('Exchange escrow state', async () => {
-    //     const result = await program.methods
-    //         .exchange()
-    //         .accounts({
-    //             taker: taker.publicKey,
-    //             initializerDepositTokenMint: mintA,
-    //             takerDepositTokenMint: mintB,
-    //             takerDepositTokenAccount: takerTokenAccountB,
-    //             takerReceiveTokenAccount: takerTokenAccountA,
-    //             initializerDepositTokenAccount: initializerTokenAccountA,
-    //             initializerReceiveTokenAccount: initializerTokenAccountB,
-    //             initializer: initializer.publicKey,
-    //             escrowState: escrowStateKey,
-    //             vault: vaultKey,
-    //             vaultAuthority: vaultAuthorityKey,
-    //             tokenProgram: TOKEN_PROGRAM_ID,
-    //         })
-    //         .signers([taker])
-    //         .rpc();
-    //     console.log(
-    //         `https://solana.fm/tx/${result}?cluster=http%253A%252F%252Flocalhost%253A8899%252F`
-    //     );
+    it('Exchange escrow state', async () => {
+        const result = await program.methods
+            .exchange()
+            .accounts({
+                taker: taker.publicKey,
+                initializerDepositTokenMint: mint,
+                takerReceiveTokenAccount: takerTokenAccount,
+                initializerDepositTokenAccount: initializerTokenAccount,
+                initializer: initializer.publicKey,
+                escrowState: escrowStateKey,
+                vault: vaultKey,
+                vaultAuthority: vaultAuthorityKey,
+                tokenProgram: TOKEN_PROGRAM_ID,
+            })
+            .signers([taker])
+            .rpc();
+        console.log(
+            `https://solana.fm/tx/${result}?cluster=http%253A%252F%252Flocalhost%253A8899%252F`
+        );
 
-    //     let fetchedInitializerTokenAccountA = await getAccount(
-    //         connection,
-    //         initializerTokenAccountA
-    //     );
-    //     let fetchedInitializerTokenAccountB = await getAccount(
-    //         connection,
-    //         initializerTokenAccountB
-    //     );
-    //     let fetchedTakerTokenAccountA = await getAccount(
-    //         connection,
-    //         takerTokenAccountA
-    //     );
-    //     let fetchedTakerTokenAccountB = await getAccount(
-    //         connection,
-    //         takerTokenAccountB
-    //     );
+        let fetchedInitializerTokenAccount = await getAccount(
+            connection,
+            initializerTokenAccount
+        );
+        let fetchedTakerTokenAccount = await getAccount(
+            connection,
+            takerTokenAccount
+        );
 
-    //     assert.ok(
-    //         Number(fetchedTakerTokenAccountA.amount) == initializerAmount
-    //     );
-    //     assert.ok(Number(fetchedInitializerTokenAccountA.amount) == 0);
-    //     assert.ok(
-    //         Number(fetchedInitializerTokenAccountB.amount) == takerAmount
-    //     );
-    //     assert.ok(Number(fetchedTakerTokenAccountB.amount) == 0);
-    // });
+        assert.ok(
+            Number(fetchedTakerTokenAccount.amount) == initializerAmount
+        );
+        assert.ok(Number(fetchedInitializerTokenAccount.amount) == 0);
+    });
 
     // it('Initialize escrow and cancel escrow', async () => {
     //     // Put back tokens into initializer token A account.
@@ -392,212 +334,212 @@ describe('anchor-escrow', () => {
     //     );
     // });
 
-    it('Mint NFT', async () => {
-      const verifiedUser = anchor.web3.Keypair.generate();
+//     it('Mint NFT', async () => {
+//       const verifiedUser = anchor.web3.Keypair.generate();
 
-      // 1. Airdrop 1 SOL to payer
-      const signature = await provider.connection.requestAirdrop(
-          verifiedUser.publicKey,
-          1000000000
-      );
-      const latestBlockhash = await connection.getLatestBlockhash();
-      await provider.connection.confirmTransaction(
-          {
-              signature,
-              ...latestBlockhash,
-          },
-          commitment
-      );
+//       // 1. Airdrop 1 SOL to payer
+//       const signature = await provider.connection.requestAirdrop(
+//           verifiedUser.publicKey,
+//           1000000000
+//       );
+//       const latestBlockhash = await connection.getLatestBlockhash();
+//       await provider.connection.confirmTransaction(
+//           {
+//               signature,
+//               ...latestBlockhash,
+//           },
+//           commitment
+//       );
 
-      /**
-       * Create an NFT collection on-chain, using the regular Metaplex standards
-       * with the `payer` as the authority
-       */
-      async function createCollection(
-          connection: Connection,
-          payer: anchor.web3.Keypair,
-          metadataV3: CreateMetadataAccountArgsV3
-      ) {
-          // create and initialize the SPL token mint
-          console.log("Creating the collection's mint...");
-          const mint = await createMint(
-              connection,
-              payer,
-              // mint authority
-              payer.publicKey,
-              // freeze authority
-              payer.publicKey,
-              // decimals - use `0` for NFTs since they are non-fungible
-              0
-          );
-          console.log('Mint address:', mint.toBase58());
+//       /**
+//        * Create an NFT collection on-chain, using the regular Metaplex standards
+//        * with the `payer` as the authority
+//        */
+//       async function createCollection(
+//           connection: Connection,
+//           payer: anchor.web3.Keypair,
+//           metadataV3: CreateMetadataAccountArgsV3
+//       ) {
+//           // create and initialize the SPL token mint
+//           console.log("Creating the collection's mint...");
+//           const mint = await createMint(
+//               connection,
+//               payer,
+//               // mint authority
+//               payer.publicKey,
+//               // freeze authority
+//               payer.publicKey,
+//               // decimals - use `0` for NFTs since they are non-fungible
+//               0
+//           );
+//           console.log('Mint address:', mint.toBase58());
 
-          // create the token account
-          console.log('Creating a token account...');
-          const tokenAccount = await createAccount(
-              connection,
-              payer,
-              mint,
-              payer.publicKey,
-              undefined,
-              {
-                  skipPreflight: true,
-              }
-          );
-          console.log('Token account:', tokenAccount.toBase58());
+//           // create the token account
+//           console.log('Creating a token account...');
+//           const tokenAccount = await createAccount(
+//               connection,
+//               payer,
+//               mint,
+//               payer.publicKey,
+//               undefined,
+//               {
+//                   skipPreflight: true,
+//               }
+//           );
+//           console.log('Token account:', tokenAccount.toBase58());
 
-          // mint 1 token ()
-          console.log('Minting 1 token for the collection...');
-          const mintSig = await mintTo(
-              connection,
-              payer,
-              mint,
-              tokenAccount,
-              payer,
-              // mint exactly 1 token
-              1,
-              // no `multiSigners`
-              [],
-              {
-                  skipPreflight: true,
-              },
-              TOKEN_PROGRAM_ID
-          );
-          // console.log(explorerURL({ txSignature: mintSig }));
+//           // mint 1 token ()
+//           console.log('Minting 1 token for the collection...');
+//           const mintSig = await mintTo(
+//               connection,
+//               payer,
+//               mint,
+//               tokenAccount,
+//               payer,
+//               // mint exactly 1 token
+//               1,
+//               // no `multiSigners`
+//               [],
+//               {
+//                   skipPreflight: true,
+//               },
+//               TOKEN_PROGRAM_ID
+//           );
+//           // console.log(explorerURL({ txSignature: mintSig }));
 
-          // derive the PDA for the metadata account
-          const [metadataAccount, _bump] = PublicKey.findProgramAddressSync(
-              [
-                  Buffer.from('metadata', 'utf8'),
-                  TOKEN_METADATA_PROGRAM_ID.toBuffer(),
-                  mint.toBuffer(),
-              ],
-              TOKEN_METADATA_PROGRAM_ID
-          );
-          console.log('Metadata account:', metadataAccount.toBase58());
+//           // derive the PDA for the metadata account
+//           const [metadataAccount, _bump] = PublicKey.findProgramAddressSync(
+//               [
+//                   Buffer.from('metadata', 'utf8'),
+//                   TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+//                   mint.toBuffer(),
+//               ],
+//               TOKEN_METADATA_PROGRAM_ID
+//           );
+//           console.log('Metadata account:', metadataAccount.toBase58());
 
-          // create an instruction to create the metadata account
-          const createMetadataIx = createCreateMetadataAccountV3Instruction(
-              {
-                  metadata: metadataAccount,
-                  mint: mint,
-                  mintAuthority: payer.publicKey,
-                  payer: payer.publicKey,
-                  updateAuthority: payer.publicKey,
-              },
-              {
-                  createMetadataAccountArgsV3: metadataV3,
-              }
-          );
+//           // create an instruction to create the metadata account
+//           const createMetadataIx = createCreateMetadataAccountV3Instruction(
+//               {
+//                   metadata: metadataAccount,
+//                   mint: mint,
+//                   mintAuthority: payer.publicKey,
+//                   payer: payer.publicKey,
+//                   updateAuthority: payer.publicKey,
+//               },
+//               {
+//                   createMetadataAccountArgsV3: metadataV3,
+//               }
+//           );
 
-          // derive the PDA for the metadata account
-          const [masterEditionAccount, _bump2] =
-              PublicKey.findProgramAddressSync(
-                  [
-                      Buffer.from('metadata', 'utf8'),
-                      TOKEN_METADATA_PROGRAM_ID.toBuffer(),
-                      mint.toBuffer(),
-                      Buffer.from('edition', 'utf8'),
-                  ],
-                  TOKEN_METADATA_PROGRAM_ID
-              );
-          console.log(
-              'Master edition account:',
-              masterEditionAccount.toBase58()
-          );
+//           // derive the PDA for the metadata account
+//           const [masterEditionAccount, _bump2] =
+//               PublicKey.findProgramAddressSync(
+//                   [
+//                       Buffer.from('metadata', 'utf8'),
+//                       TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+//                       mint.toBuffer(),
+//                       Buffer.from('edition', 'utf8'),
+//                   ],
+//                   TOKEN_METADATA_PROGRAM_ID
+//               );
+//           console.log(
+//               'Master edition account:',
+//               masterEditionAccount.toBase58()
+//           );
 
-          // create an instruction to create the metadata account
-          const createMasterEditionIx =
-              createCreateMasterEditionV3Instruction(
-                  {
-                      edition: masterEditionAccount,
-                      mint: mint,
-                      mintAuthority: payer.publicKey,
-                      payer: payer.publicKey,
-                      updateAuthority: payer.publicKey,
-                      metadata: metadataAccount,
-                  },
-                  {
-                      createMasterEditionArgs: {
-                          maxSupply: 0,
-                      },
-                  }
-              );
+//           // create an instruction to create the metadata account
+//           const createMasterEditionIx =
+//               createCreateMasterEditionV3Instruction(
+//                   {
+//                       edition: masterEditionAccount,
+//                       mint: mint,
+//                       mintAuthority: payer.publicKey,
+//                       payer: payer.publicKey,
+//                       updateAuthority: payer.publicKey,
+//                       metadata: metadataAccount,
+//                   },
+//                   {
+//                       createMasterEditionArgs: {
+//                           maxSupply: 0,
+//                       },
+//                   }
+//               );
 
-          // create the collection size instruction
-          const collectionSizeIX = createSetCollectionSizeInstruction(
-              {
-                  collectionMetadata: metadataAccount,
-                  collectionAuthority: payer.publicKey,
-                  collectionMint: mint,
-              },
-              {
-                  setCollectionSizeArgs: { size: 1 },
-              }
-          );
+//           // create the collection size instruction
+//           const collectionSizeIX = createSetCollectionSizeInstruction(
+//               {
+//                   collectionMetadata: metadataAccount,
+//                   collectionAuthority: payer.publicKey,
+//                   collectionMint: mint,
+//               },
+//               {
+//                   setCollectionSizeArgs: { size: 1 },
+//               }
+//           );
 
-          try {
-              // construct the transaction with our instructions, making the `payer` the `feePayer`
-              const tx = new anchor.web3.Transaction()
-                  .add(createMetadataIx)
-                  .add(createMasterEditionIx)
-                  .add(collectionSizeIX);
-              tx.feePayer = payer.publicKey;
+//           try {
+//               // construct the transaction with our instructions, making the `payer` the `feePayer`
+//               const tx = new anchor.web3.Transaction()
+//                   .add(createMetadataIx)
+//                   .add(createMasterEditionIx)
+//                   .add(collectionSizeIX);
+//               tx.feePayer = payer.publicKey;
 
-              // send the transaction to the cluster
-              const txSignature = await anchor.web3.sendAndConfirmTransaction(
-                  connection,
-                  tx,
-                  [payer],
-                  {
-                      commitment: 'confirmed',
-                      skipPreflight: true,
-                  }
-              );
+//               // send the transaction to the cluster
+//               const txSignature = await anchor.web3.sendAndConfirmTransaction(
+//                   connection,
+//                   tx,
+//                   [payer],
+//                   {
+//                       commitment: 'confirmed',
+//                       skipPreflight: true,
+//                   }
+//               );
 
-              console.log('\nCollection successfully created!');
-          } catch (err) {
-              console.error('\nFailed to create collection:', err);
+//               console.log('\nCollection successfully created!');
+//           } catch (err) {
+//               console.error('\nFailed to create collection:', err);
 
-              throw err;
-          }
+//               throw err;
+//           }
 
-          // return all the accounts
-          return {
-              mint,
-              tokenAccount,
-              metadataAccount,
-              masterEditionAccount,
-          };
-      }
+//           // return all the accounts
+//           return {
+//               mint,
+//               tokenAccount,
+//               metadataAccount,
+//               masterEditionAccount,
+//           };
+//       }
 
-      const metadataV3 = {
-          data: {
-              name: 'string',
-              symbol: 'string',
-              uri: 'string',
-              sellerFeeBasisPoints: 0,
-              creators: null,
-              collection: {
-                  verified: true,
-                  key: new PublicKey(
-                      'F17gXajNLmVdMXtCPVpJ8enhwoxtscmDf7fLoJE8vUgw'
-                  ),
-              },
-              uses: null,
-          },
-          isMutable: true,
-          collectionDetails: null,
-      };
+//       const metadataV3 = {
+//           data: {
+//               name: 'string',
+//               symbol: 'string',
+//               uri: 'string',
+//               sellerFeeBasisPoints: 0,
+//               creators: null,
+//               collection: {
+//                   verified: true,
+//                   key: new PublicKey(
+//                       'F17gXajNLmVdMXtCPVpJ8enhwoxtscmDf7fLoJE8vUgw'
+//                   ),
+//               },
+//               uses: null,
+//           },
+//           isMutable: true,
+//           collectionDetails: null,
+//       };
 
-      const { mint, tokenAccount, metadataAccount } = await createCollection(
-          connection,
-          verifiedUser,
-          metadataV3
-      );
+//       const { mint, tokenAccount, metadataAccount } = await createCollection(
+//           connection,
+//           verifiedUser,
+//           metadataV3
+//       );
 
      
-  });
+//   });
 
     // it('Initialize escrow, validate work and then exchange', async () => {
     //     const verifiedUser = anchor.web3.Keypair.generate();
