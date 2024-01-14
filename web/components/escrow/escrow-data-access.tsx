@@ -12,6 +12,11 @@ import * as anchor from '@coral-xyz/anchor';
 
 import { useAnchorProvider } from '../solana/anchor-provider';
 import { useTransactionToast } from '@/hooks/use-transaction-toast';
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  TOKEN_PROGRAM_ID,
+  getAssociatedTokenAddress,
+} from '@solana/spl-token';
 
 export function useEscrowProgram() {
   const { connection } = useConnection();
@@ -34,59 +39,80 @@ export function useEscrowProgram() {
     queryFn: () => connection.getParsedAccountInfo(programId),
   });
 
-  // Random Seed
-  const randomSeed: anchor.BN = new anchor.BN(
-    Math.floor(Math.random() * 100000000)
-  );
-
   interface Escrow {
     keypair: Keypair;
     initializerAmount: number;
-    takerAmount: number;
-    vaultAuthorityKey: PublicKey;
-    vaultKey: PublicKey;
-    mintA: PublicKey;
-    initializerTokenAccountA: PublicKey;
-    initializerTokenAccountB: PublicKey;
-    escrowStateKey: PublicKey;
-    TOKEN_PROGRAM_ID: PublicKey;
   }
 
   const initialize = useMutation({
     mutationKey: ['escrow', 'initialize', { cluster }],
-    mutationFn: ({
-      keypair,
-      initializerAmount,
-      takerAmount,
-      vaultAuthorityKey,
-      vaultKey,
-      mintA,
-      initializerTokenAccountA,
-      initializerTokenAccountB,
-      escrowStateKey,
-      TOKEN_PROGRAM_ID,
-    }: Escrow) =>
-      program.methods
+    mutationFn: async ({ keypair, initializerAmount }: Escrow) => {
+      // Random Seed
+      const randomSeed: anchor.BN = new anchor.BN(
+        Math.floor(Math.random() * 100000000)
+      );
+
+      // Determined Seeds
+      const stateSeed = 'state';
+      const authoritySeed = 'authority';
+
+      // USDC mint address goes here
+      const mint = new PublicKey(
+        'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
+      );
+
+      // Derive PDAs: escrowStateKey, vaultKey, vaultAuthorityKey
+      const escrowStateKey = PublicKey.findProgramAddressSync(
+        [
+          Buffer.from(anchor.utils.bytes.utf8.encode(stateSeed)),
+          randomSeed.toArrayLike(Buffer, 'le', 8),
+        ],
+        program.programId
+      )[0];
+
+      const vaultAuthorityKey = PublicKey.findProgramAddressSync(
+        [Buffer.from(authoritySeed, 'utf-8')],
+        program.programId
+      )[0];
+
+      const _vaultKey = PublicKey.findProgramAddressSync(
+        [
+          vaultAuthorityKey.toBuffer(),
+          TOKEN_PROGRAM_ID.toBuffer(),
+          mint.toBuffer(),
+        ],
+        ASSOCIATED_TOKEN_PROGRAM_ID
+      )[0];
+      const vaultKey = _vaultKey;
+
+      const initializerTokenAccount = await getAssociatedTokenAddress(
+        mint,
+        keypair.publicKey,
+        true,
+        TOKEN_PROGRAM_ID,
+        ASSOCIATED_TOKEN_PROGRAM_ID
+      );
+
+      return program.methods
         .initialize(
           randomSeed,
           new anchor.BN(initializerAmount),
-          new anchor.BN(takerAmount),
           new anchor.BN(1)
         )
         .accounts({
           initializer: keypair.publicKey,
           vaultAuthority: vaultAuthorityKey,
           vault: vaultKey,
-          mint: mintA,
-          initializerDepositTokenAccount: initializerTokenAccountA,
-          initializerReceiveTokenAccount: initializerTokenAccountB,
+          mint: mint,
+          initializerDepositTokenAccount: initializerTokenAccount,
           escrowState: escrowStateKey,
           systemProgram: anchor.web3.SystemProgram.programId,
           rent: anchor.web3.SYSVAR_RENT_PUBKEY,
           tokenProgram: TOKEN_PROGRAM_ID,
         })
         .signers([keypair])
-        .rpc(),
+        .rpc();
+    },
     onSuccess: (signature) => {
       transactionToast(signature);
       return escrowAccounts.refetch();

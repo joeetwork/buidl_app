@@ -15,7 +15,7 @@ export function EscrowCreate() {
   return (
     <button
       className="btn btn-xs lg:btn-md btn-primary"
-      onClick={() => initialize.mutateAsync(Keypair.generate())}
+      onClick={() => initialize.mutateAsync({keypair: Keypair.generate(), initializerAmount: 1})}
       disabled={initialize.isPending}
     >
       Create {initialize.isPending && '...'}

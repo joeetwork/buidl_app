@@ -55,7 +55,6 @@ describe('anchor-escrow', () => {
     let initializerTokenAccount = null as PublicKey;
     let takerTokenAccount = null as PublicKey;
 
-    const takerAmount = 1000;
     const initializerAmount = 500;
 
     // Main Roles
