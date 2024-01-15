@@ -1,6 +1,6 @@
 'use client';
 
-import { Keypair, PublicKey } from '@solana/web3.js';
+import { PublicKey } from '@solana/web3.js';
 
 import { ExplorerLink } from '../cluster/cluster-ui';
 import { ellipsify } from '../shared/ellipsify';
@@ -15,7 +15,7 @@ export function EscrowCreate() {
   return (
     <button
       className="btn btn-xs lg:btn-md btn-primary"
-      onClick={() => initialize.mutateAsync({keypair: Keypair.generate(), initializerAmount: 1})}
+      onClick={() => initialize.mutateAsync({initializerAmount: 1})}
       disabled={initialize.isPending}
     >
       Create {initialize.isPending && '...'}

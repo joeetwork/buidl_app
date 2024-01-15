@@ -2,8 +2,8 @@
 
 import { BuidlIDL, getBuidlProgramId } from '@buidl/anchor';
 import { Program } from '@coral-xyz/anchor';
-import { useConnection } from '@solana/wallet-adapter-react';
-import { Cluster, Keypair, PublicKey } from '@solana/web3.js';
+import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import { Cluster, PublicKey } from '@solana/web3.js';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import toast from 'react-hot-toast';
@@ -27,8 +27,9 @@ export function useEscrowProgram() {
     () => getBuidlProgramId(cluster.network as Cluster),
     [cluster]
   );
-  const program = new Program(BuidlIDL, programId, provider);
+  const { publicKey } = useWallet();
 
+  const program = new Program(BuidlIDL, programId, provider);
   const escrowAccounts = useQuery({
     queryKey: ['escrow', 'all', { cluster }],
     queryFn: () => program.account.escrowState.all(),
@@ -40,13 +41,12 @@ export function useEscrowProgram() {
   });
 
   interface Escrow {
-    keypair: Keypair;
     initializerAmount: number;
   }
 
   const initialize = useMutation({
     mutationKey: ['escrow', 'initialize', { cluster }],
-    mutationFn: async ({ keypair, initializerAmount }: Escrow) => {
+    mutationFn: async ({ initializerAmount }: Escrow) => {
       // Random Seed
       const randomSeed: anchor.BN = new anchor.BN(
         Math.floor(Math.random() * 100000000)
@@ -87,7 +87,7 @@ export function useEscrowProgram() {
 
       const initializerTokenAccount = await getAssociatedTokenAddress(
         mint,
-        keypair.publicKey,
+        publicKey,
         true,
         TOKEN_PROGRAM_ID,
         ASSOCIATED_TOKEN_PROGRAM_ID
@@ -100,7 +100,7 @@ export function useEscrowProgram() {
           new anchor.BN(1)
         )
         .accounts({
-          initializer: keypair.publicKey,
+          initializer: publicKey,
           vaultAuthority: vaultAuthorityKey,
           vault: vaultKey,
           mint: mint,
@@ -110,7 +110,6 @@ export function useEscrowProgram() {
           rent: anchor.web3.SYSVAR_RENT_PUBKEY,
           tokenProgram: TOKEN_PROGRAM_ID,
         })
-        .signers([keypair])
         .rpc();
     },
     onSuccess: (signature) => {
