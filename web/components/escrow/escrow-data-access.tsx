@@ -106,7 +106,7 @@ export function useEscrowProgram() {
           mint: mint,
           initializerDepositTokenAccount: initializerTokenAccount,
           escrowState: escrowStateKey,
-          systemProgram: anchor.web3.SystemProgram.programId,
+          systemProgram: program.programId,
           rent: anchor.web3.SYSVAR_RENT_PUBKEY,
           tokenProgram: TOKEN_PROGRAM_ID,
         })

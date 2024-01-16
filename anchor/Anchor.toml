@@ -7,11 +7,14 @@ skip-lint = false
 [programs.localnet]
 buidl = "EuNCzKegGAUCkmSGMtMxe3znUdx4tY82v56mHfaTywZ2"
 
+[programs.devnet]
+buidl = "EuNCzKegGAUCkmSGMtMxe3znUdx4tY82v56mHfaTywZ2"
+
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Localnet"
+cluster = "localnet"
 wallet = "/Users/joe/.config/solana/id.json"
 
 [scripts]
