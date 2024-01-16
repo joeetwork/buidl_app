@@ -58,7 +58,7 @@ export function useEscrowProgram() {
 
       // USDC mint address goes here
       const mint = new PublicKey(
-        'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
+        '4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU'
       );
 
       // Derive PDAs: escrowStateKey, vaultKey, vaultAuthorityKey
@@ -106,7 +106,7 @@ export function useEscrowProgram() {
           mint: mint,
           initializerDepositTokenAccount: initializerTokenAccount,
           escrowState: escrowStateKey,
-          systemProgram: program.programId,
+          systemProgram: anchor.web3.SystemProgram.programId,
           rent: anchor.web3.SYSVAR_RENT_PUBKEY,
           tokenProgram: TOKEN_PROGRAM_ID,
         })
