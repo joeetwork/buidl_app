@@ -5,10 +5,10 @@ seeds = false
 skip-lint = false
 
 [programs.localnet]
-buidl = "EuNCzKegGAUCkmSGMtMxe3znUdx4tY82v56mHfaTywZ2"
+buidl = "2V5CjDKFCS1g9reFz3ZezFCmGb9SixRgwAVkpesRHS6B"
 
 [programs.devnet]
-buidl = "EuNCzKegGAUCkmSGMtMxe3znUdx4tY82v56mHfaTywZ2"
+buidl = "2V5CjDKFCS1g9reFz3ZezFCmGb9SixRgwAVkpesRHS6B"
 
 [registry]
 url = "https://api.apr.dev"

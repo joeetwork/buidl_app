@@ -3,7 +3,7 @@ use anchor_spl::associated_token::AssociatedToken;
 use anchor_spl::token::{self, CloseAccount, Mint, Token, TokenAccount, TransferChecked};
 use anchor_spl::metadata::MetadataAccount;
 
-declare_id!("EuNCzKegGAUCkmSGMtMxe3znUdx4tY82v56mHfaTywZ2");
+declare_id!("2V5CjDKFCS1g9reFz3ZezFCmGb9SixRgwAVkpesRHS6B");
 
 #[program]
 pub mod anchor_escrow {
