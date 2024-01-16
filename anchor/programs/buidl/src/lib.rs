@@ -80,43 +80,10 @@ pub mod anchor_escrow {
 
     pub fn validate_work(ctx: Context<ValidateWork>) -> Result<()> {
 
-        // let nft_token_account = &ctx.accounts.nft_token_account;
-
-        // let user = &ctx.accounts.user;
-
-        // let nft_mint_account = &ctx.accounts.nft_mint;
-
-
-        // assert_eq!(nft_token_account.owner, user.key());
-
-        // assert_eq!(nft_token_account.mint, nft_mint_account.key());
-
-        // assert_eq!(nft_token_account.amount, 1);
-
-        // let (metadata, _) = Pubkey::find_program_address(
-        //     &[
-        //         mpl_token_metadata::accounts::Metadata::PREFIX,
-        //         mpl_token_metadata::ID.as_ref(),
-        //         nft_token_account.mint.as_ref(),
-        //     ],
-        //     &mpl_token_metadata::ID,
-        // );
-        //  metadata;
-
-        //  let mint_metadata= mpl_token_metadata::accounts::Metadata::try_from(&ctx.accounts.metadata_account.to_account_info())?; 
-
-        //  if mint_metadata.collection.is_some() {
-        //     let collection = mint_metadata.collection.unwrap();
-        //     if collection.verified && collection.key ==  ctx.accounts.escrow_state.verified_account {
-        //         ctx.accounts.escrow_state.validator_count = ctx.accounts.escrow_state.validator_count.checked_add(1)
-        //         .unwrap();
-        //     }
-        // } 
-
         ctx.accounts.escrow_state.validator_count = ctx.accounts.escrow_state.validator_count.checked_add(1)
         .unwrap();
 
-            Ok(())
+        Ok(())
     }
 
     pub fn exchange(ctx: Context<Exchange>) -> Result<()> {
