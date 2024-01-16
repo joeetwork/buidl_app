@@ -97,7 +97,8 @@ export function useEscrowProgram() {
         .initialize(
           randomSeed,
           new anchor.BN(initializerAmount),
-          new anchor.BN(1)
+          new anchor.BN(1),
+          publicKey
         )
         .accounts({
           initializer: publicKey,

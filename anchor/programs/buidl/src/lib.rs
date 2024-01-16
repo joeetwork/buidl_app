@@ -17,7 +17,8 @@ pub mod anchor_escrow {
         ctx: Context<Initialize>,
         random_seed: u64,
         initializer_amount: u64,
-        validator_total_count: u64
+        validator_total_count: u64,
+        taker: Pubkey
     ) -> Result<()> {
         ctx.accounts.escrow_state.initializer_key = *ctx.accounts.initializer.key;
         ctx.accounts.escrow_state.initializer_deposit_token_account = *ctx
@@ -30,6 +31,7 @@ pub mod anchor_escrow {
         ctx.accounts.escrow_state.validator_total_count = validator_total_count;
         ctx.accounts.escrow_state.validator_count = 0;
         ctx.accounts.escrow_state.verified_account = Pubkey::from_str("F17gXajNLmVdMXtCPVpJ8enhwoxtscmDf7fLoJE8vUgw").unwrap();
+        ctx.accounts.escrow_state.taker_key = taker;
 
         let (_vault_authority, vault_authority_bump) =
             Pubkey::find_program_address(&[AUTHORITY_SEED], ctx.program_id);
@@ -283,6 +285,7 @@ pub struct Exchange<'info> {
         constraint = escrow_state.initializer_deposit_token_account == *initializer_deposit_token_account.to_account_info().key,
         constraint = escrow_state.initializer_key == *initializer.key,
         constraint = escrow_state.validator_total_count == escrow_state.validator_count,
+        constraint = escrow_state.taker_key == *taker.key,
         close = initializer
     )]
     pub escrow_state: Box<Account<'info, EscrowState>>,
@@ -313,7 +316,8 @@ pub struct EscrowState {
     pub vault_authority_bump: u8,
     pub verified_account: Pubkey,
     pub validator_total_count: u64,
-    pub validator_count: u64
+    pub validator_count: u64,
+    pub taker_key: Pubkey
 }
 
 impl EscrowState {
