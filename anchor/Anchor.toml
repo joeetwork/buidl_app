@@ -5,16 +5,16 @@ seeds = false
 skip-lint = false
 
 [programs.localnet]
-buidl = "2V5CjDKFCS1g9reFz3ZezFCmGb9SixRgwAVkpesRHS6B"
+buidl = "AmaFf9hFpemKXPaAPqxu14vGaZWcGu1ADN1vpy1gtJtw"
 
 [programs.devnet]
-buidl = "2V5CjDKFCS1g9reFz3ZezFCmGb9SixRgwAVkpesRHS6B"
+buidl = "AmaFf9hFpemKXPaAPqxu14vGaZWcGu1ADN1vpy1gtJtw"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "/Users/joe/.config/solana/id.json"
 
 [scripts]

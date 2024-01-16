@@ -47,7 +47,7 @@ describe('anchor-escrow', () => {
   // CAUTION: if you are intended to use the program that is deployed by yourself,
   // please make sure that the programIDs are consistent
   const programId = new PublicKey(
-    '2V5CjDKFCS1g9reFz3ZezFCmGb9SixRgwAVkpesRHS6B'
+    'AmaFf9hFpemKXPaAPqxu14vGaZWcGu1ADN1vpy1gtJtw'
   );
   const program = new anchor.Program(IDL, programId, provider);
 
@@ -226,107 +226,106 @@ describe('anchor-escrow', () => {
     );
   });
 
-  it('Exchange escrow state', async () => {
-    const result = await program.methods
-      .exchange()
-      .accounts({
-        taker: taker.publicKey,
-        initializerDepositTokenMint: mint,
-        takerReceiveTokenAccount: takerTokenAccount,
-        initializerDepositTokenAccount: initializerTokenAccount,
-        initializer: initializer.publicKey,
-        escrowState: escrowStateKey,
-        vault: vaultKey,
-        vaultAuthority: vaultAuthorityKey,
-        tokenProgram: TOKEN_PROGRAM_ID,
-      })
-      .signers([taker])
-      .rpc();
-    console.log(
-      `https://solana.fm/tx/${result}?cluster=http%253A%252F%252Flocalhost%253A8899%252F`
-    );
+//   it('Exchange escrow state', async () => {
+//     const result = await program.methods
+//       .exchange()
+//       .accounts({
+//         taker: taker.publicKey,
+//         initializerDepositTokenMint: mint,
+//         takerReceiveTokenAccount: takerTokenAccount,
+//         initializerDepositTokenAccount: initializerTokenAccount,
+//         initializer: initializer.publicKey,
+//         escrowState: escrowStateKey,
+//         vault: vaultKey,
+//         vaultAuthority: vaultAuthorityKey,
+//         tokenProgram: TOKEN_PROGRAM_ID,
+//       })
+//       .signers([taker])
+//       .rpc();
+//     console.log(
+//       `https://solana.fm/tx/${result}?cluster=http%253A%252F%252Flocalhost%253A8899%252F`
+//     );
 
-    let fetchedInitializerTokenAccount = await getAccount(
-      connection,
-      initializerTokenAccount
-    );
-    let fetchedTakerTokenAccount = await getAccount(
-      connection,
-      takerTokenAccount
-    );
+//     let fetchedInitializerTokenAccount = await getAccount(
+//       connection,
+//       initializerTokenAccount
+//     );
+//     let fetchedTakerTokenAccount = await getAccount(
+//       connection,
+//       takerTokenAccount
+//     );
 
-    assert.ok(Number(fetchedTakerTokenAccount.amount) == initializerAmount);
-    assert.ok(Number(fetchedInitializerTokenAccount.amount) == 0);
+//     assert.ok(Number(fetchedTakerTokenAccount.amount) == initializerAmount);
+//     assert.ok(Number(fetchedInitializerTokenAccount.amount) == 0);
+//   });
+
+  it('Initialize escrow and cancel escrow', async () => {
+      // Put back tokens into initializer token A account.
+    //   await mintTo(
+    //       connection,
+    //       initializer,
+    //       mint,
+    //       initializerTokenAccount,
+    //       mintAuthority,
+    //       initializerAmount
+    //   );
+
+    //   const initializedTx = await program.methods
+    //   .initialize(
+    //     randomSeed,
+    //     new anchor.BN(initializerAmount),
+    //     new anchor.BN(0),
+    //     taker.publicKey
+    //   )
+    //   .accounts({
+    //     initializer: initializer.publicKey,
+    //     vaultAuthority: vaultAuthorityKey,
+    //     vault: vaultKey,
+    //     mint: mint,
+    //     initializerDepositTokenAccount: initializerTokenAccount,
+    //     escrowState: escrowStateKey,
+    //     systemProgram: anchor.web3.SystemProgram.programId,
+    //     rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+    //     tokenProgram: TOKEN_PROGRAM_ID,
+    //   })
+    //   .signers([initializer])
+    //   .rpc();
+    //   console.log(
+    //       `https://solana.fm/tx/${initializedTx}?cluster=http%253A%252F%252Flocalhost%253A8899%252F`
+    //   );
+
+    //   Cancel the escrow.
+      const canceledTX = await program.methods
+          .cancel()
+          .accounts({
+              initializer: initializer.publicKey,
+              mint: mint,
+              initializerDepositTokenAccount: initializerTokenAccount,
+              vault: vaultKey,
+              vaultAuthority: vaultAuthorityKey,
+              escrowState: escrowStateKey,
+              tokenProgram: TOKEN_PROGRAM_ID,
+          })
+          .signers([initializer])
+          .rpc();
+      console.log(
+          `https://solana.fm/tx/${canceledTX}?cluster=http%253A%252F%252Flocalhost%253A8899%252F`
+      );
+
+      // Check the final owner should be the provider public key.
+      const fetchedInitializerTokenAccountA = await getAccount(
+          connection,
+          initializerTokenAccount
+      );
+
+      assert.ok(
+          fetchedInitializerTokenAccountA.owner.equals(initializer.publicKey)
+      );
+      // Check all the funds are still there.
+      assert.ok(
+          Number(fetchedInitializerTokenAccountA.amount) == initializerAmount
+      );
   });
-
-  // it('Initialize escrow and cancel escrow', async () => {
-  //     // Put back tokens into initializer token A account.
-  //     await mintTo(
-  //         connection,
-  //         initializer,
-  //         mintA,
-  //         initializerTokenAccountA,
-  //         mintAuthority,
-  //         initializerAmount
-  //     );
-
-  //     const initializedTx = await program.methods
-  //         .initialize(
-  //             randomSeed,
-  //             new anchor.BN(initializerAmount),
-  //             new anchor.BN(takerAmount),
-  //             new anchor.BN(2)
-  //         )
-  //         .accounts({
-  //             initializer: initializer.publicKey,
-  //             vaultAuthority: vaultAuthorityKey,
-  //             vault: vaultKey,
-  //             mint: mintA,
-  //             initializerDepositTokenAccount: initializerTokenAccountA,
-  //             initializerReceiveTokenAccount: initializerTokenAccountB,
-  //             escrowState: escrowStateKey,
-  //             systemProgram: anchor.web3.SystemProgram.programId,
-  //             rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-  //             tokenProgram: TOKEN_PROGRAM_ID,
-  //         })
-  //         .signers([initializer])
-  //         .rpc();
-  //     console.log(
-  //         `https://solana.fm/tx/${initializedTx}?cluster=http%253A%252F%252Flocalhost%253A8899%252F`
-  //     );
-
-  //     // Cancel the escrow.
-  //     const canceledTX = await program.methods
-  //         .cancel()
-  //         .accounts({
-  //             initializer: initializer.publicKey,
-  //             mint: mintA,
-  //             initializerDepositTokenAccount: initializerTokenAccountA,
-  //             vault: vaultKey,
-  //             vaultAuthority: vaultAuthorityKey,
-  //             escrowState: escrowStateKey,
-  //             tokenProgram: TOKEN_PROGRAM_ID,
-  //         })
-  //         .signers([initializer])
-  //         .rpc();
-  //     console.log(
-  //         `https://solana.fm/tx/${canceledTX}?cluster=http%253A%252F%252Flocalhost%253A8899%252F`
-  //     );
-
-  //     // Check the final owner should be the provider public key.
-  //     const fetchedInitializerTokenAccountA = await getAccount(
-  //         connection,
-  //         initializerTokenAccountA
-  //     );
-
-  //     assert.ok(
-  //         fetchedInitializerTokenAccountA.owner.equals(initializer.publicKey)
-  //     );
-  //     // Check all the funds are still there.
-  //     assert.ok(
-  //         Number(fetchedInitializerTokenAccountA.amount) == initializerAmount
-  //     );
-  // });
 
   //     it('Mint NFT', async () => {
   //       const verifiedUser = anchor.web3.Keypair.generate();
