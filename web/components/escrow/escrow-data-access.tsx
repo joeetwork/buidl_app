@@ -3,7 +3,7 @@
 import { BuidlIDL, getBuidlProgramId } from '@buidl/anchor';
 import { Program } from '@coral-xyz/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { Cluster, Keypair, PublicKey } from '@solana/web3.js';
+import { Cluster, PublicKey } from '@solana/web3.js';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import toast from 'react-hot-toast';
@@ -16,7 +16,6 @@ import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   TOKEN_PROGRAM_ID,
   getAssociatedTokenAddress,
-  getOrCreateAssociatedTokenAccount,
 } from '@solana/spl-token';
 
 export function useEscrowProgram() {
@@ -96,8 +95,8 @@ export function useEscrowProgram() {
         .initialize(
           randomSeed,
           new anchor.BN(initializerAmount),
-          new anchor.BN(1),
-          Keypair.generate().publicKey
+          new anchor.BN(0),
+          new PublicKey("5nuannxWhLeH3WW64m8PAamPkVCqDhFhNQXtLvNp5cUR")
         )
         .accounts({
           initializer: publicKey,
@@ -133,7 +132,6 @@ export function useEscrowProgramAccount({ vault }: { vault: PublicKey }) {
   const transactionToast = useTransactionToast();
   const { program, escrowAccounts } = useEscrowProgram();
   const { publicKey } = useWallet();
-  const { connection } = useConnection();
 
   // USDC mint address goes here
   const mint = new PublicKey('4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU');
@@ -241,13 +239,10 @@ export function useEscrowProgramAccount({ vault }: { vault: PublicKey }) {
         program.programId
       )[0];
 
-      const takerTokenAccount = await getOrCreateAssociatedTokenAccount(
-        connection,
-        publicKey,
+     const takerTokenAccount = await getAssociatedTokenAddress(
         mint,
         publicKey,
         true,
-        'confirmed',
         TOKEN_PROGRAM_ID,
         ASSOCIATED_TOKEN_PROGRAM_ID
       );
@@ -267,11 +262,11 @@ export function useEscrowProgramAccount({ vault }: { vault: PublicKey }) {
         .accounts({
           taker: publicKey,
           initializerDepositTokenMint: mint,
-          takerReceiveTokenAccount: takerTokenAccount.address,
+          takerReceiveTokenAccount: takerTokenAccount,
           initializerDepositTokenAccount:
-            account.data?.initializerDepositTokenAccount,
-          initializer: account.data?.initializerKey,
-          escrowState: escrowStateKey,
+          escrowAccounts.data[0]?.account?.initializerDepositTokenAccount,
+          initializer: escrowAccounts.data[0]?.account?.initializerKey,
+          escrowState: escrowAccounts.data[0]?.publicKey,
           vault: vaultKey,
           vaultAuthority: vaultAuthorityKey,
           tokenProgram: TOKEN_PROGRAM_ID,
