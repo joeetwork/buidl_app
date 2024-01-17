@@ -63,7 +63,7 @@ export function EscrowList() {
 }
 
 function EscrowCard({ vault }: { vault: PublicKey }) {
-  const { account, exchange, close } = useEscrowProgramAccount({
+  const { account, exchange, close, validate } = useEscrowProgramAccount({
     vault,
   });
 
@@ -99,18 +99,12 @@ function EscrowCard({ vault }: { vault: PublicKey }) {
             <button
               className="btn btn-xs btn-secondary btn-outline"
               onClick={() => {
-                if (
-                  !window.confirm(
-                    'Are you sure you want to close this account?'
-                  )
-                ) {
-                  return;
-                }
-                return close.mutateAsync();
+               
+                return validate.mutateAsync();
               }}
-              disabled={close.isPending}
+              disabled={validate.isPending}
             >
-              Close
+              Validate
             </button>
           </div>
         </div>

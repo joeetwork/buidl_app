@@ -17,6 +17,7 @@ import {
   TOKEN_PROGRAM_ID,
   getAssociatedTokenAddress,
 } from '@solana/spl-token';
+import { Metaplex } from '@metaplex-foundation/js';
 
 export function useEscrowProgram() {
   const { connection } = useConnection();
@@ -95,8 +96,9 @@ export function useEscrowProgram() {
         .initialize(
           randomSeed,
           new anchor.BN(initializerAmount),
-          new anchor.BN(0),
-          new PublicKey("5nuannxWhLeH3WW64m8PAamPkVCqDhFhNQXtLvNp5cUR")
+          new anchor.BN(1),
+          new PublicKey('F17gXajNLmVdMXtCPVpJ8enhwoxtscmDf7fLoJE8vUgw'),
+          new PublicKey('9ifBnWRecQxF3b4UfqEWp2pw7a6UAVBYiDfYYB7UtFq2')
         )
         .accounts({
           initializer: publicKey,
@@ -132,6 +134,7 @@ export function useEscrowProgramAccount({ vault }: { vault: PublicKey }) {
   const transactionToast = useTransactionToast();
   const { program, escrowAccounts } = useEscrowProgram();
   const { publicKey } = useWallet();
+  const { connection } = useConnection();
 
   // USDC mint address goes here
   const mint = new PublicKey('4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU');
@@ -239,7 +242,7 @@ export function useEscrowProgramAccount({ vault }: { vault: PublicKey }) {
         program.programId
       )[0];
 
-     const takerTokenAccount = await getAssociatedTokenAddress(
+      const takerTokenAccount = await getAssociatedTokenAddress(
         mint,
         publicKey,
         true,
@@ -264,7 +267,7 @@ export function useEscrowProgramAccount({ vault }: { vault: PublicKey }) {
           initializerDepositTokenMint: mint,
           takerReceiveTokenAccount: takerTokenAccount,
           initializerDepositTokenAccount:
-          escrowAccounts.data[0]?.account?.initializerDepositTokenAccount,
+            escrowAccounts.data[0]?.account?.initializerDepositTokenAccount,
           initializer: escrowAccounts.data[0]?.account?.initializerKey,
           escrowState: escrowAccounts.data[0]?.publicKey,
           vault: vaultKey,
@@ -279,9 +282,51 @@ export function useEscrowProgramAccount({ vault }: { vault: PublicKey }) {
     },
   });
 
+  const validate = useMutation({
+    mutationKey: ['escrow', 'validate', { cluster }],
+    mutationFn: async () => {
+      const nftTokenAccount = await getAssociatedTokenAddress(
+        new PublicKey('9GCYpiytVnhXTggEC4tKrAHicfpz6pXBuCuc3X7PeL12'),
+        publicKey,
+        true,
+        TOKEN_PROGRAM_ID,
+        ASSOCIATED_TOKEN_PROGRAM_ID
+      );
+
+      const metaplex = Metaplex.make(connection);
+      const metadataPda = metaplex
+        .nfts()
+        .pdas()
+        .metadata({
+          mint: new PublicKey('9GCYpiytVnhXTggEC4tKrAHicfpz6pXBuCuc3X7PeL12'),
+        });
+
+      return program.methods
+        .validateWork()
+        .accounts({
+          user: publicKey,
+          escrowState: escrowAccounts.data[0].publicKey,
+          nftMint: new PublicKey(
+            '9GCYpiytVnhXTggEC4tKrAHicfpz6pXBuCuc3X7PeL12'
+          ),
+          nftTokenAccount: nftTokenAccount,
+          metadataAccount: metadataPda,
+          systemProgram: anchor.web3.SystemProgram.programId,
+        })
+        .rpc({
+          skipPreflight: true,
+        });
+    },
+    onSuccess: (tx) => {
+      transactionToast(tx);
+      return escrowAccounts.refetch();
+    },
+  });
+
   return {
     account,
     close,
     exchange,
+    validate,
   };
 }

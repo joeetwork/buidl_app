@@ -9,6 +9,7 @@
   "private": true,
   "dependencies": {
     "@coral-xyz/anchor": "^0.29.0",
+    "@metaplex-foundation/js": "^0.20.1",
     "@solana-developers/preset-next": "2.0.0",
     "@solana/spl-token": "0.3.9",
     "@solana/wallet-adapter-base": "^0.9.23",
