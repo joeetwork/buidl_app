@@ -74,6 +74,8 @@ describe('anchor-escrow', () => {
     program.programId
   )[0];
 
+let vault = null;
+
   it('Initialize program state', async () => {
     // 1. Airdrop 1 SOL to payer
     const signature = await provider.connection.requestAirdrop(
@@ -148,6 +150,8 @@ describe('anchor-escrow', () => {
       initializerAmount
     );
 
+   vault = getAssociatedTokenAddressSync(mint, escrow, true);
+
     const fetchedInitializerTokenAccount = await getAccount(
       connection,
       initializerTokenAccount
@@ -159,8 +163,6 @@ describe('anchor-escrow', () => {
   });
 
   it('Initialize escrow', async () => {
-    const vault = getAssociatedTokenAddressSync(mint, escrow, true);
-
     const result = await program.methods
       .initialize(
         seed,
@@ -196,38 +198,38 @@ describe('anchor-escrow', () => {
     );
   });
 
-  // it('Exchange escrow state', async () => {
-  //   const result = await program.methods
-  //     .exchange()
-  //     .accounts({
-  //       taker: taker.publicKey,
-  //       initializerDepositTokenMint: mint,
-  //       takerReceiveTokenAccount: takerTokenAccount,
-  //       initializerDepositTokenAccount: initializerTokenAccount,
-  //       initializer: initializer.publicKey,
-  //       escrowState: escrowStateKey,
-  //       vault: vaultKey,
-  //       vaultAuthority: vaultAuthorityKey,
-  //       tokenProgram: TOKEN_PROGRAM_ID,
-  //     })
-  //     .signers([taker])
-  //     .rpc();
-  //   console.log(
-  //     `https://solana.fm/tx/${result}?cluster=http%253A%252F%252Flocalhost%253A8899%252F`
-  //   );
+  it('Exchange escrow state', async () => {
+    const result = await program.methods
+      .exchange()
+      .accounts({
+        taker: taker.publicKey,
+        mint: mint,
+        takerReceiveTokenAccount: takerTokenAccount,
+        initializer: initializer.publicKey,
+        escrowState: escrow,
+        vault: vault,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        systemProgram: SystemProgram.programId,
+      })
+      .signers([taker])
+      .rpc();
+    console.log(
+      `https://solana.fm/tx/${result}?cluster=http%253A%252F%252Flocalhost%253A8899%252F`
+    );
 
-  //   let fetchedInitializerTokenAccount = await getAccount(
-  //     connection,
-  //     initializerTokenAccount
-  //   );
-  //   let fetchedTakerTokenAccount = await getAccount(
-  //     connection,
-  //     takerTokenAccount
-  //   );
+    let fetchedInitializerTokenAccount = await getAccount(
+      connection,
+      initializerTokenAccount
+    );
+    let fetchedTakerTokenAccount = await getAccount(
+      connection,
+      takerTokenAccount
+    );
 
-  //   assert.ok(Number(fetchedTakerTokenAccount.amount) == initializerAmount);
-  //   assert.ok(Number(fetchedInitializerTokenAccount.amount) == 0);
-  // });
+    assert.ok(Number(fetchedTakerTokenAccount.amount) == initializerAmount);
+    assert.ok(Number(fetchedInitializerTokenAccount.amount) == 0);
+  });
 
   //   it('Initialize escrow and cancel escrow', async () => {
   // Put back tokens into initializer token A account.
