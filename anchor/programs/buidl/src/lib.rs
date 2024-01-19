@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 use anchor_spl::associated_token::AssociatedToken;
-use anchor_spl::token::{self, CloseAccount, Mint, Token, TokenAccount, TransferChecked};
+use anchor_spl::token::{self, CloseAccount, Mint, Token, TokenAccount, TransferChecked, transfer_checked, close_account};
 use anchor_spl::metadata::MetadataAccount;
 
 declare_id!("AmaFf9hFpemKXPaAPqxu14vGaZWcGu1ADN1vpy1gtJtw");
@@ -14,36 +14,24 @@ pub mod anchor_escrow {
 
     pub fn initialize(
         ctx: Context<Initialize>,
-        random_seed: u64,
+        seed: u64,
         initializer_amount: u64,
         validator_total_count: u64,
         taker: Pubkey,
         verified_collection: Pubkey
     ) -> Result<()> {
-        ctx.accounts.escrow_state.initializer_key = *ctx.accounts.initializer.key;
-        ctx.accounts.escrow_state.initializer_deposit_token_account = *ctx
-            .accounts
-            .initializer_deposit_token_account
-            .to_account_info()
-            .key;
-        ctx.accounts.escrow_state.initializer_amount = initializer_amount;
-        ctx.accounts.escrow_state.random_seed = random_seed;
-        ctx.accounts.escrow_state.validator_total_count = validator_total_count;
-        ctx.accounts.escrow_state.validator_count = 0;
-        ctx.accounts.escrow_state.verified_account = verified_collection;
-        ctx.accounts.escrow_state.taker_key = taker;
 
-        let (_vault_authority, vault_authority_bump) =
-            Pubkey::find_program_address(&[AUTHORITY_SEED], ctx.program_id);
-        ctx.accounts.escrow_state.vault_authority_bump = vault_authority_bump;
-
-        token::transfer_checked(
-            ctx.accounts.into_transfer_to_pda_context(),
-            ctx.accounts.escrow_state.initializer_amount,
-            ctx.accounts.mint.decimals,
+        ctx.accounts
+        .initialize_escrow(
+            seed, 
+            &ctx.bumps, 
+            initializer_amount, 
+            taker,
+            verified_collection,
+            validator_total_count
         )?;
 
-        Ok(())
+        ctx.accounts.deposit(initializer_amount)
     }
 
     pub fn initialize_user(
@@ -56,30 +44,10 @@ pub mod anchor_escrow {
     }
 
     pub fn cancel(ctx: Context<Cancel>) -> Result<()> {
-        let authority_seeds = &[
-            &AUTHORITY_SEED[..],
-            &[ctx.accounts.escrow_state.vault_authority_bump],
-        ];
-
-        token::transfer_checked(
-            ctx.accounts
-                .into_transfer_to_initializer_context()
-                .with_signer(&[&authority_seeds[..]]),
-            ctx.accounts.escrow_state.initializer_amount,
-            ctx.accounts.mint.decimals,
-        )?;
-
-        token::close_account(
-            ctx.accounts
-                .into_close_context()
-                .with_signer(&[&authority_seeds[..]]),
-        )?;
-
-        Ok(())
+        ctx.accounts.refund_and_close_vault()
     }
 
     pub fn validate_work(ctx: Context<ValidateWork>) -> Result<()> {
-
         ctx.accounts.escrow_state.validator_count = ctx.accounts.escrow_state.validator_count.checked_add(1)
         .unwrap();
 
@@ -87,70 +55,41 @@ pub mod anchor_escrow {
     }
 
     pub fn exchange(ctx: Context<Exchange>) -> Result<()> {
-        let authority_seeds = &[
-            &AUTHORITY_SEED[..],
-            &[ctx.accounts.escrow_state.vault_authority_bump],
-        ];
-
-        token::transfer_checked(
-            ctx.accounts
-                .into_transfer_to_taker_context()
-                .with_signer(&[&authority_seeds[..]]),
-            ctx.accounts.escrow_state.initializer_amount,
-            ctx.accounts.initializer_deposit_token_mint.decimals,
-        )?;
-
-        token::close_account(
-            ctx.accounts
-                .into_close_context()
-                .with_signer(&[&authority_seeds[..]]),
-        )?;
-
-        Ok(())
+        ctx.accounts.withdraw_and_close_vault()
     }
 }
 
 #[derive(Accounts)]
-#[instruction(escrow_seed: u64, initializer_amount: u64)]
+#[instruction(seed: u64, initializer_amount: u64)]
 pub struct Initialize<'info> {
-    /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
     pub initializer: Signer<'info>,
     pub mint: Account<'info, Mint>,
-    /// CHECK: This is not dangerous because we don't read or write from this account
-    #[account(
-        seeds = [b"authority".as_ref()],
-        bump,
-    )]
-    pub vault_authority: AccountInfo<'info>,
-    #[account(
-        init,
-        payer = initializer,
-        associated_token::mint = mint,
-        associated_token::authority = vault_authority
-    )]
-    pub vault: Box<Account<'info, TokenAccount>>,
     #[account(
         mut,
-        constraint = initializer_deposit_token_account.amount >= initializer_amount
+        constraint = initializer_deposit_token_account.amount >= initializer_amount,
+        associated_token::mint = mint,
+        associated_token::authority = initializer
     )]
     pub initializer_deposit_token_account: Account<'info, TokenAccount>,
-
     #[account(
-        init,
-        seeds = [b"state".as_ref(), &escrow_seed.to_le_bytes()],
-        bump,
+        init_if_needed,
         payer = initializer,
-        space = std::mem::size_of::<EscrowState>() + 8
+        space = std::mem::size_of::<EscrowState>() + 8,
+        seeds = [b"escrow".as_ref(), &seed.to_le_bytes()],
+        bump
     )]
     pub escrow_state: Box<Account<'info, EscrowState>>,
-    /// CHECK: This is not dangerous because we don't read or write from this account
-    pub system_program: Program<'info, System>,
-    pub rent: Sysvar<'info, Rent>,
-    /// CHECK: This is not dangerous because we don't read or write from this account
-    pub token_program: Program<'info, Token>,
-    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(
+        init_if_needed,
+        payer = initializer,
+        associated_token::mint = mint,
+        associated_token::authority = escrow_state
+    )]
+    pub vault: Box<Account<'info, TokenAccount>>,
     pub associated_token_program: Program<'info, AssociatedToken>,
+    pub token_program: Program<'info, Token>,
+    pub system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]
@@ -178,25 +117,30 @@ pub struct Cancel<'info> {
     #[account(mut)]
     pub initializer: Signer<'info>,
     pub mint: Account<'info, Mint>,
-    #[account(mut)]
-    pub vault: Account<'info, TokenAccount>,
-    /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(
-        seeds = [b"authority".as_ref()],
-        bump,
+        mut,
+        associated_token::mint = mint,
+        associated_token::authority = initializer
     )]
-    pub vault_authority: AccountInfo<'info>,
-    #[account(mut)]
     pub initializer_deposit_token_account: Account<'info, TokenAccount>,
     #[account(
         mut,
-        constraint = escrow_state.initializer_key == *initializer.key,
-        constraint = escrow_state.initializer_deposit_token_account == *initializer_deposit_token_account.to_account_info().key,
-        close = initializer
+        has_one = initializer,
+        has_one = mint,
+        close = initializer,
+        seeds=[b"escrow", escrow_state.seed.to_le_bytes().as_ref()],
+        bump = escrow_state.bump,
     )]
     pub escrow_state: Box<Account<'info, EscrowState>>,
-    /// CHECK: This is not dangerous because we don't read or write from this account
-    pub token_program: Program<'info, Token>,
+    #[account(
+        mut,
+        associated_token::mint = mint,
+        associated_token::authority = escrow_state
+    )]
+    pub vault: Account<'info, TokenAccount>,
+    associated_token_program: Program<'info, AssociatedToken>,
+    token_program: Program<'info, Token>,
+    system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]
@@ -218,7 +162,7 @@ pub struct ValidateWork<'info> {
         bump,
         constraint = metadata_account.collection.as_ref().unwrap().verified,
         constraint = metadata_account.collection.as_ref().unwrap().key ==
-        escrow_state.verified_account.key(),
+        escrow_state.verified_collection.key(),
         constraint = nft_token_account.owner == user.key(),
         constraint = nft_token_account.mint == nft_mint.key(),
         constraint = nft_token_account.amount == 1
@@ -228,7 +172,7 @@ pub struct ValidateWork<'info> {
     #[account(
         mut,
         constraint = metadata_account.collection.as_ref().unwrap().key ==
-        escrow_state.verified_account.key()
+        escrow_state.verified_collection.key()
     )]
     pub escrow_state: Box<Account<'info, EscrowState>>,
     /// CHECK: This is not dangerous because we don't read or write from this account
@@ -237,35 +181,35 @@ pub struct ValidateWork<'info> {
 
 #[derive(Accounts)]
 pub struct Exchange<'info> {
-    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
     pub taker: Signer<'info>,
-    pub initializer_deposit_token_mint: Account<'info, Mint>,
     #[account(mut)]
-    pub taker_receive_token_account: Box<Account<'info, TokenAccount>>,
-    #[account(mut)]
-    pub initializer_deposit_token_account: Box<Account<'info, TokenAccount>>,
-    /// CHECK: This is not dangerous because we don't read or write from this account
-    #[account(mut)]
-    pub initializer: AccountInfo<'info>,
+    pub initializer: SystemAccount<'info>,
+    pub mint: Account<'info, Mint>,
+    #[account(
+        init_if_needed,
+        payer = taker,
+        associated_token::mint = mint,
+        associated_token::authority = taker
+    )]
+    pub taker_receive_token_account: Account<'info, TokenAccount>,
     #[account(
         mut,
-        constraint = escrow_state.initializer_deposit_token_account == *initializer_deposit_token_account.to_account_info().key,
-        constraint = escrow_state.initializer_key == *initializer.key,
+        close = initializer,
+        seeds=[b"escrow", escrow_state.seed.to_le_bytes().as_ref()],
         constraint = escrow_state.validator_total_count == escrow_state.validator_count,
-        constraint = escrow_state.taker_key == *taker.key,
-        close = initializer
+        bump = escrow_state.bump,
     )]
-    pub escrow_state: Box<Account<'info, EscrowState>>,
-    #[account(mut)]
-    pub vault: Box<Account<'info, TokenAccount>>,
-    /// CHECK: This is not dangerous because we don't read or write from this account
+    pub escrow_state: Account<'info, EscrowState>,
     #[account(
-        seeds = [b"authority".as_ref()],
-        bump,
+        mut,
+        associated_token::mint = mint,
+        associated_token::authority = escrow_state
     )]
-    pub vault_authority: AccountInfo<'info>,
-    /// CHECK: This is not dangerous because we don't read or write from this account
+    pub vault: Account<'info, TokenAccount>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
     pub token_program: Program<'info, Token>,
+    pub system_program: Program<'info, System>,
 }
 
 #[account]
@@ -276,15 +220,16 @@ pub struct UserState {
 
 #[account]
 pub struct EscrowState {
-    pub random_seed: u64,
-    pub initializer_key: Pubkey,
-    pub initializer_deposit_token_account: Pubkey,
+    pub seed: u64,
+    pub bump: u8,
+    pub initializer: Pubkey,
+    pub taker: Pubkey,
+    pub mint: Pubkey,
     pub initializer_amount: u64,
-    pub vault_authority_bump: u8,
-    pub verified_account: Pubkey,
+
+    pub verified_collection: Pubkey,
     pub validator_total_count: u64,
     pub validator_count: u64,
-    pub taker_key: Pubkey
 }
 
 impl EscrowState {
@@ -294,7 +239,7 @@ impl EscrowState {
 }
 
 impl<'info> Initialize<'info> {
-    fn into_transfer_to_pda_context(
+    fn into_deposit_context(
         &self,
     ) -> CpiContext<'_, '_, '_, 'info, TransferChecked<'info>> {
         let cpi_accounts = TransferChecked {
@@ -305,17 +250,62 @@ impl<'info> Initialize<'info> {
         };
         CpiContext::new(self.token_program.to_account_info(), cpi_accounts)
     }
+
+    fn deposit(&mut self, initializer_amount: u64) -> Result<()> {
+        transfer_checked(
+            self.into_deposit_context(),
+            initializer_amount,
+            self.mint.decimals,
+        )
+    }
+
+    fn initialize_escrow(
+        &mut self,
+        seed: u64,
+        bumps: &InitializeBumps,
+        initializer_amount: u64,
+        taker: Pubkey,
+        verified_collection: Pubkey,
+        validator_total_count: u64
+    ) -> Result<()> {
+        self.escrow_state.set_inner(EscrowState {
+            seed,
+            bump: bumps.escrow_state,
+            initializer: self.initializer.key(),
+            mint: self.mint.key(),
+            initializer_amount,
+            taker,
+            verified_collection,
+            validator_total_count,
+            validator_count: 0
+        });
+        Ok(())
+    }
 }
 
 impl<'info> Cancel<'info> {
-    fn into_transfer_to_initializer_context(
-        &self,
-    ) -> CpiContext<'_, '_, '_, 'info, TransferChecked<'info>> {
+    pub fn refund_and_close_vault(&mut self) -> Result<()> {
+        let signer_seeds: [&[&[u8]]; 1] = [&[
+            b"escrow",
+            &self.escrow_state.seed.to_le_bytes()[..],
+            &[self.escrow_state.bump],
+        ]];
+
+        transfer_checked(
+            self.into_refund_context().with_signer(&signer_seeds),
+            self.escrow_state.initializer_amount,
+            self.mint.decimals,
+        )?;
+
+        close_account(self.into_close_context().with_signer(&signer_seeds))
+    }
+
+    fn into_refund_context(&self) -> CpiContext<'_, '_, '_, 'info, TransferChecked<'info>> {
         let cpi_accounts = TransferChecked {
             from: self.vault.to_account_info(),
             mint: self.mint.to_account_info(),
             to: self.initializer_deposit_token_account.to_account_info(),
-            authority: self.vault_authority.clone(),
+            authority: self.escrow_state.to_account_info(),
         };
         CpiContext::new(self.token_program.to_account_info(), cpi_accounts)
     }
@@ -324,21 +314,35 @@ impl<'info> Cancel<'info> {
         let cpi_accounts = CloseAccount {
             account: self.vault.to_account_info(),
             destination: self.initializer.to_account_info(),
-            authority: self.vault_authority.clone(),
+            authority: self.escrow_state.to_account_info(),
         };
         CpiContext::new(self.token_program.to_account_info(), cpi_accounts)
     }
 }
 
 impl<'info> Exchange<'info> {
-    fn into_transfer_to_taker_context(
-        &self,
-    ) -> CpiContext<'_, '_, '_, 'info, TransferChecked<'info>> {
+    pub fn withdraw_and_close_vault(&mut self) -> Result<()> {
+        let signer_seeds: [&[&[u8]]; 1] = [&[
+            b"escrow",
+            &self.escrow_state.seed.to_le_bytes()[..],
+            &[self.escrow_state.bump],
+        ]];
+
+        transfer_checked(
+            self.into_withdraw_context().with_signer(&signer_seeds),
+            self.escrow_state.initializer_amount,
+            self.mint.decimals,
+        )?;
+
+        close_account(self.into_close_context().with_signer(&signer_seeds))
+    }
+
+    fn into_withdraw_context(&self) -> CpiContext<'_, '_, '_, 'info, TransferChecked<'info>> {
         let cpi_accounts = TransferChecked {
             from: self.vault.to_account_info(),
-            mint: self.initializer_deposit_token_mint.to_account_info(),
+            mint: self.mint.to_account_info(),
             to: self.taker_receive_token_account.to_account_info(),
-            authority: self.vault_authority.clone(),
+            authority: self.escrow_state.to_account_info(),
         };
         CpiContext::new(self.token_program.to_account_info(), cpi_accounts)
     }
@@ -346,8 +350,8 @@ impl<'info> Exchange<'info> {
     fn into_close_context(&self) -> CpiContext<'_, '_, '_, 'info, CloseAccount<'info>> {
         let cpi_accounts = CloseAccount {
             account: self.vault.to_account_info(),
-            destination: self.initializer.clone(),
-            authority: self.vault_authority.clone(),
+            destination: self.initializer.to_account_info(),
+            authority: self.escrow_state.to_account_info(),
         };
         CpiContext::new(self.token_program.to_account_info(), cpi_accounts)
     }

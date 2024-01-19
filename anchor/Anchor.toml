@@ -14,7 +14,7 @@ buidl = "AmaFf9hFpemKXPaAPqxu14vGaZWcGu1ADN1vpy1gtJtw"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "devnet"
+cluster = "localnet"
 wallet = "/Users/joe/.config/solana/id.json"
 
 [scripts]
