@@ -64,10 +64,6 @@ describe('anchor-escrow', () => {
   const initializer = anchor.web3.Keypair.generate();
   const taker = anchor.web3.Keypair.generate();
 
-  // Determined Seeds
-  const stateSeed = 'escrow';
-  const authoritySeed = 'authority';
-
   // Random Seed
   const seed: anchor.BN = new anchor.BN(
     Math.floor(Math.random() * 100000000)
