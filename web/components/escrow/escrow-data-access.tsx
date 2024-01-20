@@ -143,6 +143,46 @@ export function useEscrowProgramAccount({ vault }: { vault: PublicKey }) {
     },
   });
 
+  const declineRequest = useMutation({
+    mutationKey: ['escrow', 'declineRequest', { cluster, vault }],
+    mutationFn: () => {
+      const escrow = PublicKey.findProgramAddressSync(
+        [
+          Buffer.from(anchor.utils.bytes.utf8.encode('escrow')),
+          escrowAccounts.data[1]?.account.seed.toArrayLike(Buffer, 'le', 8),
+        ],
+        program.programId
+      )[0];
+
+      vault = getAssociatedTokenAddressSync(mint, escrow, true);
+
+      const initializerDepositTokenAccount = getAssociatedTokenAddressSync(
+        mint,
+        escrowAccounts.data[1].account.initializer,
+        true
+      );
+
+      return program.methods
+        .declineRequest()
+        .accounts({
+          taker: publicKey,
+          initializer: escrowAccounts.data[1].account.initializer,
+          mint: mint,
+          initializerDepositTokenAccount: initializerDepositTokenAccount,
+          vault: vault,
+          escrowState: escrow,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+          systemProgram: SystemProgram.programId
+        })
+        .rpc();
+    },
+    onSuccess: (tx) => {
+      transactionToast(tx);
+      return escrowAccounts.refetch();
+    },
+  });
+
   const close = useMutation({
     mutationKey: ['escrow', 'close', { cluster, vault }],
     mutationFn: () => {
@@ -274,5 +314,6 @@ export function useEscrowProgramAccount({ vault }: { vault: PublicKey }) {
     close,
     exchange,
     validate,
+    declineRequest
   };
 }

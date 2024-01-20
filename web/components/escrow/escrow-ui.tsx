@@ -63,7 +63,7 @@ export function EscrowList() {
 }
 
 function EscrowCard({ vault }: { vault: PublicKey }) {
-  const { account, exchange, close, validate } = useEscrowProgramAccount({
+  const { account, exchange, close, validate, declineRequest } = useEscrowProgramAccount({
     vault,
   });
 
@@ -105,6 +105,16 @@ function EscrowCard({ vault }: { vault: PublicKey }) {
               disabled={validate.isPending}
             >
               Validate
+            </button>
+            <button
+              className="btn btn-xs btn-secondary btn-outline"
+              onClick={() => {
+               
+                return declineRequest.mutateAsync();
+              }}
+              disabled={declineRequest.isPending}
+            >
+              Decline
             </button>
           </div>
         </div>

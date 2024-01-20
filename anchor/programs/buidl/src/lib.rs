@@ -47,6 +47,10 @@ pub mod anchor_escrow {
         ctx.accounts.refund_and_close_vault()
     }
 
+    pub fn decline_request(ctx: Context<DeclineRequest>) -> Result<()> {
+        ctx.accounts.refund_and_close_vault()
+    }
+
     pub fn validate_work(ctx: Context<ValidateWork>) -> Result<()> {
         ctx.accounts.escrow_state.validator_count = ctx.accounts.escrow_state.validator_count.checked_add(1)
         .unwrap();
@@ -213,6 +217,41 @@ pub struct Exchange<'info> {
     pub system_program: Program<'info, System>,
 }
 
+#[derive(Accounts)]
+pub struct DeclineRequest<'info> {
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    pub taker: Signer<'info>,
+    #[account(mut)]
+    pub initializer: SystemAccount<'info>,
+    pub mint: Account<'info, Mint>,
+    #[account(
+        mut,
+        associated_token::mint = mint,
+        associated_token::authority = initializer
+    )]
+    pub initializer_deposit_token_account: Account<'info, TokenAccount>,
+    #[account(
+        mut,
+        has_one = initializer,
+        has_one = mint,
+        close = initializer,
+        seeds=[b"escrow", escrow_state.seed.to_le_bytes().as_ref()],
+        constraint = escrow_state.taker == *taker.key,
+        bump = escrow_state.bump,
+    )]
+    pub escrow_state: Box<Account<'info, EscrowState>>,
+    #[account(
+        mut,
+        associated_token::mint = mint,
+        associated_token::authority = escrow_state
+    )]
+    pub vault: Account<'info, TokenAccount>,
+    associated_token_program: Program<'info, AssociatedToken>,
+    token_program: Program<'info, Token>,
+    system_program: Program<'info, System>,
+}
+
 #[account]
 pub struct UserState {
     pub initializer_key: Pubkey,
@@ -285,6 +324,43 @@ impl<'info> Initialize<'info> {
 }
 
 impl<'info> Cancel<'info> {
+    pub fn refund_and_close_vault(&mut self) -> Result<()> {
+        let signer_seeds: [&[&[u8]]; 1] = [&[
+            b"escrow",
+            &self.escrow_state.seed.to_le_bytes()[..],
+            &[self.escrow_state.bump],
+        ]];
+
+        transfer_checked(
+            self.into_refund_context().with_signer(&signer_seeds),
+            self.escrow_state.initializer_amount,
+            self.mint.decimals,
+        )?;
+
+        close_account(self.into_close_context().with_signer(&signer_seeds))
+    }
+
+    fn into_refund_context(&self) -> CpiContext<'_, '_, '_, 'info, TransferChecked<'info>> {
+        let cpi_accounts = TransferChecked {
+            from: self.vault.to_account_info(),
+            mint: self.mint.to_account_info(),
+            to: self.initializer_deposit_token_account.to_account_info(),
+            authority: self.escrow_state.to_account_info(),
+        };
+        CpiContext::new(self.token_program.to_account_info(), cpi_accounts)
+    }
+
+    fn into_close_context(&self) -> CpiContext<'_, '_, '_, 'info, CloseAccount<'info>> {
+        let cpi_accounts = CloseAccount {
+            account: self.vault.to_account_info(),
+            destination: self.initializer.to_account_info(),
+            authority: self.escrow_state.to_account_info(),
+        };
+        CpiContext::new(self.token_program.to_account_info(), cpi_accounts)
+    }
+}
+
+impl<'info> DeclineRequest<'info> {
     pub fn refund_and_close_vault(&mut self) -> Result<()> {
         let signer_seeds: [&[&[u8]]; 1] = [&[
             b"escrow",
