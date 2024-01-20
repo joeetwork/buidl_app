@@ -8,18 +8,33 @@ import {
   useEscrowProgram,
   useEscrowProgramAccount,
 } from './escrow-data-access';
+import { useEffect } from 'react';
 
 export function EscrowCreate() {
-  const { initialize } = useEscrowProgram();
+  const { initialize, initializeUser, userAccounts } = useEscrowProgram();
+
+  useEffect(() => {
+    console.log(userAccounts.data);
+  }, [userAccounts, userAccounts.isLoading]);
 
   return (
-    <button
-      className="btn btn-xs lg:btn-md btn-primary"
-      onClick={() => initialize.mutateAsync({initializerAmount: 1})}
-      disabled={initialize.isPending}
-    >
-      Create {initialize.isPending && '...'}
-    </button>
+    <>
+      <button
+        className="btn btn-xs lg:btn-md btn-primary"
+        onClick={() => initialize.mutateAsync(1)}
+        disabled={initialize.isPending}
+      >
+        Create {initialize.isPending && '...'}
+      </button>
+
+      <button
+        className="btn btn-xs lg:btn-md btn-primary"
+        onClick={() => initializeUser.mutateAsync('joe')}
+        disabled={initialize.isPending}
+      >
+        Create user {initialize.isPending && '...'}
+      </button>
+    </>
   );
 }
 
@@ -63,9 +78,10 @@ export function EscrowList() {
 }
 
 function EscrowCard({ vault }: { vault: PublicKey }) {
-  const { account, exchange, close, validate, declineRequest } = useEscrowProgramAccount({
-    vault,
-  });
+  const { account, exchange, close, validate, declineRequest } =
+    useEscrowProgramAccount({
+      vault,
+    });
 
   return account.isLoading ? (
     <span className="loading loading-spinner loading-lg"></span>
@@ -99,7 +115,6 @@ function EscrowCard({ vault }: { vault: PublicKey }) {
             <button
               className="btn btn-xs btn-secondary btn-outline"
               onClick={() => {
-               
                 return validate.mutateAsync();
               }}
               disabled={validate.isPending}
@@ -109,7 +124,6 @@ function EscrowCard({ vault }: { vault: PublicKey }) {
             <button
               className="btn btn-xs btn-secondary btn-outline"
               onClick={() => {
-               
                 return declineRequest.mutateAsync();
               }}
               disabled={declineRequest.isPending}

@@ -37,18 +37,50 @@ export function useEscrowProgram() {
     queryFn: () => program.account.escrowState.all(),
   });
 
+  const userAccounts = useQuery({
+    queryKey: ['escrow', 'fetch', { cluster }],
+    queryFn: () => {
+      const userPDA = PublicKey.findProgramAddressSync(
+        [Buffer.from('user'), publicKey?.toBuffer()],
+        program.programId
+      )[0];
+
+      return program.account.userState.fetch(userPDA);
+    },
+  });
+
   const getProgramAccount = useQuery({
     queryKey: ['get-program-account', { cluster }],
     queryFn: () => connection.getParsedAccountInfo(programId),
   });
 
-  interface Escrow {
-    initializerAmount: number;
-  }
+  const initializeUser = useMutation({
+    mutationKey: ['escrow', 'initializeUser', { cluster }],
+    mutationFn: async (name: string) => {
+      const userPDA = PublicKey.findProgramAddressSync(
+        [Buffer.from('user'), publicKey?.toBuffer()],
+        program.programId
+      )[0];
+
+      return program.methods
+        .initializeUser(name)
+        .accounts({
+          initializer: publicKey,
+          userState: userPDA,
+          systemProgram: SystemProgram.programId,
+        })
+        .rpc();
+    },
+    onSuccess: (signature) => {
+      transactionToast(signature);
+      return userAccounts.refetch();
+    },
+    onError: () => toast.error('Failed to initialize counter'),
+  });
 
   const initialize = useMutation({
     mutationKey: ['escrow', 'initialize', { cluster }],
-    mutationFn: async ({ initializerAmount }: Escrow) => {
+    mutationFn: async (initializerAmount: number) => {
       // USDC mint address goes here
       const mint = new PublicKey(
         '4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU'
@@ -107,6 +139,8 @@ export function useEscrowProgram() {
     escrowAccounts,
     getProgramAccount,
     initialize,
+    initializeUser,
+    userAccounts,
   };
 }
 
@@ -173,7 +207,7 @@ export function useEscrowProgramAccount({ vault }: { vault: PublicKey }) {
           escrowState: escrow,
           tokenProgram: TOKEN_PROGRAM_ID,
           associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-          systemProgram: SystemProgram.programId
+          systemProgram: SystemProgram.programId,
         })
         .rpc();
     },
@@ -279,13 +313,13 @@ export function useEscrowProgramAccount({ vault }: { vault: PublicKey }) {
           mint: new PublicKey('9GCYpiytVnhXTggEC4tKrAHicfpz6pXBuCuc3X7PeL12'),
         });
 
-        const escrow = PublicKey.findProgramAddressSync(
-          [
-            Buffer.from(anchor.utils.bytes.utf8.encode('escrow')),
-            escrowAccounts.data[1]?.account.seed.toArrayLike(Buffer, 'le', 8),
-          ],
-          program.programId
-        )[0];
+      const escrow = PublicKey.findProgramAddressSync(
+        [
+          Buffer.from(anchor.utils.bytes.utf8.encode('escrow')),
+          escrowAccounts.data[1]?.account.seed.toArrayLike(Buffer, 'le', 8),
+        ],
+        program.programId
+      )[0];
 
       return program.methods
         .validateWork()
@@ -314,6 +348,6 @@ export function useEscrowProgramAccount({ vault }: { vault: PublicKey }) {
     close,
     exchange,
     validate,
-    declineRequest
+    declineRequest,
   };
 }
