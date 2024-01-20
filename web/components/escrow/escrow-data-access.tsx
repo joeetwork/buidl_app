@@ -146,16 +146,30 @@ export function useEscrowProgramAccount({ vault }: { vault: PublicKey }) {
   const close = useMutation({
     mutationKey: ['escrow', 'close', { cluster, vault }],
     mutationFn: () => {
+      const escrow = PublicKey.findProgramAddressSync(
+        [
+          Buffer.from(anchor.utils.bytes.utf8.encode('escrow')),
+          escrowAccounts.data[0]?.account.seed.toArrayLike(Buffer, 'le', 8),
+        ],
+        program.programId
+      )[0];
+
+      vault = getAssociatedTokenAddressSync(mint, escrow, true);
+
+      const initializerDepositTokenAccount = getAssociatedTokenAddressSync(
+        mint,
+        publicKey,
+        true
+      );
+
       return program.methods
         .cancel()
         .accounts({
           initializer: publicKey,
           mint: mint,
-          initializerDepositTokenAccount:
-            escrowAccounts.data[0]?.account.initializerDepositTokenAccount,
-          vault: vaultKey,
-          vaultAuthority: vaultAuthorityKey,
-          escrowState: escrowAccounts.data[0].publicKey,
+          initializerDepositTokenAccount: initializerDepositTokenAccount,
+          vault: vault,
+          escrowState: escrow,
           tokenProgram: TOKEN_PROGRAM_ID,
         })
         .rpc();
@@ -169,27 +183,34 @@ export function useEscrowProgramAccount({ vault }: { vault: PublicKey }) {
   const exchange = useMutation({
     mutationKey: ['escrow', 'exchange', { cluster, vault }],
     mutationFn: async () => {
+      const escrow = PublicKey.findProgramAddressSync(
+        [
+          Buffer.from(anchor.utils.bytes.utf8.encode('escrow')),
+          escrowAccounts.data[1]?.account.seed.toArrayLike(Buffer, 'le', 8),
+        ],
+        program.programId
+      )[0];
+
+      vault = getAssociatedTokenAddressSync(mint, escrow, true);
+
       const takerTokenAccount = await getAssociatedTokenAddress(
         mint,
         publicKey,
-        true,
-        TOKEN_PROGRAM_ID,
-        ASSOCIATED_TOKEN_PROGRAM_ID
+        true
       );
 
       return program.methods
         .exchange()
         .accounts({
           taker: publicKey,
-          initializerDepositTokenMint: mint,
+          mint: mint,
           takerReceiveTokenAccount: takerTokenAccount,
-          initializerDepositTokenAccount:
-            escrowAccounts.data[0]?.account?.initializerDepositTokenAccount,
-          initializer: escrowAccounts.data[0]?.account?.initializerKey,
-          escrowState: escrowAccounts.data[0]?.publicKey,
-          vault: vaultKey,
-          vaultAuthority: vaultAuthorityKey,
+          initializer: escrowAccounts.data[0]?.account.initializer,
+          escrowState: escrow,
+          vault: vault,
           tokenProgram: TOKEN_PROGRAM_ID,
+          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+          systemProgram: SystemProgram.programId,
         })
         .rpc();
     },
@@ -218,11 +239,19 @@ export function useEscrowProgramAccount({ vault }: { vault: PublicKey }) {
           mint: new PublicKey('9GCYpiytVnhXTggEC4tKrAHicfpz6pXBuCuc3X7PeL12'),
         });
 
+        const escrow = PublicKey.findProgramAddressSync(
+          [
+            Buffer.from(anchor.utils.bytes.utf8.encode('escrow')),
+            escrowAccounts.data[1]?.account.seed.toArrayLike(Buffer, 'le', 8),
+          ],
+          program.programId
+        )[0];
+
       return program.methods
         .validateWork()
         .accounts({
           user: publicKey,
-          escrowState: escrowAccounts.data[0].publicKey,
+          escrowState: escrow,
           nftMint: new PublicKey(
             '9GCYpiytVnhXTggEC4tKrAHicfpz6pXBuCuc3X7PeL12'
           ),
