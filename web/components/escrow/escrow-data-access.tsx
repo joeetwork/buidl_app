@@ -34,12 +34,12 @@ export function useEscrowProgram() {
   const program = new Program(BuidlIDL, programId, provider);
   const escrowAccounts = useQuery({
     queryKey: ['escrow', 'all', { cluster }],
-    queryFn: () => program.account.escrowState.all(),
+    queryFn: () => program.account.escrow.all(),
   });
 
   const userRequests = useQuery({
     queryKey: ['escrow', 'all', { cluster }],
-    queryFn: () => program.account.escrowState.all([
+    queryFn: () => program.account.escrow.all([
       {
         memcmp:{
           offset: 17,
@@ -57,7 +57,7 @@ export function useEscrowProgram() {
         program.programId
       )[0];
 
-      return program.account.userState.fetch(userPDA);
+      return program.account.user.fetch(userPDA);
     },
   });
 
@@ -186,7 +186,7 @@ export function useEscrowProgramAccount({ vault }: { vault: PublicKey }) {
         program.programId
       )[0];
 
-      return program.account.escrowState.fetch(escrowStateKey);
+      return program.account.escrow.fetch(escrowStateKey);
     },
   });
 
@@ -236,7 +236,7 @@ export function useEscrowProgramAccount({ vault }: { vault: PublicKey }) {
       const escrow = PublicKey.findProgramAddressSync(
         [
           Buffer.from(anchor.utils.bytes.utf8.encode('escrow')),
-          escrowAccounts.data[0]?.account.seed.toArrayLike(Buffer, 'le', 8),
+          escrowAccounts.data[1]?.account.seed.toArrayLike(Buffer, 'le', 8),
         ],
         program.programId
       )[0];
