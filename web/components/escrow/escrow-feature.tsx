@@ -7,12 +7,12 @@ import { ExplorerLink } from '../cluster/cluster-ui';
 import { AppHero } from '../shared/app-hero';
 import { WalletButton } from '../shared/wallet-button';
 import { ellipsify } from '../shared/ellipsify';
-import { useEscrowProgram } from './escrow-data-access';
 import { EscrowCreate, EscrowList } from './escrow-ui';
+import { useAccounts } from '@/instructions/get-accounts';
 
 export default function EscrowFeature() {
   const { publicKey } = useWallet();
-  const { programId } = useEscrowProgram();
+  const { programId } = useAccounts();
 
   return publicKey ? (
     <div>

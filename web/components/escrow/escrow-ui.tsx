@@ -4,14 +4,19 @@ import { PublicKey } from '@solana/web3.js';
 
 import { ExplorerLink } from '../cluster/cluster-ui';
 import { ellipsify } from '../shared/ellipsify';
-import {
-  useEscrowProgram,
-  useEscrowProgramAccount,
-} from './escrow-data-access';
 import { useEffect } from 'react';
+import { useInitialiseEscrow } from '@/instructions/initialize-escrow';
+import { useInitialiseUser } from '@/instructions/initialize-user';
+import { useAccounts } from '@/instructions/get-accounts';
+import { useExchange } from '@/instructions/exchange';
+import { useCancel } from '@/instructions/cancel';
+import { useDeclineRequest } from '@/instructions/declineRequest';
+import { useValidate } from '@/instructions/validate';
 
 export function EscrowCreate() {
-  const { initialize, initializeUser, userAccounts } = useEscrowProgram();
+  const { userAccounts } = useAccounts();
+  const { initializeEscrow } = useInitialiseEscrow();
+  const { initializeUser } = useInitialiseUser();
 
   useEffect(() => {
     console.log(userAccounts.data);
@@ -21,25 +26,25 @@ export function EscrowCreate() {
     <>
       <button
         className="btn btn-xs lg:btn-md btn-primary"
-        onClick={() => initialize.mutateAsync(1)}
-        disabled={initialize.isPending}
+        onClick={() => initializeEscrow.mutateAsync(1)}
+        disabled={initializeEscrow.isPending}
       >
-        Create {initialize.isPending && '...'}
+        Create {initializeEscrow.isPending && '...'}
       </button>
 
       <button
         className="btn btn-xs lg:btn-md btn-primary"
         onClick={() => initializeUser.mutateAsync('joe')}
-        disabled={initialize.isPending}
+        disabled={initializeUser.isPending}
       >
-        Create user {initialize.isPending && '...'}
+        Create user {initializeUser.isPending && '...'}
       </button>
     </>
   );
 }
 
 export function EscrowList() {
-  const { escrowAccounts, getProgramAccount } = useEscrowProgram();
+  const { escrowAccounts, getProgramAccount } = useAccounts();
 
   if (getProgramAccount.isLoading) {
     return <span className="loading loading-spinner loading-lg"></span>;
@@ -78,14 +83,15 @@ export function EscrowList() {
 }
 
 function EscrowCard({ vault }: { vault: PublicKey }) {
-  const { account, exchange, close, validate, declineRequest } =
-    useEscrowProgramAccount({
-      vault,
-    });
+  const { exchange } = useExchange();
 
-  return account.isLoading ? (
-    <span className="loading loading-spinner loading-lg"></span>
-  ) : (
+  const { cancel } = useCancel();
+
+  const { declineRequest } = useDeclineRequest();
+
+  const { validate } = useValidate();
+
+  return (
     <div className="card card-bordered border-base-300 border-4 text-neutral-content">
       <div className="card-body items-center text-center">
         <div className="space-y-6">
@@ -99,8 +105,8 @@ function EscrowCard({ vault }: { vault: PublicKey }) {
             </button>
             <button
               className="btn btn-xs lg:btn-md btn-outline"
-              onClick={() => close.mutateAsync()}
-              disabled={close.isPending}
+              onClick={() => cancel.mutateAsync()}
+              disabled={cancel.isPending}
             >
               Close
             </button>
