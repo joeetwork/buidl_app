@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 use anchor_spl::associated_token::AssociatedToken;
-use anchor_spl::token::{self, CloseAccount, Mint, Token, TokenAccount, TransferChecked, transfer_checked, close_account};
+use anchor_spl::token::{ CloseAccount, Mint, Token, TokenAccount, TransferChecked, transfer_checked, close_account};
 use anchor_spl::metadata::MetadataAccount;
 
 declare_id!("AmaFf9hFpemKXPaAPqxu14vGaZWcGu1ADN1vpy1gtJtw");
@@ -9,8 +9,6 @@ declare_id!("AmaFf9hFpemKXPaAPqxu14vGaZWcGu1ADN1vpy1gtJtw");
 pub mod anchor_escrow {
 
     use super::*;
-
-    const AUTHORITY_SEED: &[u8] = b"authority";
 
     pub fn initialize(
         ctx: Context<Initialize>,
@@ -256,6 +254,8 @@ pub struct DeclineRequest<'info> {
 pub struct UserState {
     pub initializer_key: Pubkey,
     pub username: String,
+    pub about: String,
+    pub role: String
 }
 
 #[account]
@@ -269,12 +269,6 @@ pub struct EscrowState {
     pub verified_collection: Pubkey,
     pub validator_total_count: u64,
     pub validator_count: u64,
-}
-
-impl EscrowState {
-    pub fn space() -> usize {
-        8 + 121
-    }
 }
 
 impl<'info> Initialize<'info> {
