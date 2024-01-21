@@ -37,6 +37,18 @@ export function useEscrowProgram() {
     queryFn: () => program.account.escrowState.all(),
   });
 
+  const userRequests = useQuery({
+    queryKey: ['escrow', 'all', { cluster }],
+    queryFn: () => program.account.escrowState.all([
+      {
+        memcmp:{
+          offset: 17,
+          bytes: publicKey?.toBase58()
+        }
+      }
+    ]),
+  });
+
   const userAccounts = useQuery({
     queryKey: ['escrow', 'fetch', { cluster }],
     queryFn: () => {
@@ -141,6 +153,7 @@ export function useEscrowProgram() {
     initialize,
     initializeUser,
     userAccounts,
+    userRequests
   };
 }
 

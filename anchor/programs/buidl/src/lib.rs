@@ -266,7 +266,6 @@ pub struct EscrowState {
     pub taker: Pubkey,
     pub mint: Pubkey,
     pub initializer_amount: u64,
-
     pub verified_collection: Pubkey,
     pub validator_total_count: u64,
     pub validator_count: u64,
