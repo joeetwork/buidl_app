@@ -8,23 +8,15 @@ import { useAccounts } from './get-accounts';
 import { useCluster } from '@/components/cluster/cluster-data-access';
 import { PublicKey } from '@metaplex-foundation/js';
 import * as anchor from '@coral-xyz/anchor';
-import { usePDAs } from './get-PDAs';
-import {
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  TOKEN_PROGRAM_ID,
-  getAssociatedTokenAddress,
-  getAssociatedTokenAddressSync,
-} from '@solana/spl-token';
 
-export function useExchange() {
+export function useUpload() {
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
   const { program, escrowAccounts } = useAccounts();
   const { publicKey } = useWallet();
-  const { mint } = usePDAs();
 
-  const exchange = useMutation({
-    mutationKey: ['escrow', 'exchange', { cluster }],
+  const uploadWork = useMutation({
+    mutationKey: ['escrow', 'uploadWork', { cluster }],
     mutationFn: async () => {
 
       //temporary
@@ -36,25 +28,12 @@ export function useExchange() {
         program.programId
       )[0];
 
-      const vault = getAssociatedTokenAddressSync(mint, escrow, true);
-
-      const takerTokenAccount = await getAssociatedTokenAddress(
-        mint,
-        publicKey,
-        true
-      );
-
       return program.methods
-        .exchange()
+        .uploadWork("githublink.com")
         .accounts({
           taker: publicKey,
-          mint: mint,
-          takerReceiveTokenAccount: takerTokenAccount,
-          initializer: escrowAccounts.data[0]?.account.initializer,
+          initializer: escrowAccounts.data[1]?.account.initializer,
           escrowState: escrow,
-          vault: vault,
-          tokenProgram: TOKEN_PROGRAM_ID,
-          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
           systemProgram: SystemProgram.programId,
         })
         .rpc();
@@ -66,5 +45,5 @@ export function useExchange() {
     },
   });
 
-  return { exchange };
+  return { uploadWork };
 }

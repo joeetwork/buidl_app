@@ -10,3 +10,5 @@ pub mod validate_work;
 pub use validate_work::*;
 pub mod initialize_user;
 pub use initialize_user::*;
+pub mod upload_work;
+pub use upload_work::*;

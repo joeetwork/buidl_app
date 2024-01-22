@@ -42,6 +42,10 @@ pub mod anchor_escrow {
         ctx.accounts.refund_and_close_vault()
     }
 
+    pub fn upload_work(ctx: Context<UploadWork>, file: String) -> Result<()> {
+        ctx.accounts.upload_work(file)
+    }
+
     pub fn decline_request(ctx: Context<DeclineRequest>) -> Result<()> {
         ctx.accounts.refund_and_close_vault()
     }

@@ -25,10 +25,7 @@ export function useDeclineRequest() {
   const declineRequest = useMutation({
     mutationKey: ['escrow', 'declineRequest', { cluster }],
     mutationFn: () => {
-      if (!publicKey) {
-        return Promise.resolve(undefined);
-      }
-
+        
       const escrow = PublicKey.findProgramAddressSync(
         [
           Buffer.from(anchor.utils.bytes.utf8.encode('escrow')),

@@ -12,6 +12,7 @@ import { useExchange } from '@/instructions/exchange';
 import { useCancel } from '@/instructions/cancel';
 import { useDeclineRequest } from '@/instructions/declineRequest';
 import { useValidate } from '@/instructions/validate';
+import { useUpload } from '@/instructions/upload_work';
 
 export function EscrowCreate() {
   const { userAccounts } = useAccounts();
@@ -91,6 +92,8 @@ function EscrowCard({ vault }: { vault: PublicKey }) {
 
   const { validate } = useValidate();
 
+  const { uploadWork } = useUpload();
+
   return (
     <div className="card card-bordered border-base-300 border-4 text-neutral-content">
       <div className="card-body items-center text-center">
@@ -135,6 +138,15 @@ function EscrowCard({ vault }: { vault: PublicKey }) {
               disabled={declineRequest.isPending}
             >
               Decline
+            </button>
+            <button
+              className="btn btn-xs btn-secondary btn-outline"
+              onClick={() => {
+                return uploadWork.mutateAsync();
+              }}
+              disabled={uploadWork.isPending}
+            >
+              Upload
             </button>
           </div>
         </div>

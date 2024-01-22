@@ -60,7 +60,8 @@ impl<'info> Initialize<'info> {
             taker,
             verified_collection,
             validator_total_count,
-            validator_count: 0
+            validator_count: 0,
+            upload_work: "".to_string(),
         });
         Ok(())
     }
