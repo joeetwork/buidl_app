@@ -25,6 +25,9 @@ export function useInitialiseEscrow() {
   const initializeEscrow = useMutation({
     mutationKey: ['escrow', 'initialize', { cluster }],
     mutationFn: async (initializerAmount: number) => {
+      if (!publicKey) {
+        return Promise.resolve('');
+      }
 
       const initializerTokenAccount = await getAssociatedTokenAddress(
         mint,

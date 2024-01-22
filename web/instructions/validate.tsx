@@ -23,6 +23,10 @@ export function useValidate() {
   const validate = useMutation({
     mutationKey: ['escrow', 'validate', { cluster }],
     mutationFn: async () => {
+      if (!publicKey) {
+        return Promise.resolve('');
+      }
+
       const nftTokenAccount = await getAssociatedTokenAddress(
         new PublicKey('9GCYpiytVnhXTggEC4tKrAHicfpz6pXBuCuc3X7PeL12'),
         publicKey,

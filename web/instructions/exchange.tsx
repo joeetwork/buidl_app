@@ -26,6 +26,9 @@ export function useExchange() {
   const exchange = useMutation({
     mutationKey: ['escrow', 'exchange', { cluster }],
     mutationFn: async () => {
+      if (!publicKey) {
+        return Promise.resolve('');
+      }
 
       //temporary
       const escrow = PublicKey.findProgramAddressSync(

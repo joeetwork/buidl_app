@@ -22,7 +22,11 @@ export function useCancel() {
 
   const cancel = useMutation({
     mutationKey: ['escrow', 'cancel', { cluster }],
-    mutationFn: () => {
+    mutationFn: async () => {
+      if (!publicKey) {
+        return Promise.resolve('');
+      }
+
       const escrow = PublicKey.findProgramAddressSync(
         [
           Buffer.from(anchor.utils.bytes.utf8.encode('escrow')),

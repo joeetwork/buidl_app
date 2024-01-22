@@ -18,6 +18,9 @@ export function useUpload() {
   const uploadWork = useMutation({
     mutationKey: ['escrow', 'uploadWork', { cluster }],
     mutationFn: async () => {
+      if (!publicKey) {
+        return Promise.resolve('');
+      }
 
       //temporary
       const escrow = PublicKey.findProgramAddressSync(
@@ -29,7 +32,7 @@ export function useUpload() {
       )[0];
 
       return program.methods
-        .uploadWork("githublink.com")
+        .uploadWork('githublink.com')
         .accounts({
           taker: publicKey,
           initializer: escrowAccounts.data[1]?.account.initializer,

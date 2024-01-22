@@ -19,6 +19,10 @@ export function useInitialiseUser() {
   const initializeUser = useMutation({
     mutationKey: ['escrow', 'initializeUser', { cluster }],
     mutationFn: async (name: string) => {
+      if (!publicKey) {
+        return Promise.resolve('');
+      }
+
       return program.methods
         .initializeUser(name)
         .accounts({
