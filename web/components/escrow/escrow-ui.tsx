@@ -4,7 +4,7 @@ import { PublicKey } from '@solana/web3.js';
 
 import { ExplorerLink } from '../cluster/cluster-ui';
 import { ellipsify } from '../shared/ellipsify';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useInitialiseEscrow } from '@/instructions/initialize-escrow';
 import { useInitialiseUser } from '@/instructions/initialize-user';
 import { useAccounts } from '@/instructions/get-accounts';
@@ -15,6 +15,7 @@ import { useValidate } from '@/instructions/validate';
 import { useUpload } from '@/instructions/upload_work';
 import { useQuery } from '@tanstack/react-query';
 import { useWallet } from '@solana/wallet-adapter-react';
+import Modal from '../modal';
 
 export function EscrowCreate() {
   // const { userAccounts } = useAccounts();
@@ -96,25 +97,27 @@ function EscrowCard({ vault }: { vault: PublicKey }) {
 
   const { uploadWork } = useUpload();
 
-  const { publicKey } = useWallet();
+  // const { publicKey } = useWallet();
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['test'],
-    queryFn: async () => {
-      const res = await fetch('/api/helius', {
-        method: 'POST',
-        body: JSON.stringify({
-          ownerAddress: publicKey?.toBase58(),
-        }),
-      });
-      const data = res.json();
-      return data;
-    },
-  });
+  // const { data, isLoading } = useQuery({
+  //   queryKey: ['test'],
+  //   queryFn: async () => {
+  //     const res = await fetch('/api/helius', {
+  //       method: 'POST',
+  //       body: JSON.stringify({
+  //         ownerAddress: publicKey?.toBase58(),
+  //       }),
+  //     });
+  //     const data = res.json();
+  //     return data;
+  //   },
+  // });
 
-  useEffect(() => {
-    console.log(data, isLoading);
-  }, [data, isLoading]);
+  // useEffect(() => {
+  //   console.log(data, isLoading);
+  // }, [data, isLoading]);
+
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <div className="card card-bordered border-base-300 border-4 text-neutral-content">
@@ -170,6 +173,10 @@ function EscrowCard({ vault }: { vault: PublicKey }) {
             >
               Upload
             </button>
+            <button onClick={() => setIsOpen(!isOpen)}>open modal</button>
+            <Modal isOpen={isOpen} onClose={() => setIsOpen(!isOpen)}>
+              <div>hello</div>
+            </Modal>
           </div>
         </div>
       </div>
