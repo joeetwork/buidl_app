@@ -13,15 +13,17 @@ import { useCancel } from '@/instructions/cancel';
 import { useDeclineRequest } from '@/instructions/declineRequest';
 import { useValidate } from '@/instructions/validate';
 import { useUpload } from '@/instructions/upload_work';
+import { useQuery } from '@tanstack/react-query';
+import { useWallet } from '@solana/wallet-adapter-react';
 
 export function EscrowCreate() {
-  const { userAccounts } = useAccounts();
+  // const { userAccounts } = useAccounts();
   const { initializeEscrow } = useInitialiseEscrow();
   const { initializeUser } = useInitialiseUser();
 
-  useEffect(() => {
-    console.log(userAccounts.data);
-  }, [userAccounts, userAccounts.isLoading]);
+  // useEffect(() => {
+  //   console.log(userAccounts.data);
+  // }, [userAccounts, userAccounts.isLoading]);
 
   return (
     <>
@@ -93,6 +95,26 @@ function EscrowCard({ vault }: { vault: PublicKey }) {
   const { validate } = useValidate();
 
   const { uploadWork } = useUpload();
+
+  const { publicKey } = useWallet();
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['test'],
+    queryFn: async () => {
+      const res = await fetch('/api/helius', {
+        method: 'POST',
+        body: JSON.stringify({
+          ownerAddress: publicKey?.toBase58(),
+        }),
+      });
+      const data = res.json();
+      return data;
+    },
+  });
+
+  useEffect(() => {
+    console.log(data, isLoading);
+  }, [data, isLoading]);
 
   return (
     <div className="card card-bordered border-base-300 border-4 text-neutral-content">
