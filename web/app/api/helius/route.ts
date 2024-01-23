@@ -13,7 +13,7 @@ export async function POST(req: Request) {
     const params = { ownerAddress, compressed, page, limit };
 
     const response = await fetch(
-      `https://mainnet.helius-rpc.com?api-key=${'bb5648b7-6cf8-4ff7-b3ab-932ce363f52c'}`,
+      `https://mainnet.helius-rpc.com?api-key=${process.env.HELIUS_KEY}`,
       {
         method: 'POST',
         headers: {
