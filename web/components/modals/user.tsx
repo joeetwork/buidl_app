@@ -19,7 +19,7 @@ export default function User() {
         }}
       />
 
-      <Dropdown label="Role:" />
+      <Dropdown label="Role:" items={['Item 1', 'Item 2']}/>
     </div>
   );
 }
