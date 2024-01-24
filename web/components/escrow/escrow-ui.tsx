@@ -180,16 +180,16 @@ function EscrowCard({ vault }: { vault: PublicKey }) {
               Upload
             </button>
             <button onClick={() => setIsOpen(!isOpen)}>open modal</button>
-            <Modal
+            {/* <Modal
               title="Create Account"
               isOpen={isOpen}
               onClose={() => setIsOpen(!isOpen)}
               onSubmit={handleSubmit}
             >
               <User />
-            </Modal>
+            </Modal> */}
 
-            {/* <Modal
+            <Modal
               title="Job Offer"
               isOpen={isOpen}
               onClose={() => setIsOpen(!isOpen)}
@@ -204,7 +204,7 @@ function EscrowCard({ vault }: { vault: PublicKey }) {
                   return;
                 }}
               />
-            </Modal> */}
+            </Modal>
           </div>
         </div>
       </div>
