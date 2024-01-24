@@ -79,11 +79,11 @@ export default function Modal({
       ref={modalRef}
       onClick={handleOutsideClick}
       onKeyDown={handleKeyDown}
-      className="bg-gray-500 !m-auto w-4/6 rounded-md backdrop:bg-gray-900 backdrop:bg-opacity-50"
+      className="bg-gray-500 !m-auto w-3/6 rounded-md backdrop:bg-gray-900 backdrop:bg-opacity-50"
     >
       <div className="flex flex-col">
         <h3 className="font-bold text-lg">{title}</h3>
-          <form method="dialog" className='flex flex-col pt-6 pb-3'>{children}</form>
+          <form method="dialog" className='flex flex-col pt-6 pb-3 items-center'>{children}</form>
         </div>
         <div className='flex justify-end gap-2'>
           {onSubmit ? (

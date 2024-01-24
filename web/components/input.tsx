@@ -1,19 +1,21 @@
-'use client'
+'use client';
 
 import React from 'react';
 
 interface InputProps {
-  label: string;
+  label?: string;
   onChange: () => void;
 }
 
 export default function Input({ label, onChange }: InputProps) {
   return (
-    <div className="grid grid-cols-4 gap-4">
-      <div className="col-span-1 m-auto">
-        <label>{label}</label>
-      </div>
-      <div className="flex col-span-3">
+    <div className="flex items-center gap-4">
+      {label && (
+        <div>
+          <label>{label}</label>
+        </div>
+      )}
+      <div>
         <input
           type="text"
           placeholder="Type here"

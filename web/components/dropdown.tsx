@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 
 interface DropdownProps {
-  label: string;
+  label?: string;
   items: string[];
   onClick: () => void;
 }
@@ -23,11 +23,13 @@ export default function Dropdown({ label, items, onClick }: DropdownProps) {
   };
 
   return (
-    <div className="grid grid-cols-4 gap-4">
-      <div className="col-span-1 m-auto">
-        <label>{label}</label>
-      </div>
-      <div className="flex col-span-3">
+    <div className="flex items-center gap-6">
+      {label && (
+        <div>
+          <label>{label}</label>
+        </div>
+      )}
+      <div>
         <div onClick={handleDropdownClick}>
           <summary className="m-1 btn">{selectedItem}</summary>
 
