@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react';
 import Input from '../input';
 import Dropdown from '../dropdown';
@@ -19,7 +21,13 @@ export default function User() {
         }}
       />
 
-      <Dropdown label="Role:" items={['Item 1', 'Item 2']}/>
+      <Dropdown
+        label="Role:"
+        items={['Item 1', 'Item 2']}
+        onClick={() => {
+          return;
+        }}
+      />
     </div>
   );
 }
