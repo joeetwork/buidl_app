@@ -4,10 +4,12 @@ import React from 'react';
 
 interface InputProps {
   label?: string;
-  onChange: () => void;
+  value: string;
+  name?: string;
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-export default function Input({ label, onChange }: InputProps) {
+export default function Input({ label, value, name, onChange }: InputProps) {
   return (
     <div className="text-left">
       {label && (
@@ -17,10 +19,12 @@ export default function Input({ label, onChange }: InputProps) {
       )}
       <div>
         <input
+          name={name}
           type="text"
           placeholder="Type here"
+          value={value}
           className="input input-bordered w-full max-w-xs"
-          onChange={onChange}
+          onChange={(e) => onChange(e)}
         />
       </div>
     </div>

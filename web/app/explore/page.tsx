@@ -1,7 +1,6 @@
-import React from 'react'
+import ExploreUi from '@/components/explore/explore-ui';
+import React from 'react';
 
 export default function page() {
-  return (
-    <div>page</div>
-  )
+  return <ExploreUi />;
 }

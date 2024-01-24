@@ -2,10 +2,12 @@ import React from 'react';
 
 interface TextAreaProps {
   label?: string;
-  onChange: () => void;
+  value: string;
+  name?: string;
+  onChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
 }
 
-export default function TextArea({ label, onChange }: TextAreaProps) {
+export default function TextArea({ label, value, onChange }: TextAreaProps) {
   return (
     <div>
       {label && (
@@ -17,8 +19,9 @@ export default function TextArea({ label, onChange }: TextAreaProps) {
         <textarea
           placeholder="Bio"
           className="textarea textarea-bordered textarea-md w-full max-w-xs"
-          onChange={onChange}
-        ></textarea>
+          onChange={(e) => onChange(e)}
+          value={value}
+        />
       </div>
     </div>
   );

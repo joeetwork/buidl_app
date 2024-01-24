@@ -15,6 +15,13 @@ import { useAccounts } from './get-accounts';
 import { useCluster } from '@/components/cluster/cluster-data-access';
 import { usePDAs } from './get-PDAs';
 
+interface EscrowProps {
+  initializerAmount: number;
+  taker: PublicKey;
+  collection: PublicKey;
+  validatorCount: number;
+}
+
 export function useInitialiseEscrow() {
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
@@ -24,7 +31,12 @@ export function useInitialiseEscrow() {
 
   const initializeEscrow = useMutation({
     mutationKey: ['escrow', 'initialize', { cluster }],
-    mutationFn: async (initializerAmount: number) => {
+    mutationFn: async ({
+      initializerAmount,
+      taker,
+      collection,
+      validatorCount,
+    }: EscrowProps) => {
       if (!publicKey) {
         return Promise.resolve('');
       }
@@ -41,9 +53,9 @@ export function useInitialiseEscrow() {
         .initialize(
           seed,
           new anchor.BN(initializerAmount),
-          new anchor.BN(1),
-          new PublicKey('F17gXajNLmVdMXtCPVpJ8enhwoxtscmDf7fLoJE8vUgw'),
-          new PublicKey('9ifBnWRecQxF3b4UfqEWp2pw7a6UAVBYiDfYYB7UtFq2')
+          new anchor.BN(validatorCount),
+          taker,
+          collection
         )
         .accounts({
           initializer: publicKey,

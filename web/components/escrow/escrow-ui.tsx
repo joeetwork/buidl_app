@@ -40,7 +40,7 @@ export function EscrowCreate() {
 
       <button
         className="btn btn-xs lg:btn-md btn-primary"
-        onClick={() => initializeUser.mutateAsync('joe')}
+        onClick={() => initializeUser.mutateAsync('joet')}
         disabled={initializeUser.isPending}
       >
         Create user {initializeUser.isPending && '...'}
@@ -189,7 +189,7 @@ function EscrowCard({ vault }: { vault: PublicKey }) {
               <User />
             </Modal> */}
 
-            <Modal
+            {/* <Modal
               title="Job Offer"
               isOpen={isOpen}
               onClose={() => setIsOpen(!isOpen)}
@@ -204,7 +204,7 @@ function EscrowCard({ vault }: { vault: PublicKey }) {
                   return;
                 }}
               />
-            </Modal>
+            </Modal> */}
           </div>
         </div>
       </div>

@@ -26,6 +26,13 @@ export function useAccounts() {
     queryFn: () => program.account.escrow.all(),
   });
 
+  const userAccounts = useQuery({
+    queryKey: ['user', 'fetch', { cluster }],
+    queryFn: () => {
+      return program.account.user.all();
+    },
+  });
+
   const userRequests = useQuery({
     queryKey: ['escrow', 'all', { cluster }],
     queryFn: () => {
@@ -44,7 +51,7 @@ export function useAccounts() {
     },
   });
 
-  const userAccounts = useQuery({
+  const userAccount = useQuery({
     queryKey: ['escrow', 'fetch', { cluster }],
     queryFn: () => {
       if (!publicKey) {
@@ -71,6 +78,7 @@ export function useAccounts() {
     escrowAccounts,
     getProgramAccount,
     userAccounts,
+    userAccount,
     userRequests,
   };
 }
