@@ -9,9 +9,9 @@ interface InputProps {
 
 export default function Input({ label, onChange }: InputProps) {
   return (
-    <div>
+    <div className="text-left">
       {label && (
-        <div className="text-left">
+        <div>
           <label>{label}</label>
         </div>
       )}
