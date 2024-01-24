@@ -4,11 +4,21 @@ import React, { useEffect, useRef, useState } from 'react';
 
 interface ModalProps {
   isOpen: boolean;
-  onClose?: () => void;
+  title: string;
+  allowOutsideClick?: boolean;
+  onClose: () => void;
+  onSubmit?: () => void;
   children: React.ReactNode;
 }
 
-export default function Modal({ isOpen, onClose, children }: ModalProps) {
+export default function Modal({
+  isOpen,
+  title,
+  allowOutsideClick,
+  onClose,
+  onSubmit,
+  children,
+}: ModalProps) {
   const [isModalOpen, setModalOpen] = useState(isOpen);
   const modalRef = useRef<HTMLDialogElement | null>(null);
 
@@ -28,15 +38,21 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
   }, [isModalOpen]);
 
   const handleCloseModal = () => {
-    if (onClose) {
-      onClose();
+    onClose();
+    setModalOpen(false);
+  };
+
+  const handleSubmitModal = () => {
+    if (onSubmit) {
+      onSubmit();
     }
+    onClose();
     setModalOpen(false);
   };
 
   const handleOutsideClick = (e: React.MouseEvent<HTMLDialogElement>) => {
     const modalElement = modalRef.current;
-    if (!modalElement) {
+    if (!modalElement || !allowOutsideClick) {
       return;
     }
 
@@ -63,20 +79,22 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
       ref={modalRef}
       onClick={handleOutsideClick}
       onKeyDown={handleKeyDown}
-      className="bg-gray-500 !m-auto rounded-md backdrop:bg-gray-900 backdrop:bg-opacity-50"
+      className="bg-gray-500 !m-auto w-4/6 rounded-md backdrop:bg-gray-900 backdrop:bg-opacity-50"
     >
-      <div>
-        <h3 className="font-bold text-lg">Hello!</h3>
-        <p className="py-4">Press ESC key or click the button below to close</p>
-        <div className="modal-action">
-          <form method="dialog">
-            {children}
-            <button className="btn" onClick={handleCloseModal}>
-              Close
-            </button>
-          </form>
+      <div className="flex flex-col">
+        <h3 className="font-bold text-lg">{title}</h3>
+          <form method="dialog" className='flex flex-col pt-6 pb-3'>{children}</form>
         </div>
-      </div>
+        <div className='flex justify-end gap-2'>
+          {onSubmit ? (
+            <button className="btn" onClick={handleSubmitModal}>
+              Submit
+            </button>
+          ) : null}
+          <button className="btn" onClick={handleCloseModal}>
+            Close
+          </button>
+        </div>
     </dialog>
   );
 }
