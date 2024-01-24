@@ -17,6 +17,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useWallet } from '@solana/wallet-adapter-react';
 import Modal from '../modal';
 import User from '../modals/user';
+import Escrow from '../modals/escrow';
 
 export function EscrowCreate() {
   // const { userAccounts } = useAccounts();
@@ -122,8 +123,7 @@ function EscrowCard({ vault }: { vault: PublicKey }) {
 
   const handleSubmit = () => {
     console.log('submit');
-    
-  }
+  };
 
   return (
     <div className="card card-bordered border-base-300 border-4 text-neutral-content">
@@ -188,6 +188,23 @@ function EscrowCard({ vault }: { vault: PublicKey }) {
             >
               <User />
             </Modal>
+
+            {/* <Modal
+              title="Job Offer"
+              isOpen={isOpen}
+              onClose={() => setIsOpen(!isOpen)}
+              onSubmit={handleSubmit}
+            >
+              <Escrow
+                collection={['']}
+                onChangeAmount={() => {
+                  return;
+                }}
+                onChangeAbout={() => {
+                  return;
+                }}
+              />
+            </Modal> */}
           </div>
         </div>
       </div>

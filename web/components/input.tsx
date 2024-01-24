@@ -9,9 +9,9 @@ interface InputProps {
 
 export default function Input({ label, onChange }: InputProps) {
   return (
-    <div className="flex items-center gap-4">
+    <div>
       {label && (
-        <div>
+        <div className="text-left">
           <label>{label}</label>
         </div>
       )}

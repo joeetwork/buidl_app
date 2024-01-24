@@ -23,7 +23,7 @@ export default function Dropdown({ label, items, onClick }: DropdownProps) {
   };
 
   return (
-    <div className="flex items-center gap-6">
+    <div className="text-left">
       {label && (
         <div>
           <label>{label}</label>
