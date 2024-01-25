@@ -30,7 +30,7 @@ export function useCancel() {
       const escrow = PublicKey.findProgramAddressSync(
         [
           Buffer.from(anchor.utils.bytes.utf8.encode('escrow')),
-          escrowAccounts.data[1]?.account.seed.toArrayLike(Buffer, 'le', 8),
+          escrowAccounts.data[0]?.account.seed.toArrayLike(Buffer, 'le', 8),
         ],
         program.programId
       )[0];

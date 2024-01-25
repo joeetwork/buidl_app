@@ -25,7 +25,7 @@ export function EscrowCreate() {
   const { initializeUser } = useInitialiseUser();
 
   useEffect(() => {
-    console.log(escrowAccounts.data);
+    console.log(escrowAccounts.data?.length > 1 && escrowAccounts.data[0].account.taker.toString());
   }, [escrowAccounts, escrowAccounts.isLoading]);
 
   return (
@@ -42,8 +42,8 @@ export function EscrowCreate() {
         className="btn btn-xs lg:btn-md btn-primary"
         onClick={() =>
           initializeUser.mutateAsync({
-            name: 'joet',
-            about: 'test',
+            name: 'j',
+            about: 'testing',
             role: 'fd',
           })
         }

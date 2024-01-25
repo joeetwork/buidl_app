@@ -75,7 +75,7 @@ export default function ExploreUi() {
           <div
             key={user.publicKey.toString()}
             className="flex flex-col"
-            onClick={() => handleModalClick(user.publicKey)}
+            onClick={() => handleModalClick(user.account.initializerKey)}
           >
             <div>{user.account.username}</div>
             <div>{user.account.about}</div>
