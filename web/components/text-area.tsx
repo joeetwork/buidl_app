@@ -7,7 +7,7 @@ interface TextAreaProps {
   onChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
 }
 
-export default function TextArea({ label, value, onChange }: TextAreaProps) {
+export default function TextArea({ label, value, name, onChange }: TextAreaProps) {
   return (
     <div>
       {label && (
@@ -17,7 +17,8 @@ export default function TextArea({ label, value, onChange }: TextAreaProps) {
       )}
       <div>
         <textarea
-          placeholder="Bio"
+          placeholder="About"
+          name={name}
           className="textarea textarea-bordered textarea-md w-full max-w-xs"
           onChange={(e) => onChange(e)}
           value={value}

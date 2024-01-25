@@ -20,6 +20,7 @@ interface EscrowProps {
   taker: PublicKey;
   collection: PublicKey;
   validatorCount: number;
+  about: string
 }
 
 export function useInitialiseEscrow() {
@@ -36,6 +37,7 @@ export function useInitialiseEscrow() {
       taker,
       collection,
       validatorCount,
+      about
     }: EscrowProps) => {
       if (!publicKey) {
         return Promise.resolve('');
@@ -55,7 +57,8 @@ export function useInitialiseEscrow() {
           new anchor.BN(initializerAmount),
           new anchor.BN(validatorCount),
           taker,
-          collection
+          collection,
+          about
         )
         .accounts({
           initializer: publicKey,

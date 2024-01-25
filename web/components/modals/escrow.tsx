@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import React, { useEffect } from 'react';
 import Input from '../input';
@@ -10,7 +10,9 @@ import { useQuery } from '@tanstack/react-query';
 
 interface EscrowProps {
   collections: PublicKey[];
-  onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  onChange: (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void;
   escrow: {
     initializerAmount: number;
     taker: PublicKey;
@@ -63,9 +65,7 @@ export default function Escrow({ collections, onChange, escrow }: EscrowProps) {
         onChange={onChange}
       />
 
-
-        {/* <Image src={collection} alt="collection" />; */}
-
+      {/* <Image src={collection} alt="collection" />; */}
     </div>
   );
 }

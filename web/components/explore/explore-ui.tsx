@@ -44,10 +44,6 @@ export default function ExploreUi() {
   //     }));
   //   };
 
-  useEffect(() => {
-    console.log(userAccounts);
-  }, [userAccounts.data, userAccounts.isLoading]);
-
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {

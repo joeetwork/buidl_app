@@ -20,13 +20,13 @@ import User from '../modals/user';
 import Escrow from '../modals/escrow';
 
 export function EscrowCreate() {
-  // const { userAccounts } = useAccounts();
+  const { userAccounts, escrowAccounts } = useAccounts();
   const { initializeEscrow } = useInitialiseEscrow();
   const { initializeUser } = useInitialiseUser();
 
-  // useEffect(() => {
-  //   console.log(userAccounts.data);
-  // }, [userAccounts, userAccounts.isLoading]);
+  useEffect(() => {
+    console.log(escrowAccounts.data);
+  }, [escrowAccounts, escrowAccounts.isLoading]);
 
   return (
     <>
