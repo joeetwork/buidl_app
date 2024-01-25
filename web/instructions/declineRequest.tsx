@@ -1,13 +1,12 @@
 'use client';
 
 import { useWallet } from '@solana/wallet-adapter-react';
-import { SystemProgram } from '@solana/web3.js';
+import { PublicKey, SystemProgram } from '@solana/web3.js';
 import { useMutation } from '@tanstack/react-query';
 import { useTransactionToast } from '@/hooks/use-transaction-toast';
 import { useAccounts } from './get-accounts';
 import { useCluster } from '@/components/cluster/cluster-data-access';
-import { PublicKey } from '@metaplex-foundation/js';
-import * as anchor from '@coral-xyz/anchor';
+
 import { usePDAs } from './get-PDAs';
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -22,26 +21,23 @@ export function useDeclineRequest() {
   const { publicKey } = useWallet();
   const { mint } = usePDAs();
 
+  interface RequestProps {
+    pda: PublicKey;
+    initializer: PublicKey;
+  }
+
   const declineRequest = useMutation({
     mutationKey: ['escrow', 'declineRequest', { cluster }],
-    mutationFn: async () => {
+    mutationFn: async ({ pda, initializer }: RequestProps) => {
       if (!publicKey) {
         return Promise.resolve('');
       }
 
-      const escrow = PublicKey.findProgramAddressSync(
-        [
-          Buffer.from(anchor.utils.bytes.utf8.encode('escrow')),
-          escrowAccounts.data[1]?.account.seed.toArrayLike(Buffer, 'le', 8),
-        ],
-        program.programId
-      )[0];
-
-      const vault = getAssociatedTokenAddressSync(mint, escrow, true);
+      const vault = getAssociatedTokenAddressSync(mint, pda, true);
 
       const initializerDepositTokenAccount = getAssociatedTokenAddressSync(
         mint,
-        escrowAccounts.data[1].account.initializer,
+        initializer,
         true
       );
 
@@ -49,11 +45,11 @@ export function useDeclineRequest() {
         .declineRequest()
         .accounts({
           taker: publicKey,
-          initializer: escrowAccounts.data[1].account.initializer,
+          initializer: initializer,
           mint: mint,
           initializerDepositTokenAccount: initializerDepositTokenAccount,
           vault: vault,
-          escrowState: escrow,
+          escrowState: pda,
           tokenProgram: TOKEN_PROGRAM_ID,
           associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
           systemProgram: SystemProgram.programId,

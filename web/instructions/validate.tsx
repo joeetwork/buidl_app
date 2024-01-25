@@ -13,6 +13,11 @@ import {
   getAssociatedTokenAddress,
 } from '@solana/spl-token';
 
+interface ValidateProps {
+  pda: PublicKey;
+  nftAddress: PublicKey;
+}
+
 export function useValidate() {
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
@@ -22,7 +27,7 @@ export function useValidate() {
 
   const validate = useMutation({
     mutationKey: ['escrow', 'validate', { cluster }],
-    mutationFn: async () => {
+    mutationFn: async ({ pda, nftAddress }: ValidateProps) => {
       if (!publicKey) {
         return Promise.resolve('');
       }
@@ -43,19 +48,11 @@ export function useValidate() {
           mint: new PublicKey('9GCYpiytVnhXTggEC4tKrAHicfpz6pXBuCuc3X7PeL12'),
         });
 
-      const escrow = PublicKey.findProgramAddressSync(
-        [
-          Buffer.from(anchor.utils.bytes.utf8.encode('escrow')),
-          escrowAccounts.data[0]?.account.seed.toArrayLike(Buffer, 'le', 8),
-        ],
-        program.programId
-      )[0];
-
       return program.methods
         .validateWork()
         .accounts({
           user: publicKey,
-          escrowState: escrow,
+          escrowState: pda,
           nftMint: new PublicKey(
             '9GCYpiytVnhXTggEC4tKrAHicfpz6pXBuCuc3X7PeL12'
           ),
