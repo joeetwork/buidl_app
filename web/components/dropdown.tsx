@@ -5,16 +5,20 @@ import React, { useState } from 'react';
 interface DropdownProps {
   label?: string;
   items: string[];
-  onClick: () => void;
+  value: string;
+  onClick: (value: string) => void;
 }
 
-export default function Dropdown({ label, items, onClick }: DropdownProps) {
+export default function Dropdown({
+  label,
+  items,
+  value,
+  onClick,
+}: DropdownProps) {
   const [isActive, setIsActive] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<string>(items[0]);
 
   const handleSelectClick = (item: string) => {
-    onClick();
-    setSelectedItem(item);
+    onClick(item);
     setIsActive(false);
   };
 
@@ -30,8 +34,10 @@ export default function Dropdown({ label, items, onClick }: DropdownProps) {
         </div>
       )}
       <div>
-        <div onClick={handleDropdownClick}>
-          <summary className="m-1 btn">{selectedItem}</summary>
+        <div>
+          <summary onClick={handleDropdownClick} className="m-1 btn">
+            {value ? value : items[0]}
+          </summary>
 
           {isActive ? (
             <ul className="p-2 shadow menu fixed z-[1] bg-base-100 rounded-box w-52">

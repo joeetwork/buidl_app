@@ -20,10 +20,12 @@ export function usePDAs() {
     program.programId
   )[0];
 
-  const userPDA = publicKey ? PublicKey.findProgramAddressSync(
-    [Buffer.from('user'), publicKey?.toBuffer()],
-    program.programId
-  )[0] : undefined;
+  const userPDA = publicKey
+    ? PublicKey.findProgramAddressSync(
+        [Buffer.from('user'), publicKey?.toBuffer()],
+        program.programId
+      )[0]
+    : undefined;
 
   const vaultPDA = getAssociatedTokenAddressSync(mint, escrowPDA, true);
 
