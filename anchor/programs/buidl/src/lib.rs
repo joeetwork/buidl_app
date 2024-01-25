@@ -18,7 +18,8 @@ pub mod anchor_escrow {
         initializer_amount: u64,
         validator_total_count: u64,
         taker: Pubkey,
-        verified_collection: Pubkey
+        verified_collection: Pubkey,
+        about: String
     ) -> Result<()> {
 
         ctx.accounts
@@ -28,7 +29,8 @@ pub mod anchor_escrow {
             initializer_amount, 
             taker,
             verified_collection,
-            validator_total_count
+            validator_total_count,
+            about
         )?;
 
         ctx.accounts.deposit(initializer_amount)

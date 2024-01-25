@@ -49,7 +49,8 @@ impl<'info> Initialize<'info> {
         initializer_amount: u64,
         taker: Pubkey,
         verified_collection: Pubkey,
-        validator_total_count: u64
+        validator_total_count: u64,
+        about: String
     ) -> Result<()> {
         self.escrow_state.set_inner(Escrow {
             seed,
@@ -62,6 +63,7 @@ impl<'info> Initialize<'info> {
             validator_total_count,
             validator_count: 0,
             upload_work: "".to_string(),
+            about
         });
         Ok(())
     }
