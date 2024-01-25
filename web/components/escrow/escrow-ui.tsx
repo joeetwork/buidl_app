@@ -40,7 +40,13 @@ export function EscrowCreate() {
 
       <button
         className="btn btn-xs lg:btn-md btn-primary"
-        onClick={() => initializeUser.mutateAsync('joet')}
+        onClick={() =>
+          initializeUser.mutateAsync({
+            name: 'joet',
+            about: 'test',
+            role: 'fd',
+          })
+        }
         disabled={initializeUser.isPending}
       >
         Create user {initializeUser.isPending && '...'}

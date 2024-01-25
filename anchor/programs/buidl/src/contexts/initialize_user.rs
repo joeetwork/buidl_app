@@ -22,9 +22,11 @@ pub struct InitializeUser<'info> {
 
 impl <'info> InitializeUser<'info> {
  
-    pub fn initialize_user(&mut self, username: String) -> Result<()> {
+    pub fn initialize_user(&mut self, username: String, about: String, role: String) -> Result<()> {
          self.user_state.initializer_key = *self.initializer.key;
          self.user_state.username = username;
+         self.user_state.about = about;
+         self.user_state.role = role;
          Ok(())
      }
     } 

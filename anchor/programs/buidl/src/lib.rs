@@ -34,8 +34,8 @@ pub mod anchor_escrow {
         ctx.accounts.deposit(initializer_amount)
     }
 
-    pub fn initialize_user(ctx: Context<InitializeUser>, username: String) -> Result<()> {
-        ctx.accounts.initialize_user(username)
+    pub fn initialize_user(ctx: Context<InitializeUser>, username: String, about: String, role: String) -> Result<()> {
+        ctx.accounts.initialize_user(username, about, role)
     }
 
     pub fn cancel(ctx: Context<Cancel>) -> Result<()> {
