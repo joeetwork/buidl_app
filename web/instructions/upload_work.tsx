@@ -7,35 +7,31 @@ import { useTransactionToast } from '@/hooks/use-transaction-toast';
 import { useAccounts } from './get-accounts';
 import { useCluster } from '@/components/cluster/cluster-data-access';
 import { PublicKey } from '@metaplex-foundation/js';
-import * as anchor from '@coral-xyz/anchor';
+
+interface UploadProps {
+  escrow: PublicKey,
+  initializer: PublicKey,
+  link: string
+}
 
 export function useUpload() {
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
-  const { program, escrowAccounts } = useAccounts();
+  const { program } = useAccounts();
   const { publicKey } = useWallet();
 
   const uploadWork = useMutation({
     mutationKey: ['escrow', 'uploadWork', { cluster }],
-    mutationFn: async () => {
+    mutationFn: async ({escrow, initializer, link}: UploadProps) => {
       if (!publicKey) {
         return Promise.resolve('');
       }
 
-      //temporary
-      const escrow = PublicKey.findProgramAddressSync(
-        [
-          Buffer.from(anchor.utils.bytes.utf8.encode('escrow')),
-          escrowAccounts.data[1]?.account.seed.toArrayLike(Buffer, 'le', 8),
-        ],
-        program.programId
-      )[0];
-
       return program.methods
-        .uploadWork('githublink.com')
+        .uploadWork(link)
         .accounts({
           taker: publicKey,
-          initializer: escrowAccounts.data[1]?.account.initializer,
+          initializer: initializer,
           escrowState: escrow,
           systemProgram: SystemProgram.programId,
         })

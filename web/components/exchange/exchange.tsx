@@ -13,13 +13,13 @@ export default function Exchange() {
   const { exchange } = useExchange();
   const [data, setData] = useState<EscrowProps | undefined>();
 
-  const handleClick = () => {
+  const handleSubmit = () => {
     if (data) {
       exchange.mutateAsync(data);
     }
   };
 
-  const handleSubmit = ({ escrow, initializer }: EscrowProps) => {
+  const handleClick = ({ escrow, initializer }: EscrowProps) => {
     setData({ escrow, initializer });
   };
 
@@ -30,7 +30,7 @@ export default function Exchange() {
           <div
             key={escrow.publicKey.toString()}
             onClick={() =>
-              handleSubmit({
+              handleClick({
                 escrow: escrow.publicKey,
                 initializer: escrow.account.initializer,
               })
@@ -40,7 +40,7 @@ export default function Exchange() {
           </div>
         );
       })}
-      <button className="btn" onClick={handleClick} disabled={!data}>
+      <button className="btn" onClick={handleSubmit} disabled={!data}>
         Exchange
       </button>
     </>

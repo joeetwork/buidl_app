@@ -8,6 +8,7 @@ import { PublicKey } from '@solana/web3.js';
 import { useQuery } from '@tanstack/react-query';
 import React, { useState } from 'react';
 import Exchange from '../exchange/exchange';
+import UploadWork from '../upload-work/upload-work';
 
 export default function ValidateWork() {
   const { validate } = useValidate();
@@ -100,6 +101,7 @@ export default function ValidateWork() {
       >
         Validate
       </button>
+      <UploadWork />
     </>
   );
 }

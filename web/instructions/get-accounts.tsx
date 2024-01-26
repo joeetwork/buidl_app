@@ -33,8 +33,9 @@ export function useAccounts() {
     },
   });
 
+  //taker waller (offset 17 is init wallet)
   const userRequests = useQuery({
-    queryKey: ['escrow', 'all', { cluster }],
+    queryKey: ['escrow',{ cluster }],
     queryFn: () => {
       if (!publicKey) {
         return Promise.resolve(undefined);
@@ -43,7 +44,7 @@ export function useAccounts() {
       return program.account.escrow.all([
         {
           memcmp: {
-            offset: 17,
+            offset: 49,
             bytes: publicKey?.toBase58(),
           },
         },
