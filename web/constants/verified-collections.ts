@@ -1,1 +1,1 @@
-export const COLLECTIONS = ['9ifBnWRecQxF3b4UfqEWp2pw7a6UAVBYiDfYYB7UtFq2'];
+export const COLLECTIONS = ['2buwWpUqd9UaeyxQKiksa14sTyLxJaY27tYVkpR9ja5y'];

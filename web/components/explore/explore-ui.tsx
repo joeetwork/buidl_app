@@ -23,8 +23,8 @@ export default function ExploreUi() {
   const [isOpen, setIsOpen] = useState(false);
   const [escrowDetails, setEscrowDetails] = useState<EscrowProps>({
     initializerAmount: 0,
-    taker: new PublicKey('9ifBnWRecQxF3b4UfqEWp2pw7a6UAVBYiDfYYB7UtFq2'),
-    collection: new PublicKey('9ifBnWRecQxF3b4UfqEWp2pw7a6UAVBYiDfYYB7UtFq2'),
+    taker: new PublicKey('2buwWpUqd9UaeyxQKiksa14sTyLxJaY27tYVkpR9ja5y'),
+    collection: new PublicKey('2buwWpUqd9UaeyxQKiksa14sTyLxJaY27tYVkpR9ja5y'),
     about: '',
     validatorCount: 1,
   });

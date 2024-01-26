@@ -6,6 +6,7 @@ export async function POST(req: Request) {
     const {
       ownerAddress = '',
       compressed = false,
+      grouping,
       page = 1,
       limit = 1000,
     } = await req.json();
@@ -23,6 +24,7 @@ export async function POST(req: Request) {
           method: 'searchAssets',
           params: {
             ownerAddress,
+            grouping,
             compressed,
             page,
             limit,

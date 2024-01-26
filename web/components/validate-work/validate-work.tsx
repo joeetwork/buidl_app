@@ -6,7 +6,7 @@ import { useValidate } from '@/instructions/validate';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { useQuery } from '@tanstack/react-query';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 export default function ValidateWork() {
   const { validate } = useValidate();
@@ -15,7 +15,7 @@ export default function ValidateWork() {
   >();
   const [selectedEscrow, setSelectedEscrow] = useState<PublicKey | undefined>();
 
-  const {publicKey} = useWallet();
+  const { publicKey } = useWallet();
 
   const { validatorEscrows } = useAccounts();
 
@@ -34,38 +34,20 @@ export default function ValidateWork() {
 
   //check if the user has an nft related to that collection
 
-  const { data, isLoading } = useQuery({
+  const { data } = useQuery({
     queryKey: ['test', selectedCollection],
     queryFn: async () => {
-      const res = await fetch('/api/assets-by-group', {
+      const res = await fetch('/api/search-assets', {
         method: 'POST',
         body: JSON.stringify({
-          groupValue: selectedCollection?.toString(),
+          ownerAddress: publicKey?.toString(),
+          grouping: ['collection', selectedCollection?.toString()],
         }),
       });
       const data = res.json();
       return data;
     },
   });
-
-  const data2 = useQuery({
-    queryKey: ['test', publicKey],
-    queryFn: async () => {
-      const res = await fetch('/api/assets-by-owner', {
-        method: 'POST',
-        body: JSON.stringify({
-            ownerAddress: publicKey?.toString(),
-        }),
-      });
-      const data = res.json();
-      return data;
-    },
-  });
-  
-
-  useEffect(() => {    
-    console.log(data2.data, data2.isLoading);
-  }, [data2.data, data2.isLoading]);
 
   //if true enable submit button and submit the nft id and the collection id when validates
 
@@ -88,14 +70,14 @@ export default function ValidateWork() {
 
       {validatorEscrows.isSuccess ? (
         <div>
-          {validatorEscrows.data?.map((escrow, i) => {
+          {validatorEscrows.data?.map((escrow) => {
             return (
-              <>
-                <div key={i}>{escrow.publicKey.toString()}</div>
+              <div key={escrow.publicKey.toString()}>
+                <div>{escrow.publicKey.toString()}</div>
                 <div onClick={() => handleEscrowClick(escrow.publicKey)}>
                   Validate this work
                 </div>
-              </>
+              </div>
             );
           })}
         </div>
@@ -104,14 +86,16 @@ export default function ValidateWork() {
       <button
         className="btn btn-xs btn-secondary btn-outline"
         onClick={() => {
-            if (selectedEscrow) {
-              return validate.mutateAsync({
-                escrow: selectedEscrow,
-                nftAddress: '',
-              });
-            }
+          if (selectedEscrow && data?.result?.items[0]) {
+            return validate.mutateAsync({
+              escrow: selectedEscrow,
+              nftAddress: new PublicKey(data?.result?.items[0].id),
+            });
+          }
         }}
-        disabled={validate.isPending}
+        disabled={
+          validate.isPending || !data?.result?.items[0] || !selectedEscrow
+        }
       >
         Validate
       </button>

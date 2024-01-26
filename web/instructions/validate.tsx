@@ -33,7 +33,7 @@ export function useValidate() {
       }
 
       const nftTokenAccount = await getAssociatedTokenAddress(
-        new PublicKey('9GCYpiytVnhXTggEC4tKrAHicfpz6pXBuCuc3X7PeL12'),
+        nftAddress,
         publicKey,
         true,
         TOKEN_PROGRAM_ID,
@@ -45,7 +45,7 @@ export function useValidate() {
         .nfts()
         .pdas()
         .metadata({
-          mint: new PublicKey('9GCYpiytVnhXTggEC4tKrAHicfpz6pXBuCuc3X7PeL12'),
+          mint: nftAddress,
         });
 
       return program.methods
@@ -53,9 +53,7 @@ export function useValidate() {
         .accounts({
           user: publicKey,
           escrowState: escrow,
-          nftMint: new PublicKey(
-            '9GCYpiytVnhXTggEC4tKrAHicfpz6pXBuCuc3X7PeL12'
-          ),
+          nftMint: nftAddress,
           nftTokenAccount: nftTokenAccount,
           metadataAccount: metadataPda,
           systemProgram: anchor.web3.SystemProgram.programId,
