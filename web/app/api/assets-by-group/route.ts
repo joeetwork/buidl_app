@@ -4,16 +4,14 @@ import { NextResponse } from 'next/server';
 export async function POST(req: Request) {
   try {
     const {
-      ownerAddress = '',
-      compressed = false,
+      groupKey = 'collection',
+      groupValue = '',
       page = 1,
       limit = 1000,
     } = await req.json();
 
-    const params = { ownerAddress, compressed, page, limit };
-
     const response = await fetch(
-      `https://mainnet.helius-rpc.com?api-key=${process.env.HELIUS_KEY}`,
+      `https://devnet.helius-rpc.com?api-key=${process.env.HELIUS_KEY}`,
       {
         method: 'POST',
         headers: {
@@ -22,8 +20,13 @@ export async function POST(req: Request) {
         body: JSON.stringify({
           jsonrpc: '2.0',
           id: 'my-id',
-          method: 'searchAssets',
-          params,
+          method: 'getAssetsByGroup',
+          params: {
+            groupKey,
+            groupValue,
+            page,
+            limit,
+          },
         }),
       }
     );

@@ -14,7 +14,7 @@ import {
 } from '@solana/spl-token';
 
 interface ValidateProps {
-  pda: PublicKey;
+  escrow: PublicKey;
   nftAddress: PublicKey;
 }
 
@@ -27,7 +27,7 @@ export function useValidate() {
 
   const validate = useMutation({
     mutationKey: ['escrow', 'validate', { cluster }],
-    mutationFn: async ({ pda, nftAddress }: ValidateProps) => {
+    mutationFn: async ({ escrow, nftAddress }: ValidateProps) => {
       if (!publicKey) {
         return Promise.resolve('');
       }
@@ -52,7 +52,7 @@ export function useValidate() {
         .validateWork()
         .accounts({
           user: publicKey,
-          escrowState: pda,
+          escrowState: escrow,
           nftMint: new PublicKey(
             '9GCYpiytVnhXTggEC4tKrAHicfpz6pXBuCuc3X7PeL12'
           ),

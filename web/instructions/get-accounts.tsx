@@ -4,7 +4,7 @@ import { BuidlIDL, getBuidlProgramId } from '@buidl/anchor';
 import { Program } from '@coral-xyz/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Cluster, PublicKey } from '@solana/web3.js';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { useAnchorProvider } from '@/components/solana/anchor-provider';
 import { useCluster } from '@/components/cluster/cluster-data-access';
@@ -51,6 +51,25 @@ export function useAccounts() {
     },
   });
 
+  interface ValidatorEscrowsProps {
+    collection: PublicKey
+  }
+
+  const validatorEscrows = useMutation({
+    mutationKey: ['escrow', "collection"],
+    mutationFn: ({collection}: ValidatorEscrowsProps) => {
+
+      return program.account.escrow.all([
+        {
+          memcmp: {
+            offset: 121,
+            bytes: collection?.toBase58(),
+          },
+        },
+      ]);
+    },
+  });
+
   const userAccount = useQuery({
     queryKey: ['escrow', 'fetch', { cluster }],
     queryFn: () => {
@@ -80,5 +99,6 @@ export function useAccounts() {
     userAccounts,
     userAccount,
     userRequests,
+    validatorEscrows
   };
 }

@@ -110,7 +110,7 @@ function EscrowCard({ vault }: { vault: PublicKey }) {
   // const { data, isLoading } = useQuery({
   //   queryKey: ['test'],
   //   queryFn: async () => {
-  //     const res = await fetch('/api/helius', {
+  //     const res = await fetch('/api/search-assets', {
   //       method: 'POST',
   //       body: JSON.stringify({
   //         ownerAddress: publicKey?.toBase58(),
