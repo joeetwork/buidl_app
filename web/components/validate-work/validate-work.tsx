@@ -7,6 +7,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { useQuery } from '@tanstack/react-query';
 import React, { useState } from 'react';
+import Exchange from '../exchange/exchange';
 
 export default function ValidateWork() {
   const { validate } = useValidate();
@@ -82,7 +83,7 @@ export default function ValidateWork() {
           })}
         </div>
       ) : null}
-
+      <Exchange />
       <button
         className="btn btn-xs btn-secondary btn-outline"
         onClick={() => {

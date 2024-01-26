@@ -1,7 +1,7 @@
 'use client';
 
 import { useAccounts } from '@/instructions/get-accounts';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Modal from '../modal';
 import Escrow from '../modals/escrow';
 import { useInitialiseEscrow } from '@/instructions/initialize-escrow';

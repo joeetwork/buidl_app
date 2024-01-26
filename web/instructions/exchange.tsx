@@ -16,6 +16,11 @@ import {
   getAssociatedTokenAddressSync,
 } from '@solana/spl-token';
 
+interface EscrowProps {
+  escrow: PublicKey,
+  initializer: PublicKey
+}
+
 export function useExchange() {
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
@@ -25,19 +30,10 @@ export function useExchange() {
 
   const exchange = useMutation({
     mutationKey: ['escrow', 'exchange', { cluster }],
-    mutationFn: async () => {
+    mutationFn: async ({escrow, initializer}: EscrowProps) => {
       if (!publicKey) {
         return Promise.resolve('');
       }
-
-      //temporary
-      const escrow = PublicKey.findProgramAddressSync(
-        [
-          Buffer.from(anchor.utils.bytes.utf8.encode('escrow')),
-          escrowAccounts.data[0]?.account.seed.toArrayLike(Buffer, 'le', 8),
-        ],
-        program.programId
-      )[0];
 
       const vault = getAssociatedTokenAddressSync(mint, escrow, true);
 
@@ -53,7 +49,7 @@ export function useExchange() {
           taker: publicKey,
           mint: mint,
           takerReceiveTokenAccount: takerTokenAccount,
-          initializer: escrowAccounts.data[0]?.account.initializer,
+          initializer,
           escrowState: escrow,
           vault: vault,
           tokenProgram: TOKEN_PROGRAM_ID,
