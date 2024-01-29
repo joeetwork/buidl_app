@@ -1,6 +1,6 @@
 'use client';
 
-import { COLLECTIONS } from '@/constants/verified-collections';
+
 import { useAccounts } from '@/hooks/get-accounts';
 import { useValidate } from '@/hooks/validate';
 import { useWallet } from '@solana/wallet-adapter-react';
@@ -9,6 +9,7 @@ import { useQuery } from '@tanstack/react-query';
 import React, { useState } from 'react';
 import Exchange from '../exchange/exchange';
 import UploadWork from '../upload-work/upload-work';
+import { COLLECTIONS } from '@/constants';
 
 export default function ValidateWork() {
   const { validate } = useValidate();
