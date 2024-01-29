@@ -35,7 +35,7 @@ export default function Dropdown({
       )}
       <div>
         <div>
-          <summary onClick={handleDropdownClick} className="m-1 btn">
+          <summary onClick={handleDropdownClick} className="btn">
             {value ? value : items[0]}
           </summary>
 

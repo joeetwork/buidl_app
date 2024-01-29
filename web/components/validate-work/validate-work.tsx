@@ -1,8 +1,8 @@
 'use client';
 
 import { COLLECTIONS } from '@/constants/verified-collections';
-import { useAccounts } from '@/instructions/get-accounts';
-import { useValidate } from '@/instructions/validate';
+import { useAccounts } from '@/hooks/get-accounts';
+import { useValidate } from '@/hooks/validate';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { useQuery } from '@tanstack/react-query';

@@ -1,5 +1,5 @@
-import { useExchange } from '@/instructions/exchange';
-import { useAccounts } from '@/instructions/get-accounts';
+import { useExchange } from '@/hooks/exchange';
+import { useAccounts } from '@/hooks/get-accounts';
 import { PublicKey } from '@solana/web3.js';
 import React, { useState } from 'react';
 

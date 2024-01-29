@@ -1,7 +1,7 @@
 'use client';
 
-import { useDeclineRequest } from '@/instructions/declineRequest';
-import { useAccounts } from '@/instructions/get-accounts';
+import { useDeclineRequest } from '@/hooks/declineRequest';
+import { useAccounts } from '@/hooks/get-accounts';
 import { PublicKey } from '@solana/web3.js';
 
 import React from 'react';

@@ -2,7 +2,7 @@
 
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useMutation } from '@tanstack/react-query';
-import { useTransactionToast } from '@/hooks/use-transaction-toast';
+import { useTransactionToast } from '@/components/shared/use-transaction-toast';
 import { useAccounts } from './get-accounts';
 import { useCluster } from '@/components/cluster/cluster-data-access';
 import { Metaplex, PublicKey } from '@metaplex-foundation/js';
@@ -41,12 +41,9 @@ export function useValidate() {
       );
 
       const metaplex = Metaplex.make(connection);
-      const metadataPda = metaplex
-        .nfts()
-        .pdas()
-        .metadata({
-          mint: nftAddress,
-        });
+      const metadataPda = metaplex.nfts().pdas().metadata({
+        mint: nftAddress,
+      });
 
       return program.methods
         .validateWork()

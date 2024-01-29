@@ -4,7 +4,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { SystemProgram } from '@solana/web3.js';
 import { useMutation } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { useTransactionToast } from '@/hooks/use-transaction-toast';
+import { useTransactionToast } from '@/components/shared/use-transaction-toast';
 import { useAccounts } from './get-accounts';
 import { useCluster } from '@/components/cluster/cluster-data-access';
 import { usePDAs } from './get-PDAs';

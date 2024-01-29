@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import Input from '../input';
-import { useAccounts } from '@/instructions/get-accounts';
+import Input from '../shared/input';
+import { useAccounts } from '@/hooks/get-accounts';
 import { PublicKey } from '@solana/web3.js';
-import { useUpload } from '@/instructions/upload_work';
+import { useUpload } from '@/hooks/upload_work';
 
 interface ClickProps {
   escrow: PublicKey;

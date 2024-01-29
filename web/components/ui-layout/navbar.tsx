@@ -4,7 +4,7 @@ import Link from 'next/link';
 import React from 'react';
 
 import { ClusterUiSelect } from '../cluster/cluster-ui';
-import { WalletButton } from './wallet-button';
+import { WalletButton } from '../shared/wallet-button';
 
 export function Navbar() {
   const pathname = 'TODO: implement me';
@@ -12,9 +12,9 @@ export function Navbar() {
   const pages = [
     { label: 'Account', path: '/account' },
 
-    { label: 'Clusters', path: '/clusters' },
+    { label: 'Explore', path: '/explore' },
 
-    { label: 'Escrow', path: '/escrow' },
+    { label: 'Validate', path: '/validate' },
   ];
 
   return (

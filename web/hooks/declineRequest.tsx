@@ -3,7 +3,7 @@
 import { useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey, SystemProgram } from '@solana/web3.js';
 import { useMutation } from '@tanstack/react-query';
-import { useTransactionToast } from '@/hooks/use-transaction-toast';
+import { useTransactionToast } from '@/components/shared/use-transaction-toast';
 import { useAccounts } from './get-accounts';
 import { useCluster } from '@/components/cluster/cluster-data-access';
 

@@ -5,7 +5,7 @@ import { PublicKey, SystemProgram } from '@solana/web3.js';
 import { useMutation } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import * as anchor from '@coral-xyz/anchor';
-import { useTransactionToast } from '@/hooks/use-transaction-toast';
+import { useTransactionToast } from '@/components/shared/use-transaction-toast';
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   TOKEN_PROGRAM_ID,
@@ -20,7 +20,7 @@ interface EscrowProps {
   taker: PublicKey;
   collection: PublicKey;
   validatorCount: number;
-  about: string
+  about: string;
 }
 
 export function useInitialiseEscrow() {
@@ -37,7 +37,7 @@ export function useInitialiseEscrow() {
       taker,
       collection,
       validatorCount,
-      about
+      about,
     }: EscrowProps) => {
       if (!publicKey) {
         return Promise.resolve('');
