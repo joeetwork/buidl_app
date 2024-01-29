@@ -7,9 +7,10 @@ import { ClusterUiSelect } from '../cluster/cluster-ui';
 import { WalletButton } from '../shared/wallet-button';
 import Image from 'next/image';
 import { PAGES } from '@/constants';
+import { usePathname } from 'next/navigation';
 
 export function Navbar() {
-  const pathname = 'TODO: implement me';
+  const pathname = usePathname();
 
   return (
     <div className="navbar bg-base-300 text-neutral-content flex-col md:flex-row space-y-2 md:space-y-0">
