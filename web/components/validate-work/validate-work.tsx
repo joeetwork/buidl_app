@@ -1,22 +1,22 @@
 'use client';
 
-
 import { useAccounts } from '@/hooks/get-accounts';
 import { useValidate } from '@/hooks/validate';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
-import { useQuery } from '@tanstack/react-query';
 import React, { useState } from 'react';
 import Exchange from '../exchange/exchange';
 import UploadWork from '../upload-work/upload-work';
 import { COLLECTIONS } from '@/constants';
+import { useCollection } from '@/hooks/get-collection';
 
 export default function ValidateWork() {
   const { validate } = useValidate();
   const [selectedCollection, setSelectedCollection] = useState<PublicKey>();
   const [selectedEscrow, setSelectedEscrow] = useState<PublicKey>();
-  const { publicKey } = useWallet();
+  // const { publicKey } = useWallet();
   const { validatorEscrows } = useAccounts();
+  const { collection } = useCollection(selectedCollection);
 
   const handleCollectionClick = (collection: PublicKey) => {
     setSelectedCollection(collection);
@@ -32,21 +32,6 @@ export default function ValidateWork() {
   //once clicked display the escrows/work that can be validated
 
   //check if the user has an nft related to that collection
-
-  const { data } = useQuery({
-    queryKey: ['test', selectedCollection],
-    queryFn: async () => {
-      const res = await fetch('/api/search-assets', {
-        method: 'POST',
-        body: JSON.stringify({
-          ownerAddress: publicKey?.toString(),
-          grouping: ['collection', selectedCollection?.toString()],
-        }),
-      });
-      const data = res.json();
-      return data;
-    },
-  });
 
   //if true enable submit button and submit the nft id and the collection id when validates
 
@@ -85,15 +70,17 @@ export default function ValidateWork() {
       <button
         className="btn btn-xs btn-secondary btn-outline"
         onClick={() => {
-          if (selectedEscrow && data?.result?.items[0]) {
+          if (selectedEscrow && collection?.data?.result?.items[0]) {
             return validate.mutateAsync({
               escrow: selectedEscrow,
-              nftAddress: new PublicKey(data?.result?.items[0].id),
+              nftAddress: new PublicKey(collection?.data?.result?.items[0].id),
             });
           }
         }}
         disabled={
-          validate.isPending || !data?.result?.items[0] || !selectedEscrow
+          validate.isPending ||
+          !collection?.data?.result?.items[0] ||
+          !selectedEscrow
         }
       >
         Validate
