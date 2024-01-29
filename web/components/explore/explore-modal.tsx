@@ -5,15 +5,17 @@ import TextArea from '../shared/text-area';
 import { PublicKey } from '@solana/web3.js';
 import { useInitialiseEscrow } from '@/hooks/initialize-escrow';
 
+interface ExploreModalProps {
+  hideModal: () => void;
+  show: boolean;
+  taker: PublicKey;
+}
+
 export default function ExploreModal({
   hideModal,
   show,
   taker,
-}: {
-  hideModal: () => void;
-  show: boolean;
-  taker: PublicKey;
-}) {
+}: ExploreModalProps) {
   const { initializeEscrow } = useInitialiseEscrow();
   const [amount, setAmount] = useState(0);
   const [collection, setCollection] = useState(

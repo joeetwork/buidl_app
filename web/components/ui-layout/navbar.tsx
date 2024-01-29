@@ -5,6 +5,7 @@ import React from 'react';
 
 import { ClusterUiSelect } from '../cluster/cluster-ui';
 import { WalletButton } from '../shared/wallet-button';
+import Image from 'next/image';
 
 export function Navbar() {
   const pathname = 'TODO: implement me';
@@ -21,7 +22,7 @@ export function Navbar() {
     <div className="navbar bg-base-300 text-neutral-content flex-col md:flex-row space-y-2 md:space-y-0">
       <div className="flex-1">
         <Link className="btn btn-ghost normal-case text-xl" href="/">
-          <img
+          <Image
             className="h-4 md:h-6"
             alt="Solana Logo"
             src="/solana-logo.png"

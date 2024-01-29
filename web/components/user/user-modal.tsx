@@ -6,13 +6,15 @@ import { AppModal } from '../shared/app-modal';
 
 const dropDownItems = ['Item 1', 'Item 2'];
 
+interface UserModalProps {
+    hideModal: () => void;
+    show: boolean;
+  }
+
 export default function UserModal({
   hideModal,
   show,
-}: {
-  hideModal: () => void;
-  show: boolean;
-}) {
+}: UserModalProps) {
   const [name, setName] = useState('');
   const [about, setAbout] = useState('');
   const [role, setRole] = useState(dropDownItems[0]);

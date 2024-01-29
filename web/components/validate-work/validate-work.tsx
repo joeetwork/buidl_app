@@ -12,18 +12,14 @@ import UploadWork from '../upload-work/upload-work';
 
 export default function ValidateWork() {
   const { validate } = useValidate();
-  const [selectedCollection, setSelectedCollection] = useState<
-    PublicKey | undefined
-  >();
-  const [selectedEscrow, setSelectedEscrow] = useState<PublicKey | undefined>();
-
+  const [selectedCollection, setSelectedCollection] = useState<PublicKey>();
+  const [selectedEscrow, setSelectedEscrow] = useState<PublicKey>();
   const { publicKey } = useWallet();
-
   const { validatorEscrows } = useAccounts();
 
   const handleCollectionClick = (collection: PublicKey) => {
     setSelectedCollection(collection);
-    validatorEscrows.mutateAsync({ collection });
+    validatorEscrows.mutateAsync(collection);
   };
 
   const handleEscrowClick = (escrow: PublicKey) => {

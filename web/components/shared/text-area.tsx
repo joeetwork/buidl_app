@@ -7,7 +7,12 @@ interface TextAreaProps {
   onChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
 }
 
-export default function TextArea({ label, value, name, onChange }: TextAreaProps) {
+export default function TextArea({
+  label,
+  value,
+  name,
+  onChange,
+}: TextAreaProps) {
   return (
     <div>
       {label && (

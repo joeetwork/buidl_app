@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Input from '../shared/input';
 import { useAccounts } from '@/hooks/get-accounts';
 import { PublicKey } from '@solana/web3.js';
-import { useUpload } from '@/hooks/upload_work';
+import { useUpload } from '@/hooks/upload';
 
 interface ClickProps {
   escrow: PublicKey;
@@ -11,7 +11,7 @@ interface ClickProps {
 
 export default function UploadWork() {
   const { userRequests } = useAccounts();
-  const [data, setData] = useState<ClickProps | undefined>();
+  const [data, setData] = useState<ClickProps>();
   const [link, setLink] = useState('');
   const { uploadWork } = useUpload();
 

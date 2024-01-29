@@ -9,7 +9,7 @@ import { useAccounts } from './get-accounts';
 import { useCluster } from '@/components/cluster/cluster-data-access';
 import { usePDAs } from './get-PDAs';
 
-interface UserProps {
+interface InitialiseUserProps {
   name: string;
   about: string;
   role: string;
@@ -24,7 +24,7 @@ export function useInitialiseUser() {
 
   const initializeUser = useMutation({
     mutationKey: ['escrow', 'initializeUser', { cluster }],
-    mutationFn: async ({ name, about, role }: UserProps) => {
+    mutationFn: async ({ name, about, role }: InitialiseUserProps) => {
       if (!publicKey) {
         return Promise.resolve('');
       }

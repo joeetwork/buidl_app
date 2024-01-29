@@ -11,16 +11,12 @@ interface EscrowProps {
 export default function Exchange() {
   const { userRequests } = useAccounts();
   const { exchange } = useExchange();
-  const [data, setData] = useState<EscrowProps | undefined>();
+  const [data, setData] = useState<EscrowProps>();
 
   const handleSubmit = () => {
     if (data) {
       exchange.mutateAsync(data);
     }
-  };
-
-  const handleClick = ({ escrow, initializer }: EscrowProps) => {
-    setData({ escrow, initializer });
   };
 
   return (
@@ -30,7 +26,7 @@ export default function Exchange() {
           <div
             key={escrow.publicKey.toString()}
             onClick={() =>
-              handleClick({
+              setData({
                 escrow: escrow.publicKey,
                 initializer: escrow.account.initializer,
               })

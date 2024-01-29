@@ -35,7 +35,7 @@ export function useAccounts() {
 
   //taker waller (offset 17 is init wallet)
   const userRequests = useQuery({
-    queryKey: ['escrow',{ cluster }],
+    queryKey: ['escrow', { cluster }],
     queryFn: () => {
       if (!publicKey) {
         return Promise.resolve(undefined);
@@ -52,14 +52,9 @@ export function useAccounts() {
     },
   });
 
-  interface ValidatorEscrowsProps {
-    collection: PublicKey
-  }
-
   const validatorEscrows = useMutation({
-    mutationKey: ['escrow', "collection"],
-    mutationFn: ({collection}: ValidatorEscrowsProps) => {
-
+    mutationKey: ['escrow', 'collection'],
+    mutationFn: (collection: PublicKey) => {
       return program.account.escrow.all([
         {
           memcmp: {
@@ -100,6 +95,6 @@ export function useAccounts() {
     userAccounts,
     userAccount,
     userRequests,
-    validatorEscrows
+    validatorEscrows,
   };
 }

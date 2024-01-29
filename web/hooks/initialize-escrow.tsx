@@ -15,7 +15,7 @@ import { useAccounts } from './get-accounts';
 import { useCluster } from '@/components/cluster/cluster-data-access';
 import { usePDAs } from './get-PDAs';
 
-interface EscrowProps {
+interface InitializeEscrowProps {
   initializerAmount: number;
   taker: PublicKey;
   collection: PublicKey;
@@ -38,7 +38,7 @@ export function useInitialiseEscrow() {
       collection,
       validatorCount,
       about,
-    }: EscrowProps) => {
+    }: InitializeEscrowProps) => {
       if (!publicKey) {
         return Promise.resolve('');
       }
