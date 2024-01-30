@@ -1,20 +1,17 @@
 import React, { useState } from 'react';
 import Input from '../shared/input';
-import Dropdown from '../shared/dropdown';
+import Dropdown from '../shared/select';
 import { useInitialiseUser } from '@/hooks/initialize-user';
 import { AppModal } from '../shared/app-modal';
 
 const dropDownItems = ['Item 1', 'Item 2'];
 
 interface UserModalProps {
-    hideModal: () => void;
-    show: boolean;
-  }
+  hideModal: () => void;
+  show: boolean;
+}
 
-export default function UserModal({
-  hideModal,
-  show,
-}: UserModalProps) {
+export default function UserModal({ hideModal, show }: UserModalProps) {
   const [name, setName] = useState('');
   const [about, setAbout] = useState('');
   const [role, setRole] = useState(dropDownItems[0]);

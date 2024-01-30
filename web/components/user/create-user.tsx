@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import Input from '../shared/input';
-import Dropdown from '../shared/dropdown';
 import { useInitialiseUser } from '@/hooks/initialize-user';
+import Select from '../shared/select';
 
 const dropDownItems = ['Dev', 'Hiring'];
 
@@ -33,10 +33,9 @@ export default function CreateUser() {
           onChange={(e) => setAbout(e.target.value)}
         />
 
-        <Dropdown
+        <Select
           label="Role:"
           items={dropDownItems}
-          value={role}
           onClick={(v) => setRole(v)}
         />
       </div>
