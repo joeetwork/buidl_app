@@ -4,17 +4,20 @@ import Input from '../shared/input';
 import TextArea from '../shared/text-area';
 import { PublicKey } from '@solana/web3.js';
 import { useInitialiseEscrow } from '@/hooks/initialize-escrow';
+import { ellipsify } from '../shared/ellipsify';
 
 interface ExploreModalProps {
   hideModal: () => void;
   show: boolean;
   taker: PublicKey;
+  title: string;
 }
 
 export default function ExploreModal({
   hideModal,
   show,
   taker,
+  title,
 }: ExploreModalProps) {
   const { initializeEscrow } = useInitialiseEscrow();
   const [amount, setAmount] = useState(0);
@@ -40,20 +43,13 @@ export default function ExploreModal({
 
   return (
     <AppModal
-      title="Job Offer"
+      title={`Hire: ${title}`}
       show={show}
       hide={hideModal}
       submit={handleSubmit}
     >
-      <div className="flex flex-col gap-4">
-        <div>PublicKey:{taker.toString()}</div>
-
-        <TextArea
-          name="about"
-          label="About:"
-          value={about}
-          onChange={(e) => setAbout(e.target.value)}
-        />
+      <div className="flex flex-col gap-4 items-center">
+        <div>PublicKey: {ellipsify(taker.toString())}</div>
 
         <Input
           name="initializerAmount"
@@ -67,6 +63,13 @@ export default function ExploreModal({
           label="Validator Count:"
           value={count.toString()}
           onChange={(e) => setCount(Number(e.target.value))}
+        />
+
+        <TextArea
+          name="about"
+          label="About:"
+          value={about}
+          onChange={(e) => setAbout(e.target.value)}
         />
 
         {/* <Image src={collection} alt="collection" />; */}

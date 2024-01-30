@@ -14,21 +14,20 @@ export default function TextArea({
   onChange,
 }: TextAreaProps) {
   return (
-    <div>
+    <label className="form-control w-full max-w-xs">
       {label && (
-        <div className="text-left">
-          <label>{label}</label>
+        <div className="label">
+          <span className="label-text">{label}</span>
         </div>
       )}
-      <div>
-        <textarea
-          placeholder="About"
-          name={name}
-          className="textarea textarea-bordered textarea-md w-full max-w-xs"
-          onChange={(e) => onChange(e)}
-          value={value}
-        />
-      </div>
-    </div>
+
+      <textarea
+        placeholder="About"
+        name={name}
+        className="textarea textarea-bordered textarea-md w-full max-w-xs"
+        onChange={(e) => onChange(e)}
+        value={value}
+      />
+    </label>
   );
 }
