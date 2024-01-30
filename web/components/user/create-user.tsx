@@ -4,13 +4,12 @@ import React, { useState } from 'react';
 import Input from '../shared/input';
 import { useInitialiseUser } from '@/hooks/initialize-user';
 import Select from '../shared/select';
-
-const dropDownItems = ['Dev', 'Hiring'];
+import { ROLES } from '@/constants';
 
 export default function CreateUser() {
   const [name, setName] = useState('');
   const [about, setAbout] = useState('');
-  const [role, setRole] = useState(dropDownItems[0]);
+  const [role, setRole] = useState(ROLES[0]);
 
   const { initializeUser } = useInitialiseUser();
 
@@ -35,7 +34,7 @@ export default function CreateUser() {
 
         <Select
           label="Role:"
-          items={dropDownItems}
+          items={ROLES}
           onClick={(v) => setRole(v)}
         />
       </div>
