@@ -25,15 +25,7 @@ export default function ExploreUi() {
       <div className="flex">
         {userAccounts.data?.map((user) => {
           return (
-            <div
-              key={user.publicKey.toString()}
-              onClick={() =>
-                handleShowModal(
-                  user.account.initializerKey,
-                  user.account.username
-                )
-              }
-            >
+            <div key={user.publicKey.toString()}>
               <div className="card w-44 bg-base-100 shadow-xl">
                 <figure className="px-5 pt-5">
                   <img
@@ -46,7 +38,17 @@ export default function ExploreUi() {
                   <h2 className="card-title">{user.account.username}</h2>
                   <p>{user.account.about}</p>
                   <div className="card-actions">
-                    <button className="btn btn-primary">Make offer</button>
+                    <button
+                      onClick={() =>
+                        handleShowModal(
+                          user.account.initializerKey,
+                          user.account.username
+                        )
+                      }
+                      className="btn btn-primary"
+                    >
+                      Make offer
+                    </button>
                   </div>
                 </div>
               </div>
