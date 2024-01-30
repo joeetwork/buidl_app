@@ -6,6 +6,7 @@ import { PublicKey } from '@solana/web3.js';
 import React, { useState } from 'react';
 import Input from '../shared/input';
 import { useUpload } from '@/hooks/upload';
+import { useDeclineRequest } from '@/hooks/declineRequest';
 
 interface EscrowProps {
   escrow: PublicKey;
@@ -43,22 +44,48 @@ export default function DevUi() {
     }
   };
 
+  const { declineRequest } = useDeclineRequest();
+
+  const handleRequest = (data: EscrowProps) => {
+    declineRequest.mutateAsync(data);
+  };
+
   return (
     <div className="flex">
       {userRequests.data?.map((escrow) => {
         return (
           <div className="card w-72 bg-base-100 shadow-xl">
-            <figure className="px-5 pt-5">
-              <img
-                src="https://daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.jpg"
-                alt="Shoes"
-                className="rounded-xl"
-              />
-            </figure>
             <div className="card-body items-center text-center">
               <h2 className="card-title">{escrow.account.about}</h2>
               <p>Status: {status}</p>
               <div className="card-actions">
+                {status === 'offer' ? (
+                  <div className="flex gap-4">
+                    <button
+                      className="btn btn-primary"
+                      onClick={() =>
+                        handleRequest({
+                          escrow: escrow.publicKey,
+                          initializer: escrow.account.initializer,
+                        })
+                      }
+                    >
+                      accept
+                    </button>
+                    <button
+                      className="btn btn-primary"
+                      onClick={() =>
+                        handleRequest({
+                          escrow: escrow.publicKey,
+                          initializer: escrow.account.initializer,
+                        })
+                      }
+                    >
+                      decline
+                    </button>
+                  </div>
+                ) : null}
+
                 {status === 'exchange' ? (
                   <button
                     className="btn btn-primary"

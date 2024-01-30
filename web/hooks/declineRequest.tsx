@@ -22,18 +22,18 @@ export function useDeclineRequest() {
   const { mint } = usePDAs();
 
   interface RequestProps {
-    pda: PublicKey;
+    escrow: PublicKey;
     initializer: PublicKey;
   }
 
   const declineRequest = useMutation({
     mutationKey: ['escrow', 'declineRequest', { cluster }],
-    mutationFn: async ({ pda, initializer }: RequestProps) => {
+    mutationFn: async ({ escrow, initializer }: RequestProps) => {
       if (!publicKey) {
         return Promise.resolve('');
       }
 
-      const vault = getAssociatedTokenAddressSync(mint, pda, true);
+      const vault = getAssociatedTokenAddressSync(mint, escrow, true);
 
       const initializerDepositTokenAccount = getAssociatedTokenAddressSync(
         mint,
@@ -49,7 +49,7 @@ export function useDeclineRequest() {
           mint: mint,
           initializerDepositTokenAccount: initializerDepositTokenAccount,
           vault: vault,
-          escrowState: pda,
+          escrowState: escrow,
           tokenProgram: TOKEN_PROGRAM_ID,
           associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
           systemProgram: SystemProgram.programId,
