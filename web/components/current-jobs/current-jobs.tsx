@@ -5,12 +5,14 @@ import { useValidate } from '@/hooks/validate';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import React, { useState } from 'react';
-import Exchange from '../exchange/exchange';
-import UploadWork from '../upload-work/upload-work';
+import Exchange from './exchange';
+import UploadWork from './upload-work';
 import { COLLECTIONS, ROLES } from '@/constants';
 import { useCollection } from '@/hooks/get-collection';
 import Tabs from '../shared/tabs';
-import Validator from './validator';
+import ValidatorUi from './validator-ui';
+import HiringUi from './hiring-ui';
+import DevUi from './dev-ui';
 
 export default function CurrentJobs() {
   const { validate } = useValidate();
@@ -31,7 +33,7 @@ export default function CurrentJobs() {
 
   const [activeTab, setActiveTab] = useState(0);
 
-  const Roles = [<></>, <></>, <Validator />];
+  const Roles = [<DevUi />, <HiringUi />, <ValidatorUi />];
 
   return (
     <div className="flex flex-col items-center">

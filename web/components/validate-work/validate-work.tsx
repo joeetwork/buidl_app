@@ -5,8 +5,8 @@ import { useValidate } from '@/hooks/validate';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import React, { useState } from 'react';
-import Exchange from '../exchange/exchange';
-import UploadWork from '../upload-work/upload-work';
+import Exchange from '../current-jobs/exchange';
+import UploadWork from '../current-jobs/upload-work';
 import { COLLECTIONS } from '@/constants';
 import { useCollection } from '@/hooks/get-collection';
 
