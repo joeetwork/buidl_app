@@ -13,8 +13,6 @@ interface EscrowProps {
   initializer: PublicKey;
 }
 
-const STATUS = ['request', 'upload', 'validate', 'exchange', 'success'];
-
 export default function DevUi() {
   const { userRequests } = useAccounts();
   const { exchange } = useExchange();
