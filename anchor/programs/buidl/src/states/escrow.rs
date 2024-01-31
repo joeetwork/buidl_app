@@ -12,5 +12,6 @@ pub struct Escrow {
     pub validator_total_count: u64,
     pub validator_count: u64,
     pub upload_work: String,
-    pub about: String
+    pub about: String,
+    pub status: String
 }

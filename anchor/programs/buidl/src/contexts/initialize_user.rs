@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 
 use crate::states::User;
-use crate::constants::USER;
+use crate::constant::USER;
 
 #[derive(Accounts)]
 #[instruction(username: String)]

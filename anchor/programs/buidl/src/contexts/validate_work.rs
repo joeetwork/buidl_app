@@ -3,7 +3,7 @@ use anchor_spl::token::{ Mint, TokenAccount};
 use anchor_spl::metadata::MetadataAccount;
 
 use crate::states::Escrow;
-use crate::constants::METADATA;
+use crate::constant::METADATA;
 
 #[derive(Accounts)]
 pub struct ValidateWork<'info> {

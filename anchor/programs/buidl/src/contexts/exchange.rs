@@ -7,7 +7,7 @@ use anchor_spl::{
 };
 
 use crate::states::Escrow;
-use crate::constants::ESCROW;
+use crate::constant::ESCROW;
 
 #[derive(Accounts)]
 pub struct Exchange<'info> {

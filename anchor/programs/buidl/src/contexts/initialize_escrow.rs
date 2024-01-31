@@ -5,7 +5,7 @@ use anchor_spl::{
 };
 
 use crate::states::Escrow;
-use crate::constants::ESCROW;
+use crate::constant::*;
 
 #[derive(Accounts)]
 #[instruction(seed: u64, initializer_amount: u64)]
@@ -63,7 +63,8 @@ impl<'info> Initialize<'info> {
             validator_total_count,
             validator_count: 0,
             upload_work: "".to_string(),
-            about
+            about,
+            status: REQUEST.to_string()
         });
         Ok(())
     }

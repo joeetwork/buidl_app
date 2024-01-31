@@ -1,9 +1,9 @@
 use anchor_lang::prelude::*;
 
-pub mod constants;
 mod contexts;
 use contexts::*;
 mod states;
+mod constant;
 
 declare_id!("E8aKquQG13zGXDamjkTdXodU6ZftWxaBBF6azkpYK9b2");
 
