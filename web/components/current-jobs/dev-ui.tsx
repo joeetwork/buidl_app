@@ -46,7 +46,10 @@ export default function DevUi() {
     <div className="flex">
       {userRequests.data?.map((escrow) => {
         return (
-          <div className="card w-72 bg-base-100 shadow-xl">
+          <div
+            key={escrow.publicKey.toString()}
+            className="card w-72 bg-base-100 shadow-xl"
+          >
             <div className="card-body items-center text-center">
               <h2 className="card-title">{escrow.account.about}</h2>
               <p>Status: {status}</p>
