@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Input from '../shared/input';
 import Dropdown from '../shared/select';
 import { useInitialiseUser } from '@/hooks/initialize-user';
@@ -21,6 +21,10 @@ export default function UserModal({ hideModal, show }: UserModalProps) {
   const handleSubmit = () => {
     initializeUser.mutateAsync({ name, about, role });
   };
+
+  useEffect(() => {
+    hideModal();
+  }, [initializeUser.isSuccess]);
 
   return (
     <AppModal
@@ -45,7 +49,6 @@ export default function UserModal({ hideModal, show }: UserModalProps) {
         <Dropdown
           label="Role:"
           items={dropDownItems}
-          value={role}
           onClick={(v) => setRole(v)}
         />
       </div>

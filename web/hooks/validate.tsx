@@ -18,7 +18,7 @@ interface ValidateProps {
   nftAddress: PublicKey;
 }
 
-export function useValidate(collection?: PublicKey) {
+export function useValidate(collection: PublicKey) {
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
   const { program, escrowAccounts } = useAccounts();

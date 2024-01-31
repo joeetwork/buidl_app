@@ -3,11 +3,12 @@
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useQuery } from '@tanstack/react-query';
 import { PublicKey } from '@metaplex-foundation/js';
+import { Assets } from '@/types/search-assets';
 
-export function useCollection(selectedCollection?: PublicKey) {
+export function useCollection(selectedCollection: PublicKey) {
   const { publicKey } = useWallet();
 
-  const collection = useQuery({
+  const { data } = useQuery({
     queryKey: ['collection', selectedCollection],
     queryFn: async () => {
       if (selectedCollection) {
@@ -25,5 +26,5 @@ export function useCollection(selectedCollection?: PublicKey) {
     },
   });
 
-  return { collection };
+  return { collection: data?.result as Assets};
 }

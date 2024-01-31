@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AppModal } from '../shared/app-modal';
 import Input from '../shared/input';
 import TextArea from '../shared/text-area';
@@ -40,6 +40,10 @@ export default function ExploreModal({
       taker,
     });
   };
+
+  useEffect(() => {
+    hideModal();
+  }, [initializeEscrow.isSuccess]);
 
   return (
     <AppModal

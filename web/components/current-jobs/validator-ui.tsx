@@ -1,93 +1,61 @@
 'use client';
 
-import { useAccounts } from '@/hooks/get-accounts';
-import { useValidate } from '@/hooks/validate';
-import { useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import React, { useState } from 'react';
-import { COLLECTIONS, ROLES } from '@/constants';
-import { useCollection } from '@/hooks/get-collection';
+import { COLLECTIONS } from '@/constants';
 import { ellipsify } from '../shared/ellipsify';
+import { useMetadata } from '@/hooks/get-metadata';
+import ValidatorModal from './validator-modal';
 
 export default function ValidatorUi() {
   const [selectedCollection, setSelectedCollection] = useState<PublicKey>();
-  const [selectedEscrow, setSelectedEscrow] = useState<PublicKey>();
-  // const { publicKey } = useWallet();
-  const { validate, validatorEscrows } = useValidate(selectedCollection);
-  const { collection } = useCollection(selectedCollection);
+  const { metadata } = useMetadata(COLLECTIONS);
+  const [showModal, setShowModal] = useState(false);
 
   const handleCollectionClick = (collection: PublicKey) => {
     setSelectedCollection(collection);
+    setShowModal(true);
   };
-
-  const handleEscrowClick = (escrow: PublicKey) => {
-    setSelectedEscrow(escrow);
-    if (collection.data?.result.items.length >= 1) {
-      validate.mutateAsync({
-        escrow,
-        nftAddress: new PublicKey(collection.data?.result.items[0].id),
-      });
-    }
-  };
-
-  //need to get the collection cover nft
 
   return (
     <>
       <div className="flex flex-col">
         <div>Verified Collection</div>
-        {COLLECTIONS.map((collection, i) => {
+        {metadata?.map((data, i) => {
           return (
-            <div
-              key={i}
-              onClick={() => handleCollectionClick(new PublicKey(collection))}
-              className="flex"
-            >
-              {collection}
+            <div key={i} className="card w-60 bg-base-100 shadow-xl">
+              <figure className="px-10 pt-10">
+                <img
+                  src={data.content.links.image}
+                  alt="Shoes"
+                  className="rounded-xl"
+                />
+              </figure>
+              <div className="card-body items-center text-center">
+                <h2 className="card-title">{data.content.metadata.name}</h2>
+                <p>Pubkey: {ellipsify(data.id)}</p>
+                <div className="card-actions">
+                  <button
+                    onClick={() =>
+                      handleCollectionClick(new PublicKey(data.id))
+                    }
+                    className="btn btn-primary"
+                  >
+                    Select Collection
+                  </button>
+                </div>
+              </div>
             </div>
           );
         })}
       </div>
 
-      {validatorEscrows.isSuccess ? (
-        <div>
-          {validatorEscrows.data?.map((escrow) => {
-            return (
-              <div
-                key={escrow.publicKey.toString()}
-                className="card w-96 bg-base-100 shadow-xl"
-              >
-                <figure className="px-10 pt-10"></figure>
-                <div className="card-body items-center text-center">
-                  <h2 className="card-title">
-                    {ellipsify(escrow.account.about)}
-                  </h2>
-                  <p>Status: {escrow.account.status}</p>
-                  <p>Pubkey: {ellipsify(escrow.publicKey.toString())}</p>
-                  <div className="py-8">
-                    <a href={`${escrow.account.uploadWork}`}>
-                      Check Uploaded work
-                    </a>
-                  </div>
-                  <div className="card-actions">
-                    <button
-                      onClick={() => handleEscrowClick(escrow.publicKey)}
-                      className="btn btn-primary"
-                      disabled={
-                        escrow.account.status !== 'validate' ||
-                        !collection.data ||
-                        !collection.data?.result?.items ||
-                        collection.data?.result?.items.length < 1
-                      }
-                    >
-                      Validate Work
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+      {selectedCollection ? (
+        <ValidatorModal
+          show={showModal}
+          selectedCollection={selectedCollection}
+          hideModal={() => setShowModal(false)}
+        />
       ) : null}
     </>
   );
