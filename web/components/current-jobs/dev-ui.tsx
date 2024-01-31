@@ -6,27 +6,21 @@ import { PublicKey } from '@solana/web3.js';
 import React, { useState } from 'react';
 import Input from '../shared/input';
 import { useUpload } from '@/hooks/upload';
-import { useDeclineRequest } from '@/hooks/declineRequest';
+import { useRequests } from '@/hooks/requests';
 
 interface EscrowProps {
   escrow: PublicKey;
   initializer: PublicKey;
 }
 
-const STATUS = [
-  'request',
-  'upload',
-  'validate',
-  'exchange',
-  'success',
-];
+const STATUS = ['request', 'upload', 'validate', 'exchange', 'success'];
 
 export default function DevUi() {
   const { userRequests } = useAccounts();
   const { exchange } = useExchange();
   const { uploadWork } = useUpload();
+  const { declineRequest, acceptRequest } = useRequests();
   const [link, setLink] = useState('');
-  const [status, setStatus] = useState('exchange');
 
   const handleExchange = (data: EscrowProps) => {
     exchange.mutateAsync(data);
@@ -42,10 +36,12 @@ export default function DevUi() {
     }
   };
 
-  const { declineRequest } = useDeclineRequest();
-
-  const handleRequest = (data: EscrowProps) => {
+  const handleDecline = (data: EscrowProps) => {
     declineRequest.mutateAsync(data);
+  };
+
+  const handleAccept = (data: EscrowProps) => {
+    acceptRequest.mutateAsync(data);
   };
 
   return (
@@ -57,12 +53,12 @@ export default function DevUi() {
               <h2 className="card-title">{escrow.account.about}</h2>
               <p>Status: {status}</p>
               <div className="card-actions">
-                {status === 'request' ? (
+                {escrow.account.status === 'request' ? (
                   <div className="flex gap-4">
                     <button
                       className="btn btn-primary"
                       onClick={() =>
-                        handleRequest({
+                        handleAccept({
                           escrow: escrow.publicKey,
                           initializer: escrow.account.initializer,
                         })
@@ -73,7 +69,7 @@ export default function DevUi() {
                     <button
                       className="btn btn-primary"
                       onClick={() =>
-                        handleRequest({
+                        handleDecline({
                           escrow: escrow.publicKey,
                           initializer: escrow.account.initializer,
                         })
@@ -84,7 +80,7 @@ export default function DevUi() {
                   </div>
                 ) : null}
 
-                {status === 'exchange' ? (
+                {escrow.account.status === 'exchange' ? (
                   <button
                     className="btn btn-primary"
                     onClick={() =>
@@ -99,7 +95,7 @@ export default function DevUi() {
                   </button>
                 ) : null}
 
-                {status === 'upload' ? (
+                {escrow.account.status === 'upload' ? (
                   <div>
                     <Input
                       label="Upload work"

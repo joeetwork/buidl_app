@@ -14,7 +14,7 @@ import {
   getAssociatedTokenAddressSync,
 } from '@solana/spl-token';
 
-export function useDeclineRequest() {
+export function useRequests() {
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
   const { program, escrowAccounts } = useAccounts();
@@ -25,6 +25,42 @@ export function useDeclineRequest() {
     escrow: PublicKey;
     initializer: PublicKey;
   }
+
+  const acceptRequest = useMutation({
+    mutationKey: ['escrow', 'acceptRequest', { cluster }],
+    mutationFn: async ({ escrow, initializer }: RequestProps) => {
+      if (!publicKey) {
+        return Promise.resolve('');
+      }
+
+      const vault = getAssociatedTokenAddressSync(mint, escrow, true);
+
+      const initializerDepositTokenAccount = getAssociatedTokenAddressSync(
+        mint,
+        initializer,
+        true
+      );
+
+      return program.methods
+        .acceptRequest()
+        .accounts({
+          taker: publicKey,
+          initializer: initializer,
+          mint: mint,
+          initializerDepositTokenAccount: initializerDepositTokenAccount,
+          vault: vault,
+          escrowState: escrow,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+          systemProgram: SystemProgram.programId,
+        })
+        .rpc();
+    },
+    onSuccess: (tx) => {
+      transactionToast(tx);
+      return escrowAccounts.refetch();
+    },
+  });
 
   const declineRequest = useMutation({
     mutationKey: ['escrow', 'declineRequest', { cluster }],
@@ -62,5 +98,5 @@ export function useDeclineRequest() {
     },
   });
 
-  return { declineRequest };
+  return { declineRequest, acceptRequest };
 }
