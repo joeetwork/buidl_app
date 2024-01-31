@@ -9,7 +9,7 @@ import { PublicKey } from '@solana/web3.js';
 
 interface ValidatorModalProps {
   show: boolean;
-  selectedCollection: PublicKey;
+  selectedCollection?: PublicKey;
   hideModal: () => void;
 }
 

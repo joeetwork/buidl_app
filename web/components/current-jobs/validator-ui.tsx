@@ -50,13 +50,11 @@ export default function ValidatorUi() {
         })}
       </div>
 
-      {selectedCollection ? (
-        <ValidatorModal
-          show={showModal}
-          selectedCollection={selectedCollection}
-          hideModal={() => setShowModal(false)}
-        />
-      ) : null}
+      <ValidatorModal
+        show={showModal}
+        selectedCollection={selectedCollection}
+        hideModal={() => setShowModal(false)}
+      />
     </>
   );
 }

@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { PublicKey } from '@metaplex-foundation/js';
 import { Assets } from '@/types/search-assets';
 
-export function useCollection(selectedCollection: PublicKey) {
+export function useCollection(selectedCollection?: PublicKey) {
   const { publicKey } = useWallet();
 
   const { data } = useQuery({
