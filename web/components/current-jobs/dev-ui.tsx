@@ -14,9 +14,7 @@ interface EscrowProps {
 }
 
 const STATUS = [
-  'offer',
-  'accepted',
-  'declined',
+  'request',
   'upload',
   'validate',
   'exchange',
@@ -59,7 +57,7 @@ export default function DevUi() {
               <h2 className="card-title">{escrow.account.about}</h2>
               <p>Status: {status}</p>
               <div className="card-actions">
-                {status === 'offer' ? (
+                {status === 'request' ? (
                   <div className="flex gap-4">
                     <button
                       className="btn btn-primary"

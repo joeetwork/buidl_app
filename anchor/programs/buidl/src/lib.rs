@@ -48,6 +48,10 @@ pub mod anchor_escrow {
         ctx.accounts.upload_work(file)
     }
 
+    pub fn accept_request(ctx: Context<AcceptRequest>) -> Result<()> {
+        ctx.accounts.accept_request()
+    }
+
     pub fn decline_request(ctx: Context<DeclineRequest>) -> Result<()> {
         ctx.accounts.refund_and_close_vault()
     }

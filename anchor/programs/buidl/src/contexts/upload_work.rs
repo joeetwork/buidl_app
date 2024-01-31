@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 
 use crate::states::Escrow;
-use crate::constant::ESCROW;
+use crate::constant::*;
 
 #[derive(Accounts)]
 pub struct UploadWork<'info> {
@@ -22,7 +22,7 @@ pub struct UploadWork<'info> {
 impl<'info> UploadWork<'info> {
     pub fn upload_work(&mut self, file: String) -> Result<()> {
         self.escrow_state.upload_work = file;
-
+        self.escrow_state.status = VALIDATE.to_string();
         Ok(())
      }
 }

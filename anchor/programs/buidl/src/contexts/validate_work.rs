@@ -3,7 +3,7 @@ use anchor_spl::token::{ Mint, TokenAccount};
 use anchor_spl::metadata::MetadataAccount;
 
 use crate::states::Escrow;
-use crate::constant::METADATA;
+use crate::constant::{EXCHANGE, METADATA};
 
 #[derive(Accounts)]
 pub struct ValidateWork<'info> {
@@ -47,6 +47,8 @@ impl<'info> ValidateWork<'info> {
      ) -> Result<()> {
         self.escrow_state.validator_count = self.escrow_state.validator_count.checked_add(1)
         .unwrap();
+
+        self.escrow_state.status = EXCHANGE.to_string();
 
         Ok(())
      }

@@ -4,6 +4,8 @@ pub mod exchange;
 pub use exchange::*;
 pub mod cancel;
 pub use cancel::*;
+pub mod accept_request;
+pub use accept_request::*;
 pub mod decline_request;
 pub use decline_request::*;
 pub mod validate_work;

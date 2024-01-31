@@ -4,9 +4,6 @@ use anchor_lang::prelude::*;
 pub const REQUEST: &str = "request";
 
 #[constant]
-pub const DECLINED: &str = "declined";
-
-#[constant]
 pub const UPLOAD: &str = "upload";
 
 #[constant]
