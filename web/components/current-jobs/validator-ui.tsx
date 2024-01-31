@@ -7,6 +7,7 @@ import { PublicKey } from '@solana/web3.js';
 import React, { useState } from 'react';
 import { COLLECTIONS, ROLES } from '@/constants';
 import { useCollection } from '@/hooks/get-collection';
+import { ellipsify } from '../shared/ellipsify';
 
 export default function ValidatorUi() {
   const [selectedCollection, setSelectedCollection] = useState<PublicKey>();
@@ -21,7 +22,15 @@ export default function ValidatorUi() {
 
   const handleEscrowClick = (escrow: PublicKey) => {
     setSelectedEscrow(escrow);
+    if (collection.data?.result.items.length >= 1) {
+      validate.mutateAsync({
+        escrow,
+        nftAddress: new PublicKey(collection.data?.result.items[0].id),
+      });
+    }
   };
+
+  //need to get the collection cover nft
 
   return (
     <>
@@ -48,14 +57,28 @@ export default function ValidatorUi() {
                 key={escrow.publicKey.toString()}
                 className="card w-96 bg-base-100 shadow-xl"
               >
-                <figure className="px-10 pt-10">
-                </figure>
+                <figure className="px-10 pt-10"></figure>
                 <div className="card-body items-center text-center">
-                  <h2 className="card-title">{escrow.publicKey.toString()}</h2>
+                  <h2 className="card-title">
+                    {ellipsify(escrow.account.about)}
+                  </h2>
+                  <p>Status: {escrow.account.status}</p>
+                  <p>Pubkey: {ellipsify(escrow.publicKey.toString())}</p>
+                  <div className="py-8">
+                    <a href={`${escrow.account.uploadWork}`}>
+                      Check Uploaded work
+                    </a>
+                  </div>
                   <div className="card-actions">
                     <button
                       onClick={() => handleEscrowClick(escrow.publicKey)}
                       className="btn btn-primary"
+                      disabled={
+                        escrow.account.status !== 'validate' ||
+                        !collection.data ||
+                        !collection.data?.result?.items ||
+                        collection.data?.result?.items.length < 1
+                      }
                     >
                       Validate Work
                     </button>
@@ -66,21 +89,6 @@ export default function ValidatorUi() {
           })}
         </div>
       ) : null}
-
-      <button
-        className="btn btn-xs btn-secondary btn-outline"
-        onClick={() => {
-          if (selectedEscrow && collection?.data?.result?.items[0]) {
-            return validate.mutateAsync({
-              escrow: selectedEscrow,
-              nftAddress: new PublicKey(collection?.data?.result?.items[0].id),
-            });
-          }
-        }}
-        disabled={validate.isPending || !selectedEscrow}
-      >
-        Validate
-      </button>
     </>
   );
 }

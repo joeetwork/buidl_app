@@ -52,7 +52,7 @@ export default function DevUi() {
           >
             <div className="card-body items-center text-center">
               <h2 className="card-title">{escrow.account.about}</h2>
-              <p>Status: {status}</p>
+              <p>Status: {escrow.account.status}</p>
               <div className="card-actions">
                 {escrow.account.status === 'request' ? (
                   <div className="flex gap-4">

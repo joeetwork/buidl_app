@@ -24,7 +24,6 @@ pub struct AcceptRequest<'info> {
         mut,
         has_one = initializer,
         has_one = mint,
-        close = initializer,
         seeds=[ESCROW, escrow_state.seed.to_le_bytes().as_ref()],
         constraint = escrow_state.taker == *taker.key,
         bump = escrow_state.bump,
