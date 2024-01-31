@@ -1,7 +1,7 @@
 'use client';
 
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useTransactionToast } from '@/components/shared/use-transaction-toast';
 import { useAccounts } from './get-accounts';
 import { useCluster } from '@/components/cluster/cluster-data-access';
@@ -18,15 +18,32 @@ interface ValidateProps {
   nftAddress: PublicKey;
 }
 
-export function useValidate() {
+export function useValidate(collection?: PublicKey) {
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
   const { program, escrowAccounts } = useAccounts();
   const { publicKey } = useWallet();
   const { connection } = useConnection();
 
+  const validatorEscrows = useQuery({
+    queryKey: ['validateEscrow', { collection }],
+    queryFn: () => {
+      if (collection) {
+        return program.account.escrow.all([
+          {
+            memcmp: {
+              offset: 121,
+              bytes: collection.toBase58(),
+            },
+          },
+        ]);
+      }
+      return null;
+    },
+  });
+
   const validate = useMutation({
-    mutationKey: ['escrow', 'validate', { cluster }],
+    mutationKey: ['validator', 'validate', { cluster }],
     mutationFn: async ({ escrow, nftAddress }: ValidateProps) => {
       if (!publicKey) {
         return Promise.resolve('');
@@ -65,5 +82,5 @@ export function useValidate() {
     },
   });
 
-  return { validate };
+  return { validate, validatorEscrows };
 }

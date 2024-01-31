@@ -9,16 +9,14 @@ import { COLLECTIONS, ROLES } from '@/constants';
 import { useCollection } from '@/hooks/get-collection';
 
 export default function ValidatorUi() {
-  const { validate } = useValidate();
   const [selectedCollection, setSelectedCollection] = useState<PublicKey>();
   const [selectedEscrow, setSelectedEscrow] = useState<PublicKey>();
   // const { publicKey } = useWallet();
-  const { validatorEscrows } = useAccounts();
+  const { validate, validatorEscrows } = useValidate(selectedCollection);
   const { collection } = useCollection(selectedCollection);
 
   const handleCollectionClick = (collection: PublicKey) => {
     setSelectedCollection(collection);
-    validatorEscrows.mutateAsync(collection);
   };
 
   const handleEscrowClick = (escrow: PublicKey) => {
@@ -48,10 +46,21 @@ export default function ValidatorUi() {
             return (
               <div
                 key={escrow.publicKey.toString()}
-                onClick={() => handleEscrowClick(escrow.publicKey)}
+                className="card w-96 bg-base-100 shadow-xl"
               >
-                <div>{escrow.publicKey.toString()}</div>
-                <div>Validate this work</div>
+                <figure className="px-10 pt-10">
+                </figure>
+                <div className="card-body items-center text-center">
+                  <h2 className="card-title">{escrow.publicKey.toString()}</h2>
+                  <div className="card-actions">
+                    <button
+                      onClick={() => handleEscrowClick(escrow.publicKey)}
+                      className="btn btn-primary"
+                    >
+                      Validate Work
+                    </button>
+                  </div>
+                </div>
               </div>
             );
           })}

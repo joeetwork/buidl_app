@@ -68,20 +68,6 @@ export function useAccounts() {
     },
   });
 
-  const validatorEscrows = useMutation({
-    mutationKey: ['escrow', 'collection'],
-    mutationFn: (collection: PublicKey) => {
-      return program.account.escrow.all([
-        {
-          memcmp: {
-            offset: 121,
-            bytes: collection?.toBase58(),
-          },
-        },
-      ]);
-    },
-  });
-
   const userAccount = useQuery({
     queryKey: ['escrow', 'fetch', { cluster }],
     queryFn: () => {
@@ -112,6 +98,5 @@ export function useAccounts() {
     userAccount,
     userRequests,
     userEscrows,
-    validatorEscrows,
   };
 }
