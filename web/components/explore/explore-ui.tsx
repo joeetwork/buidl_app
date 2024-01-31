@@ -26,16 +26,9 @@ export default function ExploreUi() {
         {userAccounts.data?.map((user) => {
           return (
             <div key={user.publicKey.toString()}>
-              <div className="card w-44 bg-base-100 shadow-xl">
-                <figure className="px-5 pt-5">
-                  <img
-                    src="https://daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.jpg"
-                    alt="Shoes"
-                    className="rounded-xl"
-                  />
-                </figure>
+              <div className="card w-72 bg-base-100 shadow-xl">
                 <div className="card-body items-center text-center">
-                  <h2 className="card-title">{user.account.username}</h2>
+                  <h2 className="card-title">User: {user.account.username}</h2>
                   <p>{user.account.about}</p>
                   <div className="card-actions">
                     <button
