@@ -80,7 +80,9 @@ export default function ValidatorModal({
                 <button
                   onClick={() => handleDeclineClick(escrow.publicKey)}
                   className="btn btn-primary"
-                  disabled={!collection?.result}
+                  disabled={
+                    escrow.account.status !== 'validate' || !collection?.result
+                  }
                 >
                   Decline Work
                 </button>
