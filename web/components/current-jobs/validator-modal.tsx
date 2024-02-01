@@ -18,12 +18,22 @@ export default function ValidatorModal({
   selectedCollection,
   hideModal,
 }: ValidatorModalProps) {
-  const { validate, validatorEscrows } = useValidate(selectedCollection);
+  const { validateAccept, validateDecline, validatorEscrows } =
+    useValidate(selectedCollection);
   const { collection } = useCollection(selectedCollection);
 
-  const handleClick = (escrow: PublicKey) => {
+  const handleAcceptClick = (escrow: PublicKey) => {
     if (collection.result && collection?.result?.items?.length >= 1) {
-      validate.mutateAsync({
+      validateAccept.mutateAsync({
+        escrow,
+        nftAddress: new PublicKey(collection?.result?.items[0]?.id),
+      });
+    }
+  };
+
+  const handleDeclineClick = (escrow: PublicKey) => {
+    if (collection.result && collection?.result?.items?.length >= 1) {
+      validateDecline.mutateAsync({
         escrow,
         nftAddress: new PublicKey(collection?.result?.items[0]?.id),
       });
@@ -32,7 +42,7 @@ export default function ValidatorModal({
 
   useEffect(() => {
     hideModal();
-  }, [validate.isSuccess]);
+  }, [validateAccept.isSuccess, validateDecline.isSuccess]);
 
   return (
     <AppModal title={`Work to Validate`} show={show} hide={hideModal}>
@@ -56,15 +66,23 @@ export default function ValidatorModal({
                   Check Uploaded work
                 </button>
               </div>
-              <div className="card-actions">
+              <div className="card-actions flex">
                 <button
-                  onClick={() => handleClick(escrow.publicKey)}
+                  onClick={() => handleAcceptClick(escrow.publicKey)}
                   className="btn btn-primary"
                   disabled={
                     escrow.account.status !== 'validate' || !collection?.result
                   }
                 >
-                  Validate Work
+                  Accept Work
+                </button>
+
+                <button
+                  onClick={() => handleDeclineClick(escrow.publicKey)}
+                  className="btn btn-primary"
+                  disabled={!collection?.result}
+                >
+                  Decline Work
                 </button>
               </div>
             </div>

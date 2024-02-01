@@ -52,14 +52,27 @@ pub struct ValidateWork<'info> {
 }
 
 impl<'info> ValidateWork<'info> {
-    pub fn validate_work(
+    pub fn validate_accept(
          &mut self,
      ) -> Result<()> {
         self.escrow_state.validator_count = self.escrow_state.validator_count.checked_add(1)
         .unwrap();
 
-        self.escrow_state.status = EXCHANGE.to_string();
+        if self.escrow_state.validator_total_count == self.escrow_state.validator_count {
+            self.escrow_state.status = EXCHANGE.to_string()
+        };
 
         Ok(())
      }
+
+     pub fn validate_decline(
+        &mut self,
+    ) -> Result<()> {
+       self.escrow_state.validator_count = self.escrow_state.validator_count.checked_sub(1)
+       .unwrap();
+
+       self.escrow_state.status = EXCHANGE.to_string();
+
+       Ok(())
+    }
 }

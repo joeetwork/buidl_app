@@ -56,8 +56,12 @@ pub mod anchor_escrow {
         ctx.accounts.refund_and_close_vault()
     }
 
-    pub fn validate_work(ctx: Context<ValidateWork>) -> Result<()> {
-        ctx.accounts.validate_work()
+    pub fn validate_accept(ctx: Context<ValidateWork>) -> Result<()> {
+        ctx.accounts.validate_accept()
+    }
+
+    pub fn validate_decline(ctx: Context<ValidateWork>) -> Result<()> {
+        ctx.accounts.validate_decline()
     }
 
     pub fn exchange(ctx: Context<Exchange>) -> Result<()> {

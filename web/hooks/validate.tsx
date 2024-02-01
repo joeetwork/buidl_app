@@ -42,7 +42,7 @@ export function useValidate(collection?: PublicKey) {
     },
   });
 
-  const validate = useMutation({
+  const validateAccept = useMutation({
     mutationKey: ['validator', 'validate', { cluster }],
     mutationFn: async ({ escrow, nftAddress }: ValidateProps) => {
       if (!publicKey) {
@@ -68,7 +68,7 @@ export function useValidate(collection?: PublicKey) {
       });
 
       return program.methods
-        .validateWork()
+        .validateAccept()
         .accounts({
           user: publicKey,
           escrowState: escrow,
@@ -88,5 +88,51 @@ export function useValidate(collection?: PublicKey) {
     },
   });
 
-  return { validate, validatorEscrows };
+  const validateDecline = useMutation({
+    mutationKey: ['validator', 'validate', { cluster }],
+    mutationFn: async ({ escrow, nftAddress }: ValidateProps) => {
+      if (!publicKey) {
+        return Promise.resolve('');
+      }
+
+      const validatePDA = PublicKey.findProgramAddressSync(
+        [Buffer.from('validate'), publicKey?.toBuffer(), escrow.toBuffer()],
+        program.programId
+      )[0];
+
+      const nftTokenAccount = await getAssociatedTokenAddress(
+        nftAddress,
+        publicKey,
+        true,
+        TOKEN_PROGRAM_ID,
+        ASSOCIATED_TOKEN_PROGRAM_ID
+      );
+
+      const metaplex = Metaplex.make(connection);
+      const metadataPda = metaplex.nfts().pdas().metadata({
+        mint: nftAddress,
+      });
+
+      return program.methods
+        .validateDecline()
+        .accounts({
+          user: publicKey,
+          escrowState: escrow,
+          nftMint: nftAddress,
+          nftTokenAccount: nftTokenAccount,
+          metadataAccount: metadataPda,
+          validateState: validatePDA,
+          systemProgram: anchor.web3.SystemProgram.programId,
+        })
+        .rpc({
+          skipPreflight: true,
+        });
+    },
+    onSuccess: (tx) => {
+      transactionToast(tx);
+      return escrowAccounts.refetch();
+    },
+  });
+
+  return { validateAccept, validateDecline, validatorEscrows };
 }

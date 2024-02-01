@@ -41,6 +41,7 @@ export default function DevUi() {
   const handleAccept = (data: EscrowProps) => {
     acceptRequest.mutateAsync(data);
   };
+console.log(userRequests.data);
 
   return (
     <div className="flex">
