@@ -1,7 +1,8 @@
 use anchor_lang::prelude::*;
 
 use crate::states::Escrow;
-use crate::constant::*;
+use crate::constant::escrow_status::VALIDATE;
+use crate::constant::seeds::ESCROW;
 
 #[derive(Accounts)]
 pub struct UploadWork<'info> {

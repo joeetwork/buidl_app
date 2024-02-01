@@ -49,6 +49,11 @@ export function useValidate(collection?: PublicKey) {
         return Promise.resolve('');
       }
 
+      const validatePDA = PublicKey.findProgramAddressSync(
+        [Buffer.from('validate'), publicKey?.toBuffer(), escrow.toBuffer()],
+        program.programId
+      )[0];
+
       const nftTokenAccount = await getAssociatedTokenAddress(
         nftAddress,
         publicKey,
@@ -70,6 +75,7 @@ export function useValidate(collection?: PublicKey) {
           nftMint: nftAddress,
           nftTokenAccount: nftTokenAccount,
           metadataAccount: metadataPda,
+          validateState: validatePDA,
           systemProgram: anchor.web3.SystemProgram.programId,
         })
         .rpc({

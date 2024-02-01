@@ -8,3 +8,6 @@ pub const USER: &[u8] = b"user";
 
 #[constant]
 pub const METADATA: &[u8] = b"metadata";
+
+#[constant]
+pub const VALIDATE: &[u8] = b"validate";
