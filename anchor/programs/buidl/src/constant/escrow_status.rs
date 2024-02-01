@@ -11,6 +11,3 @@ pub const VALIDATE: &str = "validate";
 
 #[constant]
 pub const EXCHANGE: &str = "exchange";
-
-#[constant]
-pub const SUCCESS: &str = "success";
