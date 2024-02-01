@@ -9,14 +9,15 @@ export function useCollection(selectedCollection?: PublicKey) {
   const { publicKey } = useWallet();
 
   const { data } = useQuery({
-    queryKey: ['collection', selectedCollection],
+    queryKey: ['collection', selectedCollection, publicKey],
     queryFn: async () => {
-      if (selectedCollection) {
+      if (selectedCollection && publicKey) {
         const res = await fetch('/api/search-assets', {
           method: 'POST',
           body: JSON.stringify({
-            ownerAddress: publicKey?.toString(),
+            ownerAddress: publicKey.toString(),
             grouping: ['collection', selectedCollection?.toString()],
+            limit: 1,
           }),
         });
         const data = res.json();
@@ -26,5 +27,5 @@ export function useCollection(selectedCollection?: PublicKey) {
     },
   });
 
-  return { collection: data?.result as Assets};
+  return { collection: data as Assets };
 }

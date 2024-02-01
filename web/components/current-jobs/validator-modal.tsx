@@ -22,10 +22,10 @@ export default function ValidatorModal({
   const { collection } = useCollection(selectedCollection);
 
   const handleClick = (escrow: PublicKey) => {
-    if (collection?.result.items.length >= 1) {
+    if (collection.result && collection?.result?.items?.length >= 1) {
       validate.mutateAsync({
         escrow,
-        nftAddress: new PublicKey(collection?.result.items[0].id),
+        nftAddress: new PublicKey(collection?.result?.items[0]?.id),
       });
     }
   };
@@ -51,6 +51,7 @@ export default function ValidatorModal({
                 <button
                   onClick={() => window.open(escrow.account.uploadWork)}
                   className={'btn btn-primary'}
+                  disabled={!escrow.account.uploadWork}
                 >
                   Check Uploaded work
                 </button>
@@ -60,10 +61,7 @@ export default function ValidatorModal({
                   onClick={() => handleClick(escrow.publicKey)}
                   className="btn btn-primary"
                   disabled={
-                    escrow.account.status !== 'validate' ||
-                    !collection ||
-                    !collection?.result?.items ||
-                    collection?.result?.items.length < 1
+                    escrow.account.status !== 'validate' || !collection?.result
                   }
                 >
                   Validate Work

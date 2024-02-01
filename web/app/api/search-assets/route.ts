@@ -35,7 +35,10 @@ export async function POST(req: Request) {
 
     const { result } = (await response.json()) as Assets;
 
-    return NextResponse.json({ result });
+    if (result) {
+      return NextResponse.json({ result });
+    }
+    return;
   } catch (err) {
     console.log(err);
   }
