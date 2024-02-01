@@ -16,7 +16,7 @@ pub mod anchor_escrow {
         ctx: Context<Initialize>,
         seed: u64,
         initializer_amount: u64,
-        validator_total_count: u64,
+        validator_total_count: u8,
         taker: Pubkey,
         verified_collection: Pubkey,
         about: String

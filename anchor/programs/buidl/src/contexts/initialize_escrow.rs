@@ -49,7 +49,7 @@ impl<'info> Initialize<'info> {
         initializer_amount: u64,
         taker: Pubkey,
         verified_collection: Pubkey,
-        validator_total_count: u64,
+        validator_total_count: u8,
         about: String
     ) -> Result<()> {
         self.escrow_state.set_inner(Escrow {
