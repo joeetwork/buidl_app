@@ -14,7 +14,7 @@ pub struct InitializeUser<'info> {
         seeds = [USER.as_ref(), initializer.key().as_ref()],
         bump,
         payer = initializer,
-        space = std::mem::size_of::<User>() + 8
+        space = User::INIT_SPACE,
     )]
     pub user_state: Box<Account<'info, User>>,
     pub system_program: Program<'info, System>,

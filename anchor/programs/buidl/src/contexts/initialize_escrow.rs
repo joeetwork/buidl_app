@@ -23,7 +23,7 @@ pub struct Initialize<'info> {
     #[account(
         init_if_needed,
         payer = initializer,
-        space = std::mem::size_of::<Escrow>() + 8,
+        space = Escrow::INIT_SPACE,
         seeds = [ESCROW.as_ref(), &seed.to_le_bytes()],
         bump
     )]

@@ -15,3 +15,18 @@ pub struct Escrow {
     pub about: String,
     pub status: String
 }
+
+const STRING_LENGTH_PREFIX: usize = 4;
+const MAX_UPLOAD_LENGTH: usize = 100 * 4; 
+const MAX_CONTENT_LENGTH: usize = 250 * 4;
+const MAX_STATUS_LENGTH: usize = 50 * 4;
+
+impl Space for Escrow {
+    const INIT_SPACE: usize = 8 + 8 + 1 + 32 + 32 + 32 + 8 + 32 + 8 + 8 + 
+    STRING_LENGTH_PREFIX + 
+    MAX_UPLOAD_LENGTH + 
+    STRING_LENGTH_PREFIX + 
+    MAX_CONTENT_LENGTH + 
+    STRING_LENGTH_PREFIX + 
+    MAX_STATUS_LENGTH;
+}
