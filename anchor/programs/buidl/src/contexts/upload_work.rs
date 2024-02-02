@@ -1,8 +1,8 @@
 use anchor_lang::prelude::*;
 
-use crate::states::Escrow;
+use crate::states::{Escrow, Upload};
 use crate::constant::escrow_status::VALIDATE;
-use crate::constant::seeds::ESCROW;
+use crate::constant::seeds::{ESCROW, UPLOAD};
 
 #[derive(Accounts)]
 pub struct UploadWork<'info> {
@@ -17,13 +17,26 @@ pub struct UploadWork<'info> {
         bump = escrow_state.bump,
     )]
     pub escrow_state: Account<'info, Escrow>,
+    #[account(
+        init,
+        seeds=[UPLOAD, escrow_state.initializer.as_ref(), escrow_state.key().as_ref()],
+        bump,
+        payer = taker,
+        space = Upload::INIT_SPACE
+    )]
+    pub upload_work: Account<'info, Upload>,
+
     pub system_program: Program<'info, System>,
 }
 
 impl<'info> UploadWork<'info> {
     pub fn upload_work(&mut self, file: String) -> Result<()> {
-        self.escrow_state.upload_work = file;
+        self.escrow_state.upload_work = file.clone();
         self.escrow_state.status = VALIDATE.to_string();
+
+        self.upload_work.upload_work = file;
+        self.upload_work.escrow = self.escrow_state.key();
+        self.upload_work.user = self.escrow_state.initializer;
         Ok(())
      }
 }

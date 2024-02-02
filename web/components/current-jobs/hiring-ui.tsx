@@ -5,7 +5,10 @@ import React from 'react';
 import { ellipsify } from '../shared/ellipsify';
 
 export default function HiringUi() {
-  const { hiringEscrows } = useAccounts();
+  const { hiringEscrows, uploadHistory } = useAccounts();
+
+  console.log(uploadHistory.data);
+  
 
   return (
     <div>

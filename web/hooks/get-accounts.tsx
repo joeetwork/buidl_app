@@ -77,6 +77,23 @@ export function useAccounts() {
     },
   });
 
+  const uploadHistory = useQuery({
+    queryKey: ['uploadHistory', {publicKey}],
+    queryFn: () => {
+      if (publicKey) {
+        return program.account.upload.all([
+          {
+            memcmp: {
+              offset: 8,
+              bytes: publicKey?.toBase58(),
+            },
+          },
+        ]);
+      }
+      return null;
+    },
+  });
+
   const getProgramAccount = useQuery({
     queryKey: ['get-program-account', { cluster }],
     queryFn: () => connection.getParsedAccountInfo(programId),
@@ -90,5 +107,6 @@ export function useAccounts() {
     userAccount,
     devEscrows,
     hiringEscrows,
+    uploadHistory
   };
 }

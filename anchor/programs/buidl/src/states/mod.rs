@@ -4,3 +4,5 @@ pub mod user;
 pub use user::User;
 pub mod validate;
 pub use validate::Validate;
+pub mod upload;
+pub use upload::Upload;

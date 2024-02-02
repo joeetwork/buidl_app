@@ -24,6 +24,11 @@ export function useUpload() {
   const uploadWork = useMutation({
     mutationKey: ['uploadWork', { cluster }],
     mutationFn: async ({ escrow, initializer, link }: UploadProps) => {
+      const uploadPDA = PublicKey.findProgramAddressSync(
+        [Buffer.from('upload'), initializer?.toBuffer(), escrow.toBuffer()],
+        program.programId
+      )[0];
+
       if (publicKey) {
         return program.methods
           .uploadWork(link)
@@ -31,6 +36,7 @@ export function useUpload() {
             taker: publicKey,
             initializer: initializer,
             escrowState: escrow,
+            uploadWork: uploadPDA,
             systemProgram: SystemProgram.programId,
           })
           .rpc();

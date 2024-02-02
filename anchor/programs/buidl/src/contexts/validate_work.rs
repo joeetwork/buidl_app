@@ -3,7 +3,7 @@ use anchor_spl::token::{ Mint, TokenAccount};
 use anchor_spl::metadata::MetadataAccount;
 
 use crate::states::{Escrow, Validate};
-use crate::constant::seeds::*;
+use crate::constant::seeds::{METADATA, VALIDATE};
 use crate::constant::escrow_status::EXCHANGE;
 
 #[derive(Accounts)]

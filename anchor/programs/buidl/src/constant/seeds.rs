@@ -11,3 +11,6 @@ pub const METADATA: &[u8] = b"metadata";
 
 #[constant]
 pub const VALIDATE: &[u8] = b"validate";
+
+#[constant]
+pub const UPLOAD: &[u8] = b"upload";
