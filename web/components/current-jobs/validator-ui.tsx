@@ -6,6 +6,7 @@ import { COLLECTIONS } from '@/constants';
 import { ellipsify } from '../shared/ellipsify';
 import { useMetadata } from '@/hooks/get-metadata';
 import ValidatorModal from './validator-modal';
+import Loadie from '../shared/loadie';
 
 export default function ValidatorUi() {
   const [selectedCollection, setSelectedCollection] = useState<PublicKey>();
@@ -20,10 +21,8 @@ export default function ValidatorUi() {
   return (
     <>
       <div className="flex flex-col">
-        <div className='py-4'>Verified Collection</div>
-        {isPending ? (
-          <span className="loading loading-spinner loading-lg m-auto"></span>
-        ) : null}
+        <div className="py-4">Verified Collection</div>
+        {isPending ? <Loadie /> : null}
         {metadata?.map((data, i) => {
           return (
             <div key={i} className="card w-60 bg-base-100 shadow-xl">
