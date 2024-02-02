@@ -19,6 +19,7 @@ export function useUpload() {
   const transactionToast = useTransactionToast();
   const { program } = useAccounts();
   const { publicKey } = useWallet();
+  const { devEscrows } = useAccounts();
 
   const uploadWork = useMutation({
     mutationKey: ['escrow', 'uploadWork', { cluster }],
@@ -39,8 +40,7 @@ export function useUpload() {
     },
     onSuccess: (tx) => {
       transactionToast(tx);
-      //   return account.refetch();
-      return;
+      return devEscrows.refetch();
     },
   });
 

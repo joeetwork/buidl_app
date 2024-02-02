@@ -26,7 +26,7 @@ interface InitializeEscrowProps {
 export function useInitialiseEscrow() {
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
-  const { program, escrowAccounts } = useAccounts();
+  const { program, devEscrows } = useAccounts();
   const { publicKey } = useWallet();
   const { mint, seed, escrowPDA, vaultPDA } = usePDAs();
 
@@ -74,7 +74,7 @@ export function useInitialiseEscrow() {
     },
     onSuccess: (signature) => {
       transactionToast(signature ?? '');
-      return escrowAccounts.refetch();
+      return devEscrows.refetch();
     },
     onError: () => toast.error('Failed to initialize counter'),
   });

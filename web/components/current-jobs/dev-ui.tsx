@@ -14,7 +14,7 @@ interface EscrowProps {
 }
 
 export default function DevUi() {
-  const { userRequests } = useAccounts();
+  const { devEscrows } = useAccounts();
   const { exchange } = useExchange();
   const { uploadWork } = useUpload();
   const { declineRequest, acceptRequest } = useRequests();
@@ -44,7 +44,7 @@ export default function DevUi() {
 
   return (
     <div className="flex">
-      {userRequests.data?.map((escrow) => {
+      {devEscrows.data?.map((escrow) => {
         return (
           <div
             key={escrow.publicKey.toString()}

@@ -34,7 +34,7 @@ export function useAccounts() {
   });
 
   //taker waller (offset 17 is init wallet)
-  const userRequests = useQuery({
+  const devEscrows = useQuery({
     queryKey: ['taking', { publicKey }],
     queryFn: () => {
       if (publicKey) {
@@ -51,7 +51,7 @@ export function useAccounts() {
     },
   });
 
-  const userEscrows = useQuery({
+  const hiringEscrows = useQuery({
     queryKey: ['hiring', { publicKey }],
     queryFn: () => {
       if (publicKey) {
@@ -96,7 +96,7 @@ export function useAccounts() {
     getProgramAccount,
     userAccounts,
     userAccount,
-    userRequests,
-    userEscrows,
+    devEscrows,
+    hiringEscrows,
   };
 }

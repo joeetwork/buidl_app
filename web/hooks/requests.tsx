@@ -20,6 +20,7 @@ export function useRequests() {
   const { program, escrowAccounts } = useAccounts();
   const { publicKey } = useWallet();
   const { mint } = usePDAs();
+  const { devEscrows } = useAccounts();
 
   interface RequestProps {
     escrow: PublicKey;
@@ -58,7 +59,7 @@ export function useRequests() {
     },
     onSuccess: (tx) => {
       transactionToast(tx);
-      return escrowAccounts.refetch();
+      return devEscrows.refetch();
     },
   });
 
@@ -94,7 +95,7 @@ export function useRequests() {
     },
     onSuccess: (tx) => {
       transactionToast(tx);
-      return escrowAccounts.refetch();
+      return devEscrows.refetch();
     },
   });
 

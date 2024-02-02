@@ -5,11 +5,11 @@ import React from 'react';
 import { ellipsify } from '../shared/ellipsify';
 
 export default function HiringUi() {
-  const { userEscrows } = useAccounts();
+  const { hiringEscrows } = useAccounts();
 
   return (
     <div>
-      {userEscrows.data?.map((escrow) => {
+      {hiringEscrows.data?.map((escrow) => {
         return (
           <div
             key={escrow.publicKey.toString()}

@@ -26,6 +26,7 @@ export function useExchange() {
   const { program } = useAccounts();
   const { publicKey } = useWallet();
   const { mint } = usePDAs();
+  const { devEscrows } = useAccounts();
 
   const exchange = useMutation({
     mutationKey: ['escrow', 'exchange', { cluster }],
@@ -59,8 +60,7 @@ export function useExchange() {
     },
     onSuccess: (tx) => {
       transactionToast(tx);
-      //   return account.refetch();
-      return;
+        return devEscrows.refetch();
     },
   });
 

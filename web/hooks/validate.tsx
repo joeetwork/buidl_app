@@ -84,7 +84,7 @@ export function useValidate(collection?: PublicKey) {
     },
     onSuccess: (tx) => {
       transactionToast(tx);
-      return escrowAccounts.refetch();
+      return validatorEscrows.refetch();
     },
   });
 
@@ -130,7 +130,7 @@ export function useValidate(collection?: PublicKey) {
     },
     onSuccess: (tx) => {
       transactionToast(tx);
-      return escrowAccounts.refetch();
+      return validatorEscrows.refetch();
     },
   });
 
