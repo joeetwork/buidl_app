@@ -31,7 +31,7 @@ export function useInitialiseEscrow() {
   const { mint, seed, escrowPDA, vaultPDA } = usePDAs();
 
   const initializeEscrow = useMutation({
-    mutationKey: ['escrow', 'initialize', { cluster }],
+    mutationKey: ['initializeEscrow', 'initialize', { cluster }],
     mutationFn: async ({
       initializerAmount,
       taker,
@@ -39,38 +39,37 @@ export function useInitialiseEscrow() {
       validatorCount,
       about,
     }: InitializeEscrowProps) => {
-      if (!publicKey) {
-        return Promise.resolve('');
+      if (publicKey) {
+        const initializerTokenAccount = await getAssociatedTokenAddress(
+          mint,
+          publicKey,
+          true,
+          TOKEN_PROGRAM_ID,
+          ASSOCIATED_TOKEN_PROGRAM_ID
+        );
+
+        return program.methods
+          .initialize(
+            seed,
+            new anchor.BN(initializerAmount),
+            validatorCount,
+            taker,
+            collection,
+            about
+          )
+          .accounts({
+            initializer: publicKey,
+            vault: vaultPDA,
+            mint: mint,
+            initializerDepositTokenAccount: initializerTokenAccount,
+            escrowState: escrowPDA,
+            associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+            tokenProgram: TOKEN_PROGRAM_ID,
+            systemProgram: SystemProgram.programId,
+          })
+          .rpc();
       }
-
-      const initializerTokenAccount = await getAssociatedTokenAddress(
-        mint,
-        publicKey,
-        true,
-        TOKEN_PROGRAM_ID,
-        ASSOCIATED_TOKEN_PROGRAM_ID
-      );
-
-      return program.methods
-        .initialize(
-          seed,
-          new anchor.BN(initializerAmount),
-          new anchor.BN(validatorCount),
-          taker,
-          collection,
-          about
-        )
-        .accounts({
-          initializer: publicKey,
-          vault: vaultPDA,
-          mint: mint,
-          initializerDepositTokenAccount: initializerTokenAccount,
-          escrowState: escrowPDA,
-          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-          tokenProgram: TOKEN_PROGRAM_ID,
-          systemProgram: SystemProgram.programId,
-        })
-        .rpc();
+      return null;
     },
     onSuccess: (signature) => {
       transactionToast(signature ?? '');

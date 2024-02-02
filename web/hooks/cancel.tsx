@@ -5,8 +5,6 @@ import { useMutation } from '@tanstack/react-query';
 import { useTransactionToast } from '@/components/shared/use-transaction-toast';
 import { useAccounts } from './get-accounts';
 import { useCluster } from '@/components/cluster/cluster-data-access';
-import { PublicKey } from '@metaplex-foundation/js';
-import * as anchor from '@coral-xyz/anchor';
 import { usePDAs } from './get-PDAs';
 import {
   TOKEN_PROGRAM_ID,
@@ -16,48 +14,48 @@ import {
 export function useCancel() {
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
-  const { program, escrowAccounts } = useAccounts();
+  const { program } = useAccounts();
   const { publicKey } = useWallet();
   const { mint } = usePDAs();
+  const { hiringEscrows } = useAccounts();
 
   const cancel = useMutation({
     mutationKey: ['escrow', 'cancel', { cluster }],
     mutationFn: async () => {
-      if (!publicKey) {
-        return Promise.resolve('');
+      if (
+        publicKey &&
+        Array.isArray(hiringEscrows.data) &&
+        hiringEscrows.data[0]
+      ) {
+        const vault = getAssociatedTokenAddressSync(
+          mint,
+          hiringEscrows.data[0].publicKey,
+          true
+        );
+
+        const initializerDepositTokenAccount = getAssociatedTokenAddressSync(
+          mint,
+          publicKey,
+          true
+        );
+
+        return program.methods
+          .cancel()
+          .accounts({
+            initializer: publicKey,
+            mint: mint,
+            initializerDepositTokenAccount: initializerDepositTokenAccount,
+            vault: vault,
+            escrowState: hiringEscrows.data[0].publicKey,
+            tokenProgram: TOKEN_PROGRAM_ID,
+          })
+          .rpc();
       }
-
-      const escrow = PublicKey.findProgramAddressSync(
-        [
-          Buffer.from(anchor.utils.bytes.utf8.encode('escrow')),
-          escrowAccounts.data[0]?.account.seed.toArrayLike(Buffer, 'le', 8),
-        ],
-        program.programId
-      )[0];
-
-      const vault = getAssociatedTokenAddressSync(mint, escrow, true);
-
-      const initializerDepositTokenAccount = getAssociatedTokenAddressSync(
-        mint,
-        publicKey,
-        true
-      );
-
-      return program.methods
-        .cancel()
-        .accounts({
-          initializer: publicKey,
-          mint: mint,
-          initializerDepositTokenAccount: initializerDepositTokenAccount,
-          vault: vault,
-          escrowState: escrow,
-          tokenProgram: TOKEN_PROGRAM_ID,
-        })
-        .rpc();
+      return '';
     },
     onSuccess: (tx) => {
       transactionToast(tx);
-      return escrowAccounts.refetch();
+      return hiringEscrows.refetch();
     },
     onError: (err) => {
       return console.log(err);

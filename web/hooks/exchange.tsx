@@ -29,38 +29,37 @@ export function useExchange() {
   const { devEscrows } = useAccounts();
 
   const exchange = useMutation({
-    mutationKey: ['escrow', 'exchange', { cluster }],
+    mutationKey: ['exchange', { cluster }],
     mutationFn: async ({ escrow, initializer }: EscrowProps) => {
-      if (!publicKey) {
-        return Promise.resolve('');
+      if (publicKey) {
+        const vault = getAssociatedTokenAddressSync(mint, escrow, true);
+
+        const takerTokenAccount = await getAssociatedTokenAddress(
+          mint,
+          publicKey,
+          true
+        );
+
+        return program.methods
+          .exchange()
+          .accounts({
+            taker: publicKey,
+            mint: mint,
+            takerReceiveTokenAccount: takerTokenAccount,
+            initializer,
+            escrowState: escrow,
+            vault: vault,
+            tokenProgram: TOKEN_PROGRAM_ID,
+            associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+            systemProgram: SystemProgram.programId,
+          })
+          .rpc();
       }
-
-      const vault = getAssociatedTokenAddressSync(mint, escrow, true);
-
-      const takerTokenAccount = await getAssociatedTokenAddress(
-        mint,
-        publicKey,
-        true
-      );
-
-      return program.methods
-        .exchange()
-        .accounts({
-          taker: publicKey,
-          mint: mint,
-          takerReceiveTokenAccount: takerTokenAccount,
-          initializer,
-          escrowState: escrow,
-          vault: vault,
-          tokenProgram: TOKEN_PROGRAM_ID,
-          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-          systemProgram: SystemProgram.programId,
-        })
-        .rpc();
+      return null;
     },
     onSuccess: (tx) => {
-      transactionToast(tx);
-        return devEscrows.refetch();
+      transactionToast(tx ?? '');
+      return devEscrows.refetch();
     },
   });
 

@@ -22,24 +22,23 @@ export function useUpload() {
   const { devEscrows } = useAccounts();
 
   const uploadWork = useMutation({
-    mutationKey: ['escrow', 'uploadWork', { cluster }],
+    mutationKey: ['uploadWork', { cluster }],
     mutationFn: async ({ escrow, initializer, link }: UploadProps) => {
-      if (!publicKey) {
-        return Promise.resolve('');
+      if (publicKey) {
+        return program.methods
+          .uploadWork(link)
+          .accounts({
+            taker: publicKey,
+            initializer: initializer,
+            escrowState: escrow,
+            systemProgram: SystemProgram.programId,
+          })
+          .rpc();
       }
-
-      return program.methods
-        .uploadWork(link)
-        .accounts({
-          taker: publicKey,
-          initializer: initializer,
-          escrowState: escrow,
-          systemProgram: SystemProgram.programId,
-        })
-        .rpc();
+      return null;
     },
     onSuccess: (tx) => {
-      transactionToast(tx);
+      transactionToast(tx ?? '');
       return devEscrows.refetch();
     },
   });

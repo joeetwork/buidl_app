@@ -21,21 +21,30 @@ export function useAccounts() {
 
   const program = new Program(BuidlIDL, programId, provider);
 
-  const escrowAccounts = useQuery({
-    queryKey: ['escrow', 'all', { cluster }],
-    queryFn: () => program.account.escrow.all(),
-  });
-
   const userAccounts = useQuery({
-    queryKey: ['user', 'fetch', { cluster }],
+    queryKey: ['userAccounts'],
     queryFn: () => {
       return program.account.user.all();
     },
   });
 
-  //taker waller (offset 17 is init wallet)
+  const userAccount = useQuery({
+    queryKey: ['userAccount'],
+    queryFn: () => {
+      if (publicKey) {
+        const userPDA = PublicKey.findProgramAddressSync(
+          [Buffer.from('user'), publicKey?.toBuffer()],
+          program.programId
+        )[0];
+
+        return program.account.user.fetch(userPDA);
+      }
+      return null;
+    },
+  });
+
   const devEscrows = useQuery({
-    queryKey: ['taking', { publicKey }],
+    queryKey: ['devEscrows', { publicKey }],
     queryFn: () => {
       if (publicKey) {
         return program.account.escrow.all([
@@ -52,35 +61,19 @@ export function useAccounts() {
   });
 
   const hiringEscrows = useQuery({
-    queryKey: ['hiring', { publicKey }],
+    queryKey: ['hiringEscrows', { publicKey }],
     queryFn: () => {
       if (publicKey) {
         return program.account.escrow.all([
           {
             memcmp: {
               offset: 17,
-              bytes:  publicKey?.toBase58(),
+              bytes: publicKey?.toBase58(),
             },
           },
         ]);
       }
       return null;
-    },
-  });
-
-  const userAccount = useQuery({
-    queryKey: ['escrow', 'fetch', { cluster }],
-    queryFn: () => {
-      if (!publicKey) {
-        return Promise.resolve(undefined);
-      }
-
-      const userPDA = PublicKey.findProgramAddressSync(
-        [Buffer.from('user'), publicKey?.toBuffer()],
-        program.programId
-      )[0];
-
-      return program.account.user.fetch(userPDA);
     },
   });
 
@@ -92,7 +85,6 @@ export function useAccounts() {
   return {
     program,
     programId,
-    escrowAccounts,
     getProgramAccount,
     userAccounts,
     userAccount,

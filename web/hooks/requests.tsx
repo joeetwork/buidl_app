@@ -17,7 +17,7 @@ import {
 export function useRequests() {
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
-  const { program, escrowAccounts } = useAccounts();
+  const { program } = useAccounts();
   const { publicKey } = useWallet();
   const { mint } = usePDAs();
   const { devEscrows } = useAccounts();
@@ -28,73 +28,71 @@ export function useRequests() {
   }
 
   const acceptRequest = useMutation({
-    mutationKey: ['escrow', 'acceptRequest', { cluster }],
+    mutationKey: ['acceptRequest', { cluster }],
     mutationFn: async ({ escrow, initializer }: RequestProps) => {
-      if (!publicKey) {
-        return Promise.resolve('');
+      if (publicKey) {
+        const vault = getAssociatedTokenAddressSync(mint, escrow, true);
+
+        const initializerDepositTokenAccount = getAssociatedTokenAddressSync(
+          mint,
+          initializer,
+          true
+        );
+
+        return program.methods
+          .acceptRequest()
+          .accounts({
+            taker: publicKey,
+            initializer: initializer,
+            mint: mint,
+            initializerDepositTokenAccount: initializerDepositTokenAccount,
+            vault: vault,
+            escrowState: escrow,
+            tokenProgram: TOKEN_PROGRAM_ID,
+            associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+            systemProgram: SystemProgram.programId,
+          })
+          .rpc();
       }
-
-      const vault = getAssociatedTokenAddressSync(mint, escrow, true);
-
-      const initializerDepositTokenAccount = getAssociatedTokenAddressSync(
-        mint,
-        initializer,
-        true
-      );
-
-      return program.methods
-        .acceptRequest()
-        .accounts({
-          taker: publicKey,
-          initializer: initializer,
-          mint: mint,
-          initializerDepositTokenAccount: initializerDepositTokenAccount,
-          vault: vault,
-          escrowState: escrow,
-          tokenProgram: TOKEN_PROGRAM_ID,
-          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-          systemProgram: SystemProgram.programId,
-        })
-        .rpc();
+      return null;
     },
     onSuccess: (tx) => {
-      transactionToast(tx);
+      transactionToast(tx ?? '');
       return devEscrows.refetch();
     },
   });
 
   const declineRequest = useMutation({
-    mutationKey: ['escrow', 'declineRequest', { cluster }],
+    mutationKey: ['declineRequest', { cluster }],
     mutationFn: async ({ escrow, initializer }: RequestProps) => {
-      if (!publicKey) {
-        return Promise.resolve('');
+      if (publicKey) {
+        const vault = getAssociatedTokenAddressSync(mint, escrow, true);
+
+        const initializerDepositTokenAccount = getAssociatedTokenAddressSync(
+          mint,
+          initializer,
+          true
+        );
+
+        return program.methods
+          .declineRequest()
+          .accounts({
+            taker: publicKey,
+            initializer: initializer,
+            mint: mint,
+            initializerDepositTokenAccount: initializerDepositTokenAccount,
+            vault: vault,
+            escrowState: escrow,
+            tokenProgram: TOKEN_PROGRAM_ID,
+            associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+            systemProgram: SystemProgram.programId,
+          })
+          .rpc();
       }
-
-      const vault = getAssociatedTokenAddressSync(mint, escrow, true);
-
-      const initializerDepositTokenAccount = getAssociatedTokenAddressSync(
-        mint,
-        initializer,
-        true
-      );
-
-      return program.methods
-        .declineRequest()
-        .accounts({
-          taker: publicKey,
-          initializer: initializer,
-          mint: mint,
-          initializerDepositTokenAccount: initializerDepositTokenAccount,
-          vault: vault,
-          escrowState: escrow,
-          tokenProgram: TOKEN_PROGRAM_ID,
-          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-          systemProgram: SystemProgram.programId,
-        })
-        .rpc();
+      return null;
     },
     onSuccess: (tx) => {
-      transactionToast(tx);
+      transactionToast(tx ?? '');
       return devEscrows.refetch();
     },
   });

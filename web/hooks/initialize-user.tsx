@@ -6,7 +6,6 @@ import { useMutation } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { useTransactionToast } from '@/components/shared/use-transaction-toast';
 import { useAccounts } from './get-accounts';
-import { useCluster } from '@/components/cluster/cluster-data-access';
 import { usePDAs } from './get-PDAs';
 
 interface InitialiseUserProps {
@@ -16,30 +15,28 @@ interface InitialiseUserProps {
 }
 
 export function useInitialiseUser() {
-  const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
   const { program, userAccounts } = useAccounts();
   const { publicKey } = useWallet();
   const { userPDA } = usePDAs();
 
   const initializeUser = useMutation({
-    mutationKey: ['escrow', 'initializeUser', { cluster }],
+    mutationKey: ['initializeUser'],
     mutationFn: async ({ name, about, role }: InitialiseUserProps) => {
-      if (!publicKey) {
-        return Promise.resolve('');
+      if (publicKey) {
+        return program.methods
+          .initializeUser(name, about, role)
+          .accounts({
+            initializer: publicKey,
+            userState: userPDA,
+            systemProgram: SystemProgram.programId,
+          })
+          .rpc();
       }
-
-      return program.methods
-        .initializeUser(name, about, role)
-        .accounts({
-          initializer: publicKey,
-          userState: userPDA,
-          systemProgram: SystemProgram.programId,
-        })
-        .rpc();
+      return null;
     },
     onSuccess: (signature) => {
-      transactionToast(signature);
+      transactionToast(signature ?? '');
       return userAccounts.refetch();
     },
     onError: () => toast.error('Failed to initialize counter'),

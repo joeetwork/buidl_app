@@ -21,7 +21,7 @@ interface ValidateProps {
 export function useValidate(collection?: PublicKey) {
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
-  const { program, escrowAccounts } = useAccounts();
+  const { program } = useAccounts();
   const { publicKey } = useWallet();
   const { connection } = useConnection();
 
@@ -43,53 +43,52 @@ export function useValidate(collection?: PublicKey) {
   });
 
   const validateAccept = useMutation({
-    mutationKey: ['validator', 'validate', { cluster }],
+    mutationKey: ['validateAccept', 'validate', { cluster }],
     mutationFn: async ({ escrow, nftAddress }: ValidateProps) => {
-      if (!publicKey) {
-        return Promise.resolve('');
-      }
+      if (publicKey) {
+        const validatePDA = PublicKey.findProgramAddressSync(
+          [Buffer.from('validate'), publicKey?.toBuffer(), escrow.toBuffer()],
+          program.programId
+        )[0];
 
-      const validatePDA = PublicKey.findProgramAddressSync(
-        [Buffer.from('validate'), publicKey?.toBuffer(), escrow.toBuffer()],
-        program.programId
-      )[0];
+        const nftTokenAccount = await getAssociatedTokenAddress(
+          nftAddress,
+          publicKey,
+          true,
+          TOKEN_PROGRAM_ID,
+          ASSOCIATED_TOKEN_PROGRAM_ID
+        );
 
-      const nftTokenAccount = await getAssociatedTokenAddress(
-        nftAddress,
-        publicKey,
-        true,
-        TOKEN_PROGRAM_ID,
-        ASSOCIATED_TOKEN_PROGRAM_ID
-      );
-
-      const metaplex = Metaplex.make(connection);
-      const metadataPda = metaplex.nfts().pdas().metadata({
-        mint: nftAddress,
-      });
-
-      return program.methods
-        .validateAccept()
-        .accounts({
-          user: publicKey,
-          escrowState: escrow,
-          nftMint: nftAddress,
-          nftTokenAccount: nftTokenAccount,
-          metadataAccount: metadataPda,
-          validateState: validatePDA,
-          systemProgram: anchor.web3.SystemProgram.programId,
-        })
-        .rpc({
-          skipPreflight: true,
+        const metaplex = Metaplex.make(connection);
+        const metadataPda = metaplex.nfts().pdas().metadata({
+          mint: nftAddress,
         });
+
+        return program.methods
+          .validateAccept()
+          .accounts({
+            user: publicKey,
+            escrowState: escrow,
+            nftMint: nftAddress,
+            nftTokenAccount: nftTokenAccount,
+            metadataAccount: metadataPda,
+            validateState: validatePDA,
+            systemProgram: anchor.web3.SystemProgram.programId,
+          })
+          .rpc({
+            skipPreflight: true,
+          });
+      }
+      return null;
     },
     onSuccess: (tx) => {
-      transactionToast(tx);
+      transactionToast(tx ?? '');
       return validatorEscrows.refetch();
     },
   });
 
   const validateDecline = useMutation({
-    mutationKey: ['validator', 'validate', { cluster }],
+    mutationKey: ['validateDecline', 'validate', { cluster }],
     mutationFn: async ({ escrow, nftAddress }: ValidateProps) => {
       if (!publicKey) {
         return Promise.resolve('');
