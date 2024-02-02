@@ -54,9 +54,12 @@ export default function ValidatorModal({
           >
             <figure className="px-10 pt-10"></figure>
             <div className="card-body items-center text-center">
-              <h2 className="card-title">{ellipsify(escrow.account.about)}</h2>
+              <h2 className="card-title">Validate</h2>
               <p>Status: {escrow.account.status}</p>
               <p>Pubkey: {ellipsify(escrow.publicKey.toString())}</p>
+              <p className="w-full break-words">
+                About: {ellipsify(escrow.account.about)}
+              </p>
               <div className="py-8">
                 <button
                   onClick={() => window.open(escrow.account.uploadWork)}
