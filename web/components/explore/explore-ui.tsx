@@ -28,8 +28,8 @@ export default function ExploreUi() {
             <div key={user.publicKey.toString()}>
               <div className="card w-72 bg-base-100 shadow-xl">
                 <div className="card-body items-center text-center">
-                  <h2 className="card-title">User: {user.account.username}</h2>
-                  <p>{user.account.about}</p>
+                  <h2 className="card-title">{user.account.username}</h2>
+                  <p className="w-full break-words">{user.account.about}</p>
                   <div className="card-actions">
                     <button
                       onClick={() =>

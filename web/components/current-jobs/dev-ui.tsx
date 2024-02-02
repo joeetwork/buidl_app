@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import Input from '../shared/input';
 import { useUpload } from '@/hooks/upload';
 import { useRequests } from '@/hooks/requests';
+import { ellipsify } from '../shared/ellipsify';
 
 interface EscrowProps {
   escrow: PublicKey;
@@ -51,8 +52,33 @@ export default function DevUi() {
             className="card w-72 bg-base-100 shadow-xl"
           >
             <div className="card-body items-center text-center">
-              <h2 className="card-title">{escrow.account.about}</h2>
+              <h2 className="card-title">Brief:</h2>
+
               <p>Status: {escrow.account.status}</p>
+
+              <div
+                className="tooltip before:max-w-none"
+                data-tip={escrow.account.initializer.toString()}
+              >
+                <p>
+                  Pubkey: {ellipsify(escrow.account.initializer.toString())}
+                </p>
+              </div>
+
+              <p>Amount: {escrow.account.initializerAmount.toString()}</p>
+
+              <p>No. Validators: {escrow.account.validatorTotalCount}</p>
+
+              <div
+                className="tooltip before:max-w-none"
+                data-tip={escrow.account.verifiedCollection.toString()}
+              >
+                <p>
+                  Collection id:{' '}
+                  {ellipsify(escrow.account.verifiedCollection.toString())}
+                </p>
+              </div>
+              <p className="w-full break-words">{escrow.account.about}</p>
               <div className="card-actions">
                 {escrow.account.status === 'request' ? (
                   <div className="flex gap-4">
