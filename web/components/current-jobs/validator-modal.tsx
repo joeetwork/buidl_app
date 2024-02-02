@@ -20,7 +20,7 @@ export default function ValidatorModal({
 }: ValidatorModalProps) {
   const { validateAccept, validateDecline, validatorEscrows } =
     useValidate(selectedCollection);
-  const { collection } = useCollection(selectedCollection);
+  const { collection, isPending } = useCollection(selectedCollection);
 
   const handleAcceptClick = (escrow: PublicKey) => {
     if (collection.result && collection?.result?.items?.length >= 1) {
@@ -71,7 +71,9 @@ export default function ValidatorModal({
                   onClick={() => handleAcceptClick(escrow.publicKey)}
                   className="btn btn-primary"
                   disabled={
-                    escrow.account.status !== 'validate' || !collection?.result
+                    escrow.account.status !== 'validate' ||
+                    collection?.result.items.length < 1 ||
+                    isPending
                   }
                 >
                   Accept Work
@@ -81,7 +83,9 @@ export default function ValidatorModal({
                   onClick={() => handleDeclineClick(escrow.publicKey)}
                   className="btn btn-primary"
                   disabled={
-                    escrow.account.status !== 'validate' || !collection?.result
+                    escrow.account.status !== 'validate' ||
+                    collection?.result.items.length < 1 ||
+                    isPending
                   }
                 >
                   Decline Work

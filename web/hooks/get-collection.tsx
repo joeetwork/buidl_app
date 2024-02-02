@@ -8,7 +8,7 @@ import { Assets } from '@/types/search-assets';
 export function useCollection(selectedCollection?: PublicKey) {
   const { publicKey } = useWallet();
 
-  const { data } = useQuery({
+  const { data, isPending } = useQuery({
     queryKey: ['collection', selectedCollection, publicKey],
     queryFn: async () => {
       if (selectedCollection && publicKey) {
@@ -27,5 +27,5 @@ export function useCollection(selectedCollection?: PublicKey) {
     },
   });
 
-  return { collection: data as Assets };
+  return { collection: data as Assets, isPending };
 }
