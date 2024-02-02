@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Item } from '@/types/search-assets';
 
 export function useMetadata(collections: string[])  {
-  const { data } = useQuery({
+  const { data, isPending } = useQuery({
     queryKey: ['nftMetadata', collections],
     queryFn: async () => {
       if (collections) {
@@ -21,5 +21,5 @@ export function useMetadata(collections: string[])  {
     },
   });
 
-  return { metadata: data?.result as Item[] };
+  return { metadata: data?.result as Item[], isPending };
 }

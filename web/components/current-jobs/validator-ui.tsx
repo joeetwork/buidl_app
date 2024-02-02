@@ -9,7 +9,7 @@ import ValidatorModal from './validator-modal';
 
 export default function ValidatorUi() {
   const [selectedCollection, setSelectedCollection] = useState<PublicKey>();
-  const { metadata } = useMetadata(COLLECTIONS);
+  const { metadata, isPending } = useMetadata(COLLECTIONS);
   const [showModal, setShowModal] = useState(false);
 
   const handleCollectionClick = (collection: PublicKey) => {
@@ -20,11 +20,14 @@ export default function ValidatorUi() {
   return (
     <>
       <div className="flex flex-col">
-        <div>Verified Collection</div>
+        <div className='py-4'>Verified Collection</div>
+        {isPending ? (
+          <span className="loading loading-spinner loading-lg m-auto"></span>
+        ) : null}
         {metadata?.map((data, i) => {
           return (
             <div key={i} className="card w-60 bg-base-100 shadow-xl">
-              <figure className="px-10 pt-10">
+              <figure className="px-10">
                 <img
                   src={data.content.links.image}
                   alt="Shoes"
