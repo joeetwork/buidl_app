@@ -14,9 +14,14 @@ export default function CurrentJobs() {
 
   return (
     <div className="flex flex-col items-center">
-      <Tabs tabs={ROLES} setTab={setActiveTab} activeTab={activeTab} />
+      <Tabs
+        tabs={ROLES}
+        setTab={setActiveTab}
+        activeTab={activeTab}
+        className="mt-4"
+      />
 
-      <div>{Roles[activeTab]}</div>
+      {Roles[activeTab]}
     </div>
   );
 }

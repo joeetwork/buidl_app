@@ -44,12 +44,12 @@ export default function DevUi() {
   };
 
   return (
-    <div className="flex">
+    <div className="flex flex-col gap-4">
       {devEscrows.data?.map((escrow) => {
         return (
           <div
             key={escrow.publicKey.toString()}
-            className="card w-72 bg-base-100 shadow-xl"
+            className="card w-72 bg-base-100 shadow-xl m-auto"
           >
             <div className="card-body items-center text-center">
               <h2 className="card-title">Brief:</h2>

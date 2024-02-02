@@ -37,6 +37,8 @@ impl<'info> UploadWork<'info> {
         self.upload_work.upload_work = file;
         self.upload_work.escrow = self.escrow_state.key();
         self.upload_work.user = self.escrow_state.initializer;
+        self.upload_work.amount = self.escrow_state.initializer_amount;
+        self.upload_work.about = self.escrow_state.about.clone();
         Ok(())
      }
 }
