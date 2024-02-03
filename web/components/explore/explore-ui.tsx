@@ -1,7 +1,7 @@
 'use client';
 
 import { useAccounts } from '@/hooks/get-accounts';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { PublicKey } from '@solana/web3.js';
 import ExploreModal from './explore-modal';
 import Pagination from '../shared/pagination';
@@ -9,9 +9,7 @@ import Pagination from '../shared/pagination';
 export default function ExploreUi() {
   const { userAccounts } = useAccounts();
   const [showModal, setShowModal] = useState(false);
-  const [taker, setTaker] = useState(
-    new PublicKey('2buwWpUqd9UaeyxQKiksa14sTyLxJaY27tYVkpR9ja5y')
-  );
+  const [taker, setTaker] = useState<PublicKey>();
   const [title, setTitle] = useState('');
 
   const handleShowModal = (taker: PublicKey, name: string) => {
@@ -19,6 +17,10 @@ export default function ExploreUi() {
     setTaker(taker);
     setTitle(name);
   };
+
+  const handleHideModal = useCallback(() => {
+    setShowModal(false);
+  }, [setShowModal]);
 
   return (
     <div className="flex flex-col justify-evenly m-auto">
@@ -54,14 +56,14 @@ export default function ExploreUi() {
         <Pagination />
       </div>
 
-      {taker ? (
+
         <ExploreModal
           show={showModal}
-          hideModal={() => setShowModal(false)}
+          hideModal={handleHideModal}
           taker={taker}
           title={title}
         />
-      ) : null}
+
     </div>
   );
 }

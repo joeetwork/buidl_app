@@ -1,6 +1,5 @@
 import React from 'react';
 import { useAccounts } from '@/hooks/get-accounts';
-import { PublicKey } from '@solana/web3.js';
 import { AppModal } from '../shared/app-modal';
 
 interface HiringModalProps {
@@ -10,7 +9,6 @@ interface HiringModalProps {
 
 export default function HiringModal({ show, hideModal }: HiringModalProps) {
   const { uploadHistory } = useAccounts();
-  console.log(uploadHistory.data);
 
   return (
     <AppModal title={`Upload History`} show={show} hide={hideModal}>

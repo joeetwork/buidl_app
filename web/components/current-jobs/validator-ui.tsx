@@ -1,7 +1,7 @@
 'use client';
 
 import { PublicKey } from '@solana/web3.js';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { COLLECTIONS } from '@/constants';
 import { ellipsify } from '../shared/ellipsify';
 import { useMetadata } from '@/hooks/get-metadata';
@@ -17,6 +17,10 @@ export default function ValidatorUi() {
     setSelectedCollection(collection);
     setShowModal(true);
   };
+
+  const handleHideModal = useCallback(() => {
+    setShowModal(false);
+  }, [setShowModal]);
 
   return (
     <>
@@ -55,7 +59,7 @@ export default function ValidatorUi() {
       <ValidatorModal
         show={showModal}
         selectedCollection={selectedCollection}
-        hideModal={() => setShowModal(false)}
+        hideModal={handleHideModal}
       />
     </>
   );

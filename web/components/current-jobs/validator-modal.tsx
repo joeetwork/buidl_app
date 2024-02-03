@@ -42,7 +42,7 @@ export default function ValidatorModal({
 
   useEffect(() => {
     hideModal();
-  }, [validateAccept.isSuccess, validateDecline.isSuccess]);
+  }, [validateAccept.isSuccess, validateDecline.isSuccess, hideModal]);
 
   return (
     <AppModal title={`Work to Validate`} show={show} hide={hideModal}>
