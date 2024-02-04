@@ -11,8 +11,8 @@ pub struct ValidateWithUser<'info> {
 
     #[account(
         mut,
-        constraint = if user.key() ==
-        escrow_state.validator.unwrap().key() {true} else {user.key() == escrow_state.initializer.key()}
+        constraint = if user.key() == escrow_state.initializer.key() {true} else {user.key() ==
+            escrow_state.validator.unwrap().key()}
     )]
     pub escrow_state: Box<Account<'info, Escrow>>,
 

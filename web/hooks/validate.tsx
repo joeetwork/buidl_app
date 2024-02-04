@@ -25,6 +25,7 @@ export function useValidate(collection?: PublicKey) {
   const { program } = useAccounts();
   const { publicKey } = useWallet();
   const { connection } = useConnection();
+  const { hiringEscrows } = useAccounts();
 
   const validatorCollectionEscrows = useQuery({
     queryKey: ['validatorCollectionEscrows', { collection }],
@@ -106,7 +107,7 @@ export function useValidate(collection?: PublicKey) {
   });
 
   const validateWithUser = useMutation({
-    mutationKey: ['validateDecline', 'validate', { cluster }],
+    mutationKey: ['validateWithUser', 'validate', { cluster }],
     mutationFn: async ({ escrow, accept }: ValidateProps) => {
       if (publicKey) {
         const validatePDA = PublicKey.findProgramAddressSync(
@@ -130,7 +131,10 @@ export function useValidate(collection?: PublicKey) {
     },
     onSuccess: (tx) => {
       transactionToast(tx ?? '');
-      return validatorUserEscrows.refetch();
+      return Promise.all([
+        validatorUserEscrows.refetch(),
+        hiringEscrows.refetch(),
+      ]);
     },
   });
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useAccounts } from '@/hooks/get-accounts';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { ellipsify } from '../shared/ellipsify';
 import HiringModal from './hiring-modal';
 import { PublicKey } from '@solana/web3.js';
@@ -18,12 +18,6 @@ export default function HiringUi() {
       accept: true,
     });
   };
-
-  useEffect(() => {
-    if (validateWithUser.isSuccess) {
-      hiringEscrows.refetch();
-    }
-  }, [hiringEscrows, validateWithUser.isSuccess]);
 
   return (
     <>
