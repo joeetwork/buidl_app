@@ -1,13 +1,29 @@
 'use client';
 
 import { useAccounts } from '@/hooks/get-accounts';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ellipsify } from '../shared/ellipsify';
 import HiringModal from './hiring-modal';
+import { PublicKey } from '@solana/web3.js';
+import { useValidate } from '@/hooks/validate';
 
 export default function HiringUi() {
   const { hiringEscrows } = useAccounts();
   const [showModal, setShowModal] = useState(false);
+  const { validateWithUser } = useValidate();
+
+  const handleAcceptClick = (escrow: PublicKey) => {
+    validateWithUser.mutateAsync({
+      escrow,
+      accept: true,
+    });
+  };
+
+  useEffect(() => {
+    if (validateWithUser.isSuccess) {
+      hiringEscrows.refetch();
+    }
+  }, [hiringEscrows, validateWithUser.isSuccess]);
 
   return (
     <>
@@ -41,7 +57,12 @@ export default function HiringUi() {
 
                   {escrow.account.status === 'validate' ? (
                     <div className="card-actions justify-end">
-                      <button className="btn btn-primary">Validate</button>
+                      <button
+                        onClick={() => handleAcceptClick(escrow.publicKey)}
+                        className="btn btn-primary"
+                      >
+                        Validate
+                      </button>
                     </div>
                   ) : null}
                 </div>
