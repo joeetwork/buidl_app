@@ -5,7 +5,8 @@ use anchor_spl::{
 };
 
 use crate::states::Escrow;
-use crate::constant::*;
+use crate::constant::escrow_status::UPLOAD;
+use crate::constant::seeds::ESCROW;
 
 #[derive(Accounts)]
 pub struct AcceptRequest<'info> {
