@@ -18,8 +18,8 @@ import { usePDAs } from './get-PDAs';
 interface InitializeEscrowProps {
   initializerAmount: number;
   taker: PublicKey;
-  collection: PublicKey;
-  validatorCount: number;
+  collection: PublicKey | null;
+  validator: PublicKey | null;
   about: string;
 }
 
@@ -36,7 +36,7 @@ export function useInitialiseEscrow() {
       initializerAmount,
       taker,
       collection,
-      validatorCount,
+      validator,
       about,
     }: InitializeEscrowProps) => {
       if (publicKey) {
@@ -52,7 +52,7 @@ export function useInitialiseEscrow() {
           .initialize(
             seed,
             new anchor.BN(initializerAmount),
-            validatorCount,
+            validator,
             taker,
             collection,
             about

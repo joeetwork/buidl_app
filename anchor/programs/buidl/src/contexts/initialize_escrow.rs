@@ -48,8 +48,8 @@ impl<'info> Initialize<'info> {
         bumps: &InitializeBumps,
         initializer_amount: u64,
         taker: Pubkey,
-        verified_collection: Pubkey,
-        validator_total_count: u8,
+        verified_collection: Option<Pubkey>,
+        validator: Option<Pubkey>,
         about: String
     ) -> Result<()> {
         self.escrow_state.set_inner(Escrow {
@@ -60,7 +60,7 @@ impl<'info> Initialize<'info> {
             initializer_amount,
             taker,
             verified_collection,
-            validator_total_count,
+            validator,
             validator_count: 0,
             upload_work: "".to_string(),
             about,

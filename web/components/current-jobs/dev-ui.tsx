@@ -67,17 +67,30 @@ export default function DevUi() {
 
               <p>Amount: {escrow.account.initializerAmount.toString()}</p>
 
-              <p>No. Validators: {escrow.account.validatorTotalCount}</p>
+              <p>Validator Vote: {escrow.account.validatorCount}</p>
+              {escrow.account.validator ? (
+                <div
+                  className="tooltip before:max-w-none"
+                  data-tip={escrow.account.validator.toString()}
+                >
+                  <p>
+                    Collection id:{' '}
+                    {ellipsify(escrow.account.validator.toString())}
+                  </p>
+                </div>
+              ) : null}
 
-              <div
-                className="tooltip before:max-w-none"
-                data-tip={escrow.account.verifiedCollection.toString()}
-              >
-                <p>
-                  Collection id:{' '}
-                  {ellipsify(escrow.account.verifiedCollection.toString())}
-                </p>
-              </div>
+              {escrow.account.verifiedCollection ? (
+                <div
+                  className="tooltip before:max-w-none"
+                  data-tip={escrow.account.verifiedCollection.toString()}
+                >
+                  <p>
+                    Collection id:{' '}
+                    {ellipsify(escrow.account.verifiedCollection.toString())}
+                  </p>
+                </div>
+              ) : null}
               <p className="w-full break-words">{escrow.account.about}</p>
               <div className="card-actions">
                 {escrow.account.status === 'request' ? (

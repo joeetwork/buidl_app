@@ -15,7 +15,8 @@ import {
 
 interface ValidateProps {
   escrow: PublicKey;
-  nftAddress: PublicKey;
+  accept: boolean;
+  nftAddress?: PublicKey;
 }
 
 export function useValidate(collection?: PublicKey) {
@@ -25,14 +26,14 @@ export function useValidate(collection?: PublicKey) {
   const { publicKey } = useWallet();
   const { connection } = useConnection();
 
-  const validatorEscrows = useQuery({
-    queryKey: ['validateEscrow', { collection }],
+  const validatorCollectionEscrows = useQuery({
+    queryKey: ['validatorCollectionEscrows', { collection }],
     queryFn: () => {
       if (collection) {
         return program.account.escrow.all([
           {
             memcmp: {
-              offset: 121,
+              offset: 122,
               bytes: collection.toBase58(),
             },
           },
@@ -42,10 +43,27 @@ export function useValidate(collection?: PublicKey) {
     },
   });
 
-  const validateAccept = useMutation({
-    mutationKey: ['validateAccept', 'validate', { cluster }],
-    mutationFn: async ({ escrow, nftAddress }: ValidateProps) => {
+  const validatorUserEscrows = useQuery({
+    queryKey: ['validatorUserEscrows', { publicKey }],
+    queryFn: () => {
       if (publicKey) {
+        return program.account.escrow.all([
+          {
+            memcmp: {
+              offset: 123,
+              bytes: publicKey.toBase58(),
+            },
+          },
+        ]);
+      }
+      return null;
+    },
+  });
+
+  const validateWithCollection = useMutation({
+    mutationKey: ['validateWithCollection', 'validate', { cluster }],
+    mutationFn: async ({ escrow, nftAddress, accept }: ValidateProps) => {
+      if (publicKey && nftAddress) {
         const validatePDA = PublicKey.findProgramAddressSync(
           [Buffer.from('validate'), publicKey?.toBuffer(), escrow.toBuffer()],
           program.programId
@@ -65,7 +83,7 @@ export function useValidate(collection?: PublicKey) {
         });
 
         return program.methods
-          .validateAccept()
+          .validateWithCollection(accept)
           .accounts({
             user: publicKey,
             escrowState: escrow,
@@ -83,55 +101,43 @@ export function useValidate(collection?: PublicKey) {
     },
     onSuccess: (tx) => {
       transactionToast(tx ?? '');
-      return validatorEscrows.refetch();
+      return validatorCollectionEscrows.refetch();
     },
   });
 
-  const validateDecline = useMutation({
+  const validateWithUser = useMutation({
     mutationKey: ['validateDecline', 'validate', { cluster }],
-    mutationFn: async ({ escrow, nftAddress }: ValidateProps) => {
-      if (!publicKey) {
-        return Promise.resolve('');
+    mutationFn: async ({ escrow, accept }: ValidateProps) => {
+      if (publicKey) {
+        const validatePDA = PublicKey.findProgramAddressSync(
+          [Buffer.from('validate'), publicKey?.toBuffer(), escrow.toBuffer()],
+          program.programId
+        )[0];
+
+        return program.methods
+          .validateWithUser(accept)
+          .accounts({
+            user: publicKey,
+            escrowState: escrow,
+            validateState: validatePDA,
+            systemProgram: anchor.web3.SystemProgram.programId,
+          })
+          .rpc({
+            skipPreflight: true,
+          });
       }
-
-      const validatePDA = PublicKey.findProgramAddressSync(
-        [Buffer.from('validate'), publicKey?.toBuffer(), escrow.toBuffer()],
-        program.programId
-      )[0];
-
-      const nftTokenAccount = await getAssociatedTokenAddress(
-        nftAddress,
-        publicKey,
-        true,
-        TOKEN_PROGRAM_ID,
-        ASSOCIATED_TOKEN_PROGRAM_ID
-      );
-
-      const metaplex = Metaplex.make(connection);
-      const metadataPda = metaplex.nfts().pdas().metadata({
-        mint: nftAddress,
-      });
-
-      return program.methods
-        .validateDecline()
-        .accounts({
-          user: publicKey,
-          escrowState: escrow,
-          nftMint: nftAddress,
-          nftTokenAccount: nftTokenAccount,
-          metadataAccount: metadataPda,
-          validateState: validatePDA,
-          systemProgram: anchor.web3.SystemProgram.programId,
-        })
-        .rpc({
-          skipPreflight: true,
-        });
+      return null;
     },
     onSuccess: (tx) => {
-      transactionToast(tx);
-      return validatorEscrows.refetch();
+      transactionToast(tx ?? '');
+      return validatorUserEscrows.refetch();
     },
   });
 
-  return { validateAccept, validateDecline, validatorEscrows };
+  return {
+    validateWithCollection,
+    validateWithUser,
+    validatorCollectionEscrows,
+    validatorUserEscrows,
+  };
 }

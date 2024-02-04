@@ -10,7 +10,11 @@ import DevUi from './dev-ui';
 export default function CurrentJobs() {
   const [activeTab, setActiveTab] = useState(0);
 
-  const Roles = [<DevUi />, <HiringUi />, <ValidatorUi />];
+  const Roles = [
+    <DevUi key="dev" />,
+    <HiringUi key="hiring" />,
+    <ValidatorUi key="validator" />,
+  ];
 
   return (
     <div className="flex flex-col items-center">

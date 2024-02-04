@@ -5,7 +5,7 @@ use contexts::*;
 mod states;
 mod constant;
 
-declare_id!("AQVpTt4x61x2LR24o2hFZT7W4RU79fN8vdJGsADB5h3w");
+declare_id!("8yPzPyRoGL7kggvv3uf8w7brKCvr8KgjUqvd6SWhhSd1");
 
 #[program]
 pub mod anchor_escrow {
@@ -16,9 +16,9 @@ pub mod anchor_escrow {
         ctx: Context<Initialize>,
         seed: u64,
         initializer_amount: u64,
-        validator_total_count: u8,
+        validator: Option<Pubkey>,
         taker: Pubkey,
-        verified_collection: Pubkey,
+        verified_collection: Option<Pubkey>,
         about: String
     ) -> Result<()> {
 
@@ -29,7 +29,7 @@ pub mod anchor_escrow {
             initializer_amount, 
             taker,
             verified_collection,
-            validator_total_count,
+            validator,
             about
         )?;
 
@@ -56,12 +56,12 @@ pub mod anchor_escrow {
         ctx.accounts.refund_and_close_vault()
     }
 
-    pub fn validate_accept(ctx: Context<ValidateWork>) -> Result<()> {
-        ctx.accounts.validate_accept()
+    pub fn validate_with_collection(ctx: Context<ValidateWithCollection>, accept: bool) -> Result<()> {
+        ctx.accounts.validate(accept)
     }
 
-    pub fn validate_decline(ctx: Context<ValidateWork>) -> Result<()> {
-        ctx.accounts.validate_decline()
+    pub fn validate_with_user(ctx: Context<ValidateWithUser>, accept: bool) -> Result<()> {
+        ctx.accounts.validate(accept)
     }
 
     pub fn exchange(ctx: Context<Exchange>) -> Result<()> {

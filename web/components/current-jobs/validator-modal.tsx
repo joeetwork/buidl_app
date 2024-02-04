@@ -18,35 +18,51 @@ export default function ValidatorModal({
   selectedCollection,
   hideModal,
 }: ValidatorModalProps) {
-  const { validateAccept, validateDecline, validatorEscrows } =
-    useValidate(selectedCollection);
+  const {
+    validateWithUser,
+    validateWithCollection,
+    validatorCollectionEscrows,
+    validatorUserEscrows,
+  } = useValidate(selectedCollection);
   const { collection, isPending } = useCollection(selectedCollection);
 
   const handleAcceptClick = (escrow: PublicKey) => {
     if (collection.result && collection?.result?.items?.length >= 1) {
-      validateAccept.mutateAsync({
+      validateWithCollection.mutateAsync({
         escrow,
         nftAddress: new PublicKey(collection?.result?.items[0]?.id),
+        accept: true,
+      });
+    } else {
+      validateWithUser.mutateAsync({
+        escrow,
+        accept: true,
       });
     }
   };
 
   const handleDeclineClick = (escrow: PublicKey) => {
     if (collection.result && collection?.result?.items?.length >= 1) {
-      validateDecline.mutateAsync({
+      validateWithCollection.mutateAsync({
         escrow,
         nftAddress: new PublicKey(collection?.result?.items[0]?.id),
+        accept: false,
+      });
+    } else {
+      validateWithUser.mutateAsync({
+        escrow,
+        accept: false,
       });
     }
   };
 
   useEffect(() => {
     hideModal();
-  }, [validateAccept.isSuccess, validateDecline.isSuccess, hideModal]);
+  }, [validateWithUser.isSuccess, validateWithCollection.isSuccess, hideModal]);
 
   return (
     <AppModal title={`Work to Validate`} show={show} hide={hideModal}>
-      {validatorEscrows.data?.map((escrow) => {
+      {validatorCollectionEscrows.data?.map((escrow) => {
         return (
           <div
             key={escrow.publicKey.toString()}
@@ -92,6 +108,19 @@ export default function ValidatorModal({
                   }
                 >
                   Decline Work
+                </button>
+
+                <button
+                  onClick={() =>
+                    validatorUserEscrows.data &&
+                    validatorUserEscrows.data.length >= 1
+                      ? handleAcceptClick(
+                          validatorUserEscrows.data[0]?.publicKey
+                        )
+                      : null
+                  }
+                >
+                  Accept as user
                 </button>
               </div>
             </div>
