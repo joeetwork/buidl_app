@@ -1,5 +1,6 @@
 use anchor_lang::prelude::*;
 
+use crate::constant::escrow_status::EXCHANGE;
 use crate::states::{Escrow, Validate};
 use crate::constant::seeds::VALIDATE;
 
@@ -32,14 +33,9 @@ impl<'info> ValidateWithUser<'info> {
          &mut self, accept:bool
      ) -> Result<()> {
 
-        let current_time = Clock::get()?.unix_timestamp;
-
-        if self.escrow_state.vote_deadline.unwrap() > current_time {
-            if accept {
-                self.escrow_state.validator_count = self.escrow_state.validator_count.checked_add(1).unwrap();
-            } else {
-                self.escrow_state.validator_count = self.escrow_state.validator_count.checked_sub(1).unwrap();
-            }
+        if accept {
+            self.escrow_state.validator_count = self.escrow_state.validator_count.checked_add(1).unwrap();
+            self.escrow_state.status = EXCHANGE.to_string();
         }
 
         Ok(())

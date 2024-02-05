@@ -27,6 +27,10 @@ impl<'info> CountVote<'info> {
 
         if self.escrow_state.validator_count <= 0 && self.escrow_state.vote_deadline.unwrap() < current_time {
             // add step for dao verification here
+
+            // I think best approach - readd the new timer here
+
+            // add the add the verified collection pubkey here
         }
 
         Ok(())

@@ -8,6 +8,7 @@ use anchor_spl::{
 
 use crate::states::Escrow;
 use crate::constant::ESCROW;
+use crate::constant::escrow_status::EXCHANGE;
 
 #[derive(Accounts)]
 pub struct Exchange<'info> {
@@ -29,7 +30,7 @@ pub struct Exchange<'info> {
         seeds=[ESCROW, escrow_state.seed.to_le_bytes().as_ref()],
         constraint = escrow_state.validator_count > 0,
         constraint = escrow_state.taker == *taker.key,
-        constraint = escrow_state.status == "exchange",
+        constraint = escrow_state.status == EXCHANGE.to_string(),
         bump = escrow_state.bump,
     )]
     pub escrow_state: Account<'info, Escrow>,
