@@ -10,13 +10,10 @@ import { useValidate } from '@/hooks/validate';
 export default function HiringUi() {
   const { hiringEscrows } = useAccounts();
   const [showModal, setShowModal] = useState(false);
-  const { validateWithUser } = useValidate();
+  const { validateWithEmployer } = useValidate();
 
   const handleAcceptClick = (escrow: PublicKey) => {
-    validateWithUser.mutateAsync({
-      escrow,
-      accept: true,
-    });
+    validateWithEmployer.mutateAsync(escrow);
   };
 
   return (

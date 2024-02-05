@@ -131,10 +131,36 @@ export function useValidate(collection?: PublicKey) {
     },
     onSuccess: (tx) => {
       transactionToast(tx ?? '');
-      return Promise.all([
-        validatorUserEscrows.refetch(),
-        hiringEscrows.refetch(),
-      ]);
+      return validatorUserEscrows.refetch();
+    },
+  });
+
+  const validateWithEmployer = useMutation({
+    mutationKey: ['validateWithEmployer', { cluster }],
+    mutationFn: async (escrow: PublicKey) => {
+      if (publicKey) {
+        const validatePDA = PublicKey.findProgramAddressSync(
+          [Buffer.from('validate'), publicKey?.toBuffer(), escrow.toBuffer()],
+          program.programId
+        )[0];
+
+        return program.methods
+          .validateWithEmployer()
+          .accounts({
+            user: publicKey,
+            escrowState: escrow,
+            validateState: validatePDA,
+            systemProgram: anchor.web3.SystemProgram.programId,
+          })
+          .rpc({
+            skipPreflight: true,
+          });
+      }
+      return null;
+    },
+    onSuccess: (tx) => {
+      transactionToast(tx ?? '');
+      return hiringEscrows.refetch();
     },
   });
 
@@ -143,5 +169,6 @@ export function useValidate(collection?: PublicKey) {
     validateWithUser,
     validatorCollectionEscrows,
     validatorUserEscrows,
+    validateWithEmployer,
   };
 }

@@ -5,13 +5,13 @@ use crate::constant::seeds::VALIDATE;
 use crate::constant::escrow_status::EXCHANGE;
 
 #[derive(Accounts)]
-pub struct ValidateWithUser<'info> {
+pub struct ValidateWithEmployer<'info> {
     #[account(mut)]
     pub user: Signer<'info>,
 
     #[account(
         mut,
-        constraint = user.key() == escrow_state.validator.unwrap().key()
+        constraint = user.key() == escrow_state.initializer.key()
     )]
     pub escrow_state: Box<Account<'info, Escrow>>,
 
@@ -27,18 +27,13 @@ pub struct ValidateWithUser<'info> {
     pub system_program: Program<'info, System>,
 }
 
-impl<'info> ValidateWithUser<'info> {
+impl<'info> ValidateWithEmployer<'info> {
     pub fn validate(
-         &mut self, accept:bool
+         &mut self
      ) -> Result<()> {
 
-        if accept {
         self.escrow_state.validator_count = self.escrow_state.validator_count.checked_add(1)
-        .unwrap()
-    } else {
-        self.escrow_state.validator_count = self.escrow_state.validator_count.checked_sub(1)
-       .unwrap()
-    }
+        .unwrap();
 
         if self.escrow_state.validator_count > 0 {
             self.escrow_state.status = EXCHANGE.to_string()

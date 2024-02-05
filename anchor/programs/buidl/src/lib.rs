@@ -5,7 +5,7 @@ use contexts::*;
 mod states;
 mod constant;
 
-declare_id!("8yPzPyRoGL7kggvv3uf8w7brKCvr8KgjUqvd6SWhhSd1");
+declare_id!("3gvPzyBpV57rva7tHuoTUjKfMskvy2371yxpq855t1ff");
 
 #[program]
 pub mod anchor_escrow {
@@ -62,6 +62,10 @@ pub mod anchor_escrow {
 
     pub fn validate_with_user(ctx: Context<ValidateWithUser>, accept: bool) -> Result<()> {
         ctx.accounts.validate(accept)
+    }
+
+    pub fn validate_with_employer(ctx: Context<ValidateWithEmployer>) -> Result<()> {
+        ctx.accounts.validate()
     }
 
     pub fn exchange(ctx: Context<Exchange>) -> Result<()> {

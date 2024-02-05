@@ -12,6 +12,8 @@ pub mod validate_with_collection;
 pub use validate_with_collection::*;
 pub mod validate_with_user;
 pub use validate_with_user::*;
+pub mod validate_with_employer;
+pub use validate_with_employer::*;
 pub mod initialize_user;
 pub use initialize_user::*;
 pub mod upload_work;
