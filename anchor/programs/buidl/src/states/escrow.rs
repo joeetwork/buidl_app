@@ -12,8 +12,9 @@ pub struct Escrow {
     pub validator: Option<Pubkey>,
     pub validator_count: u8,
     pub upload_work: String,
+    pub vote_deadline: Option<i64>,
     pub about: String,
-    pub status: String
+    pub status: String,
 }
 
 const STRING_LENGTH_PREFIX: usize = 4;
@@ -24,6 +25,7 @@ const MAX_STATUS_LENGTH: usize = STRING_LENGTH_PREFIX + 50 * 4;
 impl Space for Escrow {
     const INIT_SPACE: usize = 8 + 8 + 1 + 32 + 32 + 32 + 8 + (1 + 32) + (1 + 32) + 1 + 
     MAX_UPLOAD_LENGTH + 
+    (1 + 8) +
     MAX_CONTENT_LENGTH + 
     MAX_STATUS_LENGTH;
 }

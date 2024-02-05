@@ -68,6 +68,10 @@ pub mod anchor_escrow {
         ctx.accounts.validate()
     }
 
+    pub fn count_vote(ctx: Context<CountVote>) -> Result<()> {
+        ctx.accounts.count_vote()
+    }
+
     pub fn exchange(ctx: Context<Exchange>) -> Result<()> {
         ctx.accounts.withdraw_and_close_vault()
     }

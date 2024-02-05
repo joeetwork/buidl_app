@@ -2,7 +2,6 @@ use anchor_lang::prelude::*;
 
 use crate::states::{Escrow, Validate};
 use crate::constant::seeds::VALIDATE;
-use crate::constant::escrow_status::EXCHANGE;
 
 #[derive(Accounts)]
 pub struct ValidateWithUser<'info> {
@@ -11,7 +10,8 @@ pub struct ValidateWithUser<'info> {
 
     #[account(
         mut,
-        constraint = user.key() == escrow_state.validator.unwrap().key()
+        constraint = user.key() == escrow_state.validator.unwrap().key(),
+        constraint = escrow_state.vote_deadline.unwrap() > Clock::get()?.unix_timestamp
     )]
     pub escrow_state: Box<Account<'info, Escrow>>,
 
@@ -23,7 +23,7 @@ pub struct ValidateWithUser<'info> {
         space = 8,
     )]
     pub validate_state: Box<Account<'info, Validate>>,
-    /// CHECK: This is not dangerous because we don't read or write from this account
+
     pub system_program: Program<'info, System>,
 }
 
@@ -32,17 +32,15 @@ impl<'info> ValidateWithUser<'info> {
          &mut self, accept:bool
      ) -> Result<()> {
 
-        if accept {
-        self.escrow_state.validator_count = self.escrow_state.validator_count.checked_add(1)
-        .unwrap()
-    } else {
-        self.escrow_state.validator_count = self.escrow_state.validator_count.checked_sub(1)
-       .unwrap()
-    }
+        let current_time = Clock::get()?.unix_timestamp;
 
-        if self.escrow_state.validator_count > 0 {
-            self.escrow_state.status = EXCHANGE.to_string()
-        };
+        if self.escrow_state.vote_deadline.unwrap() > current_time {
+            if accept {
+                self.escrow_state.validator_count = self.escrow_state.validator_count.checked_add(1).unwrap();
+            } else {
+                self.escrow_state.validator_count = self.escrow_state.validator_count.checked_sub(1).unwrap();
+            }
+        }
 
         Ok(())
      }

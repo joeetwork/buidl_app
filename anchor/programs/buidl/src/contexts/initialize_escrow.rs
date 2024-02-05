@@ -63,6 +63,7 @@ impl<'info> Initialize<'info> {
             validator,
             validator_count: 0,
             upload_work: "".to_string(),
+            vote_deadline: None,
             about,
             status: REQUEST.to_string()
         });

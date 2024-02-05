@@ -29,6 +29,7 @@ pub struct Exchange<'info> {
         seeds=[ESCROW, escrow_state.seed.to_le_bytes().as_ref()],
         constraint = escrow_state.validator_count > 0,
         constraint = escrow_state.taker == *taker.key,
+        constraint = escrow_state.status == "exchange",
         bump = escrow_state.bump,
     )]
     pub escrow_state: Account<'info, Escrow>,

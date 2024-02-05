@@ -18,3 +18,5 @@ pub mod initialize_user;
 pub use initialize_user::*;
 pub mod upload_work;
 pub use upload_work::*;
+pub mod count_vote;
+pub use count_vote::*;

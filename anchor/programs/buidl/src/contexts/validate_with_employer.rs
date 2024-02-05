@@ -23,7 +23,7 @@ pub struct ValidateWithEmployer<'info> {
         space = 8,
     )]
     pub validate_state: Box<Account<'info, Validate>>,
-    /// CHECK: This is not dangerous because we don't read or write from this account
+
     pub system_program: Program<'info, System>,
 }
 
@@ -32,12 +32,13 @@ impl<'info> ValidateWithEmployer<'info> {
          &mut self
      ) -> Result<()> {
 
-        self.escrow_state.validator_count = self.escrow_state.validator_count.checked_add(1)
-        .unwrap();
+        self.escrow_state.validator_count = self.escrow_state.validator_count.checked_add(1).unwrap();
 
-        if self.escrow_state.validator_count > 0 {
-            self.escrow_state.status = EXCHANGE.to_string()
-        };
+        self.escrow_state.verified_collection = None;
+
+        self.escrow_state.validator = None;
+
+        self.escrow_state.status = EXCHANGE.to_string();
 
         Ok(())
      }
