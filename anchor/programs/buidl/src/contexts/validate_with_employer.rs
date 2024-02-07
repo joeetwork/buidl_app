@@ -32,8 +32,6 @@ impl<'info> ValidateWithEmployer<'info> {
          &mut self
      ) -> Result<()> {
 
-        self.escrow_state.validator_count = self.escrow_state.validator_count.checked_add(1).unwrap();
-
         self.escrow_state.verified_collection = None;
 
         self.escrow_state.validator = None;

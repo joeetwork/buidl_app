@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::constant::escrow_status::EXCHANGE;
+use crate::constant::escrow_status::{EXCHANGE, CLOSE};
 use crate::states::{Escrow, Validate};
 use crate::constant::seeds::VALIDATE;
 
@@ -29,15 +29,21 @@ pub struct ValidateWithUser<'info> {
 }
 
 impl<'info> ValidateWithUser<'info> {
-    pub fn validate(
-         &mut self, accept:bool
+    pub fn vote_accept(
+         &mut self
      ) -> Result<()> {
-
-        if accept {
-            self.escrow_state.validator_count = self.escrow_state.validator_count.checked_add(1).unwrap();
-            self.escrow_state.status = EXCHANGE.to_string();
-        }
+        self.escrow_state.amount_of_voters = self.escrow_state.amount_of_voters.checked_add(1).unwrap();
+        self.escrow_state.status = EXCHANGE.to_string();
 
         Ok(())
      }
+
+     pub fn vote_decline(
+        &mut self
+    ) -> Result<()> {
+          self.escrow_state.amount_of_voters = self.escrow_state.amount_of_voters.checked_add(1).unwrap();
+          self.escrow_state.status = CLOSE.to_string();
+
+       Ok(())
+    }
 }

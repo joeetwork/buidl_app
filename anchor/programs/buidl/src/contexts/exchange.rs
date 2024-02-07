@@ -28,7 +28,6 @@ pub struct Exchange<'info> {
         mut,
         close = initializer,
         seeds=[ESCROW, escrow_state.seed.to_le_bytes().as_ref()],
-        constraint = escrow_state.validator_count > 0,
         constraint = escrow_state.taker == *taker.key,
         constraint = escrow_state.status == EXCHANGE.to_string(),
         bump = escrow_state.bump,

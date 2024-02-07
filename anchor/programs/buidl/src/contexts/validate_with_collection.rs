@@ -52,16 +52,21 @@ pub struct ValidateWithCollection<'info> {
 }
 
 impl<'info> ValidateWithCollection<'info> {
-    pub fn validate(
-         &mut self, accept:bool
+    pub fn vote_accept(
+         &mut self
      ) -> Result<()> {
-
-            if accept {
-                self.escrow_state.validator_count = self.escrow_state.validator_count.checked_add(1).unwrap();
-            } else {
-                self.escrow_state.validator_count = self.escrow_state.validator_count.checked_sub(1).unwrap();
-            }
+        self.escrow_state.amount_of_voters = self.escrow_state.amount_of_voters.checked_add(1).unwrap();
+        self.escrow_state.validator_count = self.escrow_state.validator_count.checked_add(1).unwrap();
 
         Ok(())
      }
+
+     pub fn vote_decline(
+        &mut self
+    ) -> Result<()> {
+        self.escrow_state.amount_of_voters = self.escrow_state.amount_of_voters.checked_add(1).unwrap();
+        self.escrow_state.validator_count = self.escrow_state.validator_count.checked_sub(1).unwrap();
+
+       Ok(())
+    }
 }

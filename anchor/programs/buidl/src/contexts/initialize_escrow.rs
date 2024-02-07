@@ -65,7 +65,8 @@ impl<'info> Initialize<'info> {
             upload_work: "".to_string(),
             vote_deadline: None,
             about,
-            status: REQUEST.to_string()
+            status: REQUEST.to_string(),
+            amount_of_voters: 0
         });
         Ok(())
     }

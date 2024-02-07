@@ -56,20 +56,28 @@ pub mod anchor_escrow {
         ctx.accounts.refund_and_close_vault()
     }
 
-    pub fn validate_with_collection(ctx: Context<ValidateWithCollection>, accept: bool) -> Result<()> {
-        ctx.accounts.validate(accept)
+    pub fn accept_with_collection(ctx: Context<ValidateWithCollection>) -> Result<()> {
+        ctx.accounts.vote_accept()
     }
 
-    pub fn validate_with_user(ctx: Context<ValidateWithUser>, accept: bool) -> Result<()> {
-        ctx.accounts.validate(accept)
-    }
-
-    pub fn validate_with_employer(ctx: Context<ValidateWithEmployer>) -> Result<()> {
-        ctx.accounts.validate()
+    pub fn decline_with_collection(ctx: Context<ValidateWithCollection>) -> Result<()> {
+        ctx.accounts.vote_decline()
     }
 
     pub fn count_vote(ctx: Context<CountVote>) -> Result<()> {
         ctx.accounts.count_vote()
+    }
+
+    pub fn accept_with_user(ctx: Context<ValidateWithUser>) -> Result<()> {
+        ctx.accounts.vote_accept()
+    }
+
+    pub fn decline_with_user(ctx: Context<ValidateWithUser>) -> Result<()> {
+        ctx.accounts.vote_decline()
+    }
+
+    pub fn validate_with_employer(ctx: Context<ValidateWithEmployer>) -> Result<()> {
+        ctx.accounts.validate()
     }
 
     pub fn exchange(ctx: Context<Exchange>) -> Result<()> {

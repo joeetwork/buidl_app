@@ -8,6 +8,7 @@ use anchor_spl::{
 
 use crate::states::Escrow;
 use crate::constant::ESCROW;
+use crate::constant::escrow_status::{REQUEST, CLOSE};
 
 #[derive(Accounts)]
 pub struct Cancel<'info> {
@@ -24,6 +25,7 @@ pub struct Cancel<'info> {
         mut,
         has_one = initializer,
         has_one = mint,
+        constraint = escrow_state.status == REQUEST || escrow_state.status == CLOSE,
         close = initializer,
         seeds=[ESCROW, escrow_state.seed.to_le_bytes().as_ref()],
         bump = escrow_state.bump,
