@@ -8,8 +8,6 @@ use crate::constant::escrow_status::EXCHANGE;
 
 #[derive(Accounts)]
 pub struct CountVote<'info> {
-    #[account(mut)]
-    pub user: Signer<'info>,
 
     #[account(mut)]
     pub escrow_state: Box<Account<'info, Escrow>>,
