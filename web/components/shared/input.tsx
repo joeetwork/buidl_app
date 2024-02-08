@@ -1,15 +1,21 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 
 interface InputProps {
   label?: string;
-  value: string;
   name?: string;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-export default function Input({ label, value, name, onChange }: InputProps) {
+export default function Input({ label, name, onChange }: InputProps) {
+  const [value, setValue] = useState('');
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value);
+    onChange(e);
+  };
+
   return (
     <label className="form-control w-full max-w-xs">
       {label && (
@@ -24,7 +30,7 @@ export default function Input({ label, value, name, onChange }: InputProps) {
         placeholder="Type here"
         value={value}
         className="input input-bordered w-full max-w-xs"
-        onChange={(e) => onChange(e)}
+        onChange={handleChange}
       />
     </label>
   );

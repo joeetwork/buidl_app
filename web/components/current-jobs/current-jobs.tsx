@@ -3,9 +3,10 @@
 import React, { useState } from 'react';
 import { ROLES } from '@/constants';
 import Tabs from '../shared/tabs';
-import ValidatorUi from './validator-ui';
 import HiringUi from './hiring-ui';
 import DevUi from './dev-ui';
+import CollectionUi from './collection-ui';
+import ValidatorUi from './validator-ui';
 
 export default function CurrentJobs() {
   const [activeTab, setActiveTab] = useState(0);
@@ -13,6 +14,7 @@ export default function CurrentJobs() {
   const Roles = [
     <DevUi key="dev" />,
     <HiringUi key="hiring" />,
+    <CollectionUi key="collection" />,
     <ValidatorUi key="validator" />,
   ];
 

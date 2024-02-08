@@ -139,7 +139,6 @@ export default function DevUi() {
                   <div>
                     <Input
                       label="Upload work"
-                      value={link}
                       onChange={(e) => setLink(e.target.value)}
                     />
 

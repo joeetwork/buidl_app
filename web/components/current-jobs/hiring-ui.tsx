@@ -6,14 +6,20 @@ import { ellipsify } from '../shared/ellipsify';
 import HiringModal from './hiring-modal';
 import { PublicKey } from '@solana/web3.js';
 import { useValidate } from '@/hooks/validate';
+import { useCancel } from '@/hooks/cancel';
 
 export default function HiringUi() {
   const { hiringEscrows } = useAccounts();
   const [showModal, setShowModal] = useState(false);
   const { validateWithEmployer } = useValidate();
+  const { cancel } = useCancel()
 
   const handleAcceptClick = (escrow: PublicKey) => {
     validateWithEmployer.mutateAsync(escrow);
+  };
+
+  const handleCancelClick = (escrow: PublicKey) => {
+    cancel.mutateAsync(escrow);
   };
 
   return (
@@ -40,9 +46,15 @@ export default function HiringUi() {
                   </h2>
                   <p>{ellipsify(escrow.publicKey.toString())}</p>
                   <p>{escrow.account.about}</p>
-                  {escrow.account.status === 'request' ? (
+                  {escrow.account.status === 'request' ||
+                  escrow.account.status === 'close' ? (
                     <div className="card-actions justify-end">
-                      <button className="btn btn-primary">Cancel</button>
+                      <button
+                        onClick={() => handleCancelClick(escrow.publicKey)}
+                        className="btn btn-primary"
+                      >
+                        Cancel
+                      </button>
                     </div>
                   ) : null}
 

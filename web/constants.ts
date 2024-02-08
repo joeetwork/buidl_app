@@ -8,4 +8,4 @@ export const PAGES = [
   { label: 'Current Jobs', path: '/current-jobs' },
 ];
 
-export const ROLES = ['Dev', 'Hiring', 'Validator'];
+export const ROLES = ['Dev', 'Hiring', 'Collection', 'Validator'];
