@@ -46,7 +46,7 @@ export function useValidate(collection?: PublicKey) {
   const validatorUserEscrows = useQuery({
     queryKey: ['validatorUserEscrows', { publicKey }],
     queryFn: () => {
-      if (publicKey) { 
+      if (publicKey) {
         return program.account.escrow.all([
           {
             memcmp: {
@@ -237,6 +237,30 @@ export function useValidate(collection?: PublicKey) {
     },
   });
 
+  const countVote = useMutation({
+    mutationKey: ['countVote', { cluster }],
+    mutationFn: async (escrow: PublicKey) => {
+      console.log(escrow);
+        return program.methods
+          .countVote()
+          .accounts({
+            escrowState: escrow,
+            systemProgram: anchor.web3.SystemProgram.programId,
+          })
+          .rpc({
+            skipPreflight: true,
+          });
+    },
+    onSuccess: (tx) => {
+      transactionToast(tx ?? '');
+      return Promise.all([
+        hiringEscrows.refetch(),
+        validatorUserEscrows.refetch(),
+        validatorCollectionEscrows.refetch(),
+      ]);
+    },
+  });
+
   return {
     acceptWithCollection,
     declineWithCollection,
@@ -245,5 +269,6 @@ export function useValidate(collection?: PublicKey) {
     validatorCollectionEscrows,
     validatorUserEscrows,
     validateWithEmployer,
+    countVote,
   };
 }
