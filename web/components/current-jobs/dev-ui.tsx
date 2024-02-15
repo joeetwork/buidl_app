@@ -8,6 +8,7 @@ import Input from '../shared/input';
 import { useUpload } from '@/hooks/upload';
 import { useRequests } from '@/hooks/requests';
 import { ellipsify } from '../shared/ellipsify';
+import DevModal from './dev-modal';
 
 interface EscrowProps {
   escrow: PublicKey;
@@ -20,6 +21,7 @@ export default function DevUi() {
   const { uploadWork } = useUpload();
   const { declineRequest, acceptRequest } = useRequests();
   const [link, setLink] = useState('');
+  const [showModal, setShowModal] = useState(false);
 
   const handleExchange = (data: EscrowProps) => {
     exchange.mutateAsync(data);
@@ -45,6 +47,9 @@ export default function DevUi() {
 
   return (
     <div className="flex flex-col gap-4">
+      <button onClick={() => setShowModal(true)} className="btn btn-primary">
+        Upload History
+      </button>
       {devEscrows.data?.map((escrow) => {
         return (
           <div
@@ -161,6 +166,8 @@ export default function DevUi() {
           </div>
         );
       })}
+
+      <DevModal show={showModal} hideModal={() => setShowModal(false)} />
     </div>
   );
 }

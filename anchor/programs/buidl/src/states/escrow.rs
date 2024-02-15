@@ -10,7 +10,7 @@ pub struct Escrow {
     pub initializer_amount: u64,
     pub verified_collection: Option<Pubkey>,
     pub validator: Option<Pubkey>,
-    pub validator_count: u8,
+    pub validator_count: i8,
     pub upload_work: String,
     pub vote_deadline: Option<i64>,
     pub about: String,

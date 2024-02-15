@@ -77,14 +77,31 @@ export function useAccounts() {
     },
   });
 
-  const uploadHistory = useQuery({
-    queryKey: ['uploadHistory', {publicKey}],
+  const uploadEmployerHistory = useQuery({
+    queryKey: ['uploadEmployerHistory', {publicKey}],
     queryFn: () => {
       if (publicKey) {
         return program.account.upload.all([
           {
             memcmp: {
               offset: 8,
+              bytes: publicKey?.toBase58(),
+            },
+          },
+        ]);
+      }
+      return null;
+    },
+  });
+
+  const uploadDevHistory = useQuery({
+    queryKey: ['uploadDevHistory', {publicKey}],
+    queryFn: () => {
+      if (publicKey) {
+        return program.account.upload.all([
+          {
+            memcmp: {
+              offset: 40,
               bytes: publicKey?.toBase58(),
             },
           },
@@ -107,6 +124,8 @@ export function useAccounts() {
     userAccount,
     devEscrows,
     hiringEscrows,
-    uploadHistory
+    uploadEmployerHistory,
+    uploadDevHistory
+
   };
 }
