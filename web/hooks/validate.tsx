@@ -24,7 +24,7 @@ export function useValidate(collection?: PublicKey) {
   const { program } = useAccounts();
   const { publicKey } = useWallet();
   const { connection } = useConnection();
-  const { hiringEscrows } = useAccounts();
+  const { hiringEscrows, devEscrows } = useAccounts();
 
   const validatorCollectionEscrows = useQuery({
     queryKey: ['validatorCollectionEscrows', { collection }],
@@ -275,6 +275,45 @@ export function useValidate(collection?: PublicKey) {
                 }),
               });
               validatorUserEscrows.refetch();
+            }
+          });
+        }
+      } else if (hiringEscrows.data) {
+        if (hiringEscrows.data) {
+          hiringEscrows.data?.forEach((escrow) => {
+            if (
+              escrow.account.status === 'validate' &&
+              escrow.account.voteDeadline &&
+              escrow.account.voteDeadline.toNumber() <
+                new Date().getTime() / 1000
+            ) {
+              fetch('/api/signer', {
+                method: 'POST',
+                body: JSON.stringify({
+                  escrow: escrow,
+                }),
+              });
+              hiringEscrows.refetch();
+            }
+          });
+        }
+      }
+      else if (devEscrows.data) {
+        if (devEscrows.data) {
+          devEscrows.data?.forEach((escrow) => {
+            if (
+              escrow.account.status === 'validate' &&
+              escrow.account.voteDeadline &&
+              escrow.account.voteDeadline.toNumber() <
+                new Date().getTime() / 1000
+            ) {
+              fetch('/api/signer', {
+                method: 'POST',
+                body: JSON.stringify({
+                  escrow: escrow,
+                }),
+              });
+              devEscrows.refetch();
             }
           });
         }
