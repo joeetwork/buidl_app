@@ -237,27 +237,28 @@ export function useValidate(collection?: PublicKey) {
     },
   });
 
-  const countVote = useMutation({
-    mutationKey: ['countVote', { cluster }],
-    mutationFn: async (escrow: PublicKey) => {
-      console.log(escrow);
-        return program.methods
-          .countVote()
-          .accounts({
-            escrowState: escrow,
-            systemProgram: anchor.web3.SystemProgram.programId,
-          })
-          .rpc({
-            skipPreflight: true,
-          });
-    },
-    onSuccess: (tx) => {
-      transactionToast(tx ?? '');
-      return Promise.all([
-        hiringEscrows.refetch(),
-        validatorUserEscrows.refetch(),
-        validatorCollectionEscrows.refetch(),
-      ]);
+  const countVote = useQuery({
+    queryKey: ['countVote', { validatorCollectionEscrows }],
+    queryFn: async () => {
+      if (validatorCollectionEscrows.data) {
+        validatorCollectionEscrows.data?.forEach((escrow) => {
+          if (
+            escrow.account.status === 'validate' &&
+            escrow.account.voteDeadline &&
+            escrow.account.voteDeadline.toNumber() < new Date().getTime() / 1000
+          ) {
+            fetch('/api/signer', {
+              method: 'POST',
+              body: JSON.stringify({
+                escrow: escrow,
+              }),
+            });
+          }
+        });
+
+        console.log(validatorCollectionEscrows.data);
+      }
+      return null;
     },
   });
 

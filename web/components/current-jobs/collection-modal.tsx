@@ -22,7 +22,6 @@ export default function CollectionModal({
     acceptWithCollection,
     declineWithCollection,
     validatorCollectionEscrows,
-    countVote,
   } = useValidate(selectedCollection);
   const { collection, isPending } = useCollection(selectedCollection);
 
@@ -54,20 +53,7 @@ export default function CollectionModal({
 
   return (
     <AppModal title={`Work to Validate`} show={show} hide={hideModal}>
-      {validatorCollectionEscrows.data?.map((escrow) => {
-
-        console.log(escrow.account.voteDeadline &&
-          escrow.account.voteDeadline.toNumber() < (new Date().getTime() / 1000));
-        
-        
-        if (
-          escrow.account.status === 'validate' &&
-          escrow.account.voteDeadline &&
-          escrow.account.voteDeadline.toNumber() < (new Date().getTime() / 1000)
-        ) {
-          countVote.mutateAsync(escrow.publicKey);
-        }
-
+      {validatorCollectionEscrows.data?.map((escrow) => {  
         return (
           <div
             key={escrow.publicKey.toString()}
