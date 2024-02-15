@@ -238,7 +238,10 @@ export function useValidate(collection?: PublicKey) {
   });
 
   const countVote = useQuery({
-    queryKey: ['countVote', { validatorCollectionEscrows }],
+    queryKey: [
+      'countVote',
+      { validatorCollectionEscrows, validatorUserEscrows },
+    ],
     queryFn: async () => {
       if (validatorCollectionEscrows.data) {
         validatorCollectionEscrows.data?.forEach((escrow) => {
@@ -253,10 +256,28 @@ export function useValidate(collection?: PublicKey) {
                 escrow: escrow,
               }),
             });
+            validatorCollectionEscrows.refetch();
           }
         });
-
-        console.log(validatorCollectionEscrows.data);
+      } else if (validatorUserEscrows.data) {
+        if (validatorUserEscrows.data) {
+          validatorUserEscrows.data?.forEach((escrow) => {
+            if (
+              escrow.account.status === 'validate' &&
+              escrow.account.voteDeadline &&
+              escrow.account.voteDeadline.toNumber() <
+                new Date().getTime() / 1000
+            ) {
+              fetch('/api/signer', {
+                method: 'POST',
+                body: JSON.stringify({
+                  escrow: escrow,
+                }),
+              });
+              validatorUserEscrows.refetch();
+            }
+          });
+        }
       }
       return null;
     },
