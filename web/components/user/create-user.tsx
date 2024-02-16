@@ -22,13 +22,11 @@ export default function CreateUser() {
       <div className="flex flex-col gap-4 pb-4">
         <Input
           label="Name:"
-          value={name}
           onChange={(e) => setName(e.target.value)}
         />
 
         <Input
           label="About:"
-          value={about}
           onChange={(e) => setAbout(e.target.value)}
         />
 

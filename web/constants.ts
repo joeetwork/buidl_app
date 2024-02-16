@@ -5,7 +5,7 @@ export const PAGES = [
 
   { label: 'Explore', path: '/explore' },
 
-  { label: 'Current Jobs', path: '/current-jobs' },
+  { label: 'Dashboard', path: '/dashboard' },
 ];
 
 export const ROLES = ['Dev', 'Hiring', 'Collection', 'Validator'];
