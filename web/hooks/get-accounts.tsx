@@ -29,7 +29,7 @@ export function useAccounts() {
   });
 
   const userAccount = useQuery({
-    queryKey: ['userAccount'],
+    queryKey: ['userAccount', {publicKey}, {cluster}],
     queryFn: () => {
       if (publicKey) {
         const userPDA = PublicKey.findProgramAddressSync(

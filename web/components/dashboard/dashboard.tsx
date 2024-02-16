@@ -19,7 +19,7 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col gap-4 pt-4 pb-10">
       <Select
         label="Role:"
         items={ROLES}
