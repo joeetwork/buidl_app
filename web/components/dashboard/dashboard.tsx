@@ -14,18 +14,18 @@ export default function Dashboard() {
   const Roles = [
     <Dev key="dev" />,
     <Hiring key="hiring" />,
-    <Validator key="validator" />,
     <Collection key="collection" />,
+    <Validator key="validator" />,
   ];
 
   return (
-    <div className="flex flex-col gap-4 pt-4 pb-10">
+    <div className="flex flex-col gap-4 pt-4 pb-10 mx-10">
       <Select
         label="Role:"
         items={ROLES}
         onClick={(v) => setRole(ROLES.findIndex((role) => role === v))}
       />
-      <div className="flex flex-col m-auto gap-4">{Roles[role]}</div>
+      <div className="flex flex-col gap-4">{Roles[role]}</div>
     </div>
   );
 }

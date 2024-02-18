@@ -9,15 +9,15 @@ export default function Hiring() {
   return (
     <>
       <div className="flex justify-between gap-4">
-        <div className="card w-80 bg-base-100 shadow-xl m-auto h-56">
+        <div className="card w-full bg-base-100 shadow-xl h-56">
           <p className="text-center pt-2">Stats</p>
         </div>
-        <div className="card w-80 bg-base-100 shadow-xl m-auto h-56">
+        <div className="card w-full bg-base-100 shadow-xl h-56">
           <p className="text-center pt-2">History</p>
         </div>
       </div>
 
-      <div className="flex card w-full bg-base-100 shadow-xl m-auto">
+      <div className="flex card w-full bg-base-100 shadow-xl min-h-[250px]">
         <p className="text-center pt-2">Active</p>
         <div className="flex flex-col">
           {uploadEmployerHistory.data?.map((work) => {
