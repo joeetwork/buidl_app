@@ -11,7 +11,7 @@ export function UiLayout({ children }: { children: ReactNode }) {
   return (
     <div className="h-full flex flex-col">
       <Navbar />
-      <div className="flex-grow mx-4 lg:mx-auto">
+      <main className="flex-grow mx-4">
         <Suspense
           fallback={
             <div className="text-center my-32">
@@ -22,7 +22,7 @@ export function UiLayout({ children }: { children: ReactNode }) {
           {children}
         </Suspense>
         <Toaster position="bottom-right" />
-      </div>
+      </main>
       <Footer />
     </div>
   );

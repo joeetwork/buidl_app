@@ -4,7 +4,7 @@ import { useAccounts } from '@/hooks/get-accounts';
 import React, { useCallback, useState } from 'react';
 import { PublicKey } from '@solana/web3.js';
 import ExploreModal from './explore-modal';
-import Pagination from '../shared/pagination';
+import Link from 'next/link';
 
 export default function ExploreUi() {
   const { userAccounts } = useAccounts();
@@ -23,28 +23,35 @@ export default function ExploreUi() {
   }, [setShowModal]);
 
   return (
-    <div className="flex flex-col justify-evenly m-auto">
-      <div className="flex">
+    <div>
+      <div>
+        <h1>Header</h1>
+        <p>Developer or artist looking for a gig?</p>
+        <Link href={'/profile'}>Sign up here!</Link>
+      </div>
+
+      <div className="grid grid-cols-3 gap-4 items-stretch w-10/12 m-auto max-[480px]:grid-cols-1 max-[480px]:gap-y-4 max-[768px]:grid-cols-2">
         {userAccounts.data?.map((user) => {
           return (
-            <div key={user.publicKey.toString()}>
-              <div className="card w-72 bg-base-100 shadow-xl">
-                <div className="card-body items-center text-center">
-                  <h2 className="card-title">{user.account.username}</h2>
-                  <p className="w-full break-words">{user.account.about}</p>
-                  <div className="card-actions">
-                    <button
-                      onClick={() =>
-                        handleShowModal(
-                          user.account.initializerKey,
-                          user.account.username
-                        )
-                      }
-                      className="btn btn-primary"
-                    >
-                      Make offer
-                    </button>
-                  </div>
+            <div
+              key={user.publicKey.toString()}
+              className="card w-full bg-base-100 shadow-xl"
+            >
+              <div className="card-body items-center text-center">
+                <h2 className="card-title">{user.account.username}</h2>
+                <p className="w-full break-words">{user.account.about}</p>
+                <div className="card-actions">
+                  <button
+                    onClick={() =>
+                      handleShowModal(
+                        user.account.initializerKey,
+                        user.account.username
+                      )
+                    }
+                    className="btn btn-primary"
+                  >
+                    Make offer
+                  </button>
                 </div>
               </div>
             </div>
@@ -52,18 +59,12 @@ export default function ExploreUi() {
         })}
       </div>
 
-      <div className="pt-8">
-        <Pagination />
-      </div>
-
-
-        <ExploreModal
-          show={showModal}
-          hideModal={handleHideModal}
-          taker={taker}
-          title={title}
-        />
-
+      <ExploreModal
+        show={showModal}
+        hideModal={handleHideModal}
+        taker={taker}
+        title={title}
+      />
     </div>
   );
 }
