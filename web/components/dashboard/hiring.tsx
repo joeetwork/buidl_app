@@ -77,6 +77,13 @@ export default function Hiring() {
                   {escrow.account.status === 'validate' ? (
                     <div className="card-actions justify-end">
                       <button
+                        onClick={() => window.open(escrow.account.uploadWork)}
+                        className={'btn btn-primary'}
+                        disabled={!escrow.account.uploadWork}
+                      >
+                        Check Uploaded work
+                      </button>
+                      <button
                         onClick={() => handleAcceptClick(escrow.publicKey)}
                         className="btn btn-primary"
                       >
