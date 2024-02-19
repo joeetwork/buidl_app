@@ -19,7 +19,7 @@ export default function Hiring() {
 
       <div className="flex card w-full bg-base-100 shadow-xl min-h-[250px]">
         <p className="text-center pt-2">Active</p>
-        <div className="flex flex-col">
+        <div className="grid grid-cols-3 gap-4 items-stretch">
           {uploadEmployerHistory.data?.map((work) => {
             return (
               <div

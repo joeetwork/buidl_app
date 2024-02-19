@@ -1,15 +1,15 @@
 'use client';
 
 import React, { useState } from 'react';
-import Select from '../shared/select';
 import { ROLES } from '@/constants';
 import Dev from './dev';
 import Hiring from './hiring';
 import Validator from './validator';
 import Collection from './collection';
+import Tabs from '../shared/tabs';
 
 export default function Dashboard() {
-  const [role, setRole] = useState(0);
+  const [activeTab, setActiveTab] = useState(0);
 
   const Roles = [
     <Dev key="dev" />,
@@ -20,12 +20,13 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-col gap-4 pt-4 pb-10 mx-10">
-      <Select
-        label="Role:"
-        items={ROLES}
-        onClick={(v) => setRole(ROLES.findIndex((role) => role === v))}
+      <Tabs
+        tabs={ROLES}
+        setTab={setActiveTab}
+        activeTab={activeTab}
+        className="m-auto"
       />
-      <div className="flex flex-col gap-4">{Roles[role]}</div>
+      <div className="flex flex-col gap-4">{Roles[activeTab]}</div>
     </div>
   );
 }
