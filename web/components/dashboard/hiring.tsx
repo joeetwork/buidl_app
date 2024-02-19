@@ -3,17 +3,33 @@
 import { useAccounts } from '@/hooks/get-accounts';
 import React, { useState } from 'react';
 import HistoryModal from './history-modal';
+import { ellipsify } from '../shared/ellipsify';
+import { useValidate } from '@/hooks/validate';
+import { useCancel } from '@/hooks/cancel';
+import { PublicKey } from '@solana/web3.js';
 
 export default function Hiring() {
   const [showModal, setShowModal] = useState(false);
   const { hiringEscrows, uploadEmployerHistory } = useAccounts();
+  const { validateWithEmployer } = useValidate();
+  const { cancel } = useCancel();
+
+  const handleAcceptClick = (escrow: PublicKey) => {
+    validateWithEmployer.mutateAsync(escrow);
+  };
+
+  const handleCancelClick = (escrow: PublicKey) => {
+    cancel.mutateAsync(escrow);
+  };
 
   return (
     <>
       <div className="flex justify-between gap-4">
         <div className="card w-full bg-base-100 shadow-xl h-56">
           <h1 className="text-center pt-2">Stats</h1>
-          <p className='text-center'>Lorem ipsum dolor sit, amet consectetur adipisicing elit.</p>
+          <p className="text-center">
+            Lorem ipsum dolor sit, amet consectetur adipisicing elit.
+          </p>
         </div>
         <div className="card w-full bg-base-100 shadow-xl h-56">
           <h1 className="text-center pt-2">History</h1>
@@ -34,25 +50,40 @@ export default function Hiring() {
       <div className="flex card w-full bg-base-100 shadow-xl min-h-[250px]">
         <h1 className="text-center pt-2">Active</h1>
         <div className="grid grid-cols-3 gap-4 items-stretch">
-          {hiringEscrows.data?.map((work) => {
+          {hiringEscrows.data?.map((escrow) => {
             return (
               <div
-                key={work.publicKey.toString()}
-                className="card w-80 bg-base-100 shadow-xl m-auto"
+                key={escrow.publicKey.toString()}
+                className="card w-72 bg-base-100 shadow-xl m-auto"
               >
                 <div className="card-body">
-                  <h2 className="text-center font-bold">Upload</h2>
-                  <p>Amount: {work.account.initializerAmount.toString()}</p>
-                  <p className="w-full break-words">
-                    About: {work.account.about}
-                  </p>
+                  <h2 className="card-title m-auto">
+                    Status: {escrow.account.status}
+                  </h2>
+                  <p>{ellipsify(escrow.publicKey.toString())}</p>
+                  <p>{escrow.account.about}</p>
+                  {escrow.account.status === 'request' ||
+                  escrow.account.status === 'close' ? (
+                    <div className="card-actions justify-end">
+                      <button
+                        onClick={() => handleCancelClick(escrow.publicKey)}
+                        className="btn btn-primary"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : null}
 
-                  <button
-                    className="btn"
-                    onClick={() => window.open(work.account.uploadWork)}
-                  >
-                    Work
-                  </button>
+                  {escrow.account.status === 'validate' ? (
+                    <div className="card-actions justify-end">
+                      <button
+                        onClick={() => handleAcceptClick(escrow.publicKey)}
+                        className="btn btn-primary"
+                      >
+                        Validate
+                      </button>
+                    </div>
+                  ) : null}
                 </div>
               </div>
             );
