@@ -17,6 +17,7 @@ export default function Dev() {
           <div className="flex justify-between gap-4">
             <div className="card w-full bg-base-100 shadow-xl h-56">
               <h1 className="text-center pt-2">Stats</h1>
+              <p className='text-center'>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
             </div>
             <div className="card w-full bg-base-100 shadow-xl h-56">
               <h1 className="text-center pt-2">History</h1>

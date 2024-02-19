@@ -26,9 +26,11 @@ export default function Validator() {
       <div className="flex justify-between gap-4">
         <div className="card w-full bg-base-100 shadow-xl h-56">
           <p className="text-center pt-2">Stats</p>
+          <p className='text-center'>Lorem ipsum dolor sit, amet consectetur adipisicing elit.</p>
         </div>
         <div className="card w-full bg-base-100 shadow-xl h-56">
           <p className="text-center pt-2">History</p>
+          <p className='text-center'>Lorem ipsum dolor sit, amet consectetur adipisicing elit.</p>
         </div>
       </div>
 

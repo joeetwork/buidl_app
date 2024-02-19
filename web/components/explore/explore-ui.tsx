@@ -24,12 +24,9 @@ export default function ExploreUi() {
 
   return (
     <div>
-
-<div>
-  <h1>
-    Discover 
-  </h1>
-</div>
+      <div>
+        <h1 className="text-center font-bold text-xl mt-4">Discover the skills you require</h1>
+      </div>
 
       <div className="grid grid-cols-3 gap-4 items-stretch w-10/12 m-auto max-[480px]:grid-cols-1 max-[480px]:gap-y-4 max-[768px]:grid-cols-2">
         {userAccounts.data?.map((user) => {

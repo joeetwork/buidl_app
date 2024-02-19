@@ -86,7 +86,7 @@ export default function ExploreModal({
 
         <Select
           label="Collection"
-          items={metadata?.map((item) => item.content.metadata.name) ?? []}
+          items={[...metadata?.map((item) => item.content.metadata.name) ?? [], 'collection 2'] ?? []}
           onClick={handleSelect}
         />
       </div>
