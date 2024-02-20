@@ -1,11 +1,9 @@
 export const COLLECTIONS = ['2buwWpUqd9UaeyxQKiksa14sTyLxJaY27tYVkpR9ja5y'];
 
 export const PAGES = [
-  { label: 'Sign Up', path: '/sign-up' },
-
   { label: 'Explore', path: '/explore' },
 
-  { label: 'Current Jobs', path: '/current-jobs' },
+  { label: 'Dashboard', path: '/dashboard' }
 ];
 
-export const ROLES = ['Dev', 'Hiring', 'Validator'];
+export const ROLES = ['Dev', 'Hiring', 'Collection', 'Validator'];

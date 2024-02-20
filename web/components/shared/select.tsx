@@ -12,7 +12,6 @@ export default function Select({ label, items, onClick }: SelectProps) {
   const handleSelectClick = (item: string) => {
     onClick(item);
   };
-
   return (
     <label className="form-control w-full max-w-xs">
       {label && (

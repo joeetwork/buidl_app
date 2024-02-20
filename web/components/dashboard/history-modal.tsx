@@ -1,19 +1,28 @@
+'use client';
 import React from 'react';
-import { useAccounts } from '@/hooks/get-accounts';
 import { AppModal } from '../shared/app-modal';
+import * as anchor from '@coral-xyz/anchor';
+import { AnchorEscrow } from '@buidl/anchor';
+import { PublicKey } from '@solana/web3.js';
 
-interface HiringModalProps {
+interface HistoryModalProps {
+  uploadHistory?: {
+    account: anchor.IdlAccounts<AnchorEscrow>['upload'];
+    publicKey: PublicKey;
+  }[];
   show: boolean;
   hideModal: () => void;
 }
 
-export default function HiringModal({ show, hideModal }: HiringModalProps) {
-  const { uploadEmployerHistory } = useAccounts();
-
+export default function HistoryModal({
+  uploadHistory,
+  show,
+  hideModal,
+}: HistoryModalProps) {
   return (
     <AppModal title={`Upload History`} show={show} hide={hideModal}>
       <div className="flex flex-col">
-        {uploadEmployerHistory.data?.map((work) => {
+        {uploadHistory?.map((work) => {
           return (
             <div
               key={work.publicKey.toString()}

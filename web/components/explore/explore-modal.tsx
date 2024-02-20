@@ -23,33 +23,33 @@ export default function ExploreModal({
   title,
 }: ExploreModalProps) {
   const { initializeEscrow } = useInitialiseEscrow();
-  const { metadata, isPending } = useMetadata(COLLECTIONS);
+  const { metadata } = useMetadata(COLLECTIONS);
   const [amount, setAmount] = useState(0);
   const [about, setAbout] = useState('');
-  const [count, setCount] = useState(1);
-  const [collection, setCollection] = useState<string | undefined>();
+  const [collection, setCollection] = useState<PublicKey | null>(null);
+  const [validator, setValidator] = useState<PublicKey | null>(null);
 
-  //   const handleCollectionSelect = (collection: PublicKey) => {
-  //     setCollection(collection);
-  //   };
+  const handleSelect = (v: string) => {
+    const collection = metadata.find(
+      (item) => item.content.metadata.name === v
+    )?.id;
+
+    if (collection) {
+      setCollection(new PublicKey(collection));
+    }
+  };
 
   const handleSubmit = () => {
-    if (collection && taker) {
-      const collectionId = new PublicKey(collection);
+    if (taker) {
       initializeEscrow.mutateAsync({
         initializerAmount: amount,
-        collection: collectionId,
+        collection,
         about,
-        validatorCount: count,
+        validator,
         taker,
       });
     }
   };
-
-  useEffect(() => {
-    if(metadata){
-    setCollection(metadata[0]?.id)};
-  }, [metadata, isPending]);
 
   useEffect(() => {
     hideModal();
@@ -68,15 +68,13 @@ export default function ExploreModal({
         <Input
           name="initializerAmount"
           label="Amount:"
-          value={amount.toString()}
           onChange={(e) => setAmount(Number(e.target.value))}
         />
 
         <Input
-          name="validatorCount"
-          label="Validator Count:"
-          value={count.toString()}
-          onChange={(e) => setCount(Number(e.target.value))}
+          name="validator"
+          label="Validator Pubkey:"
+          onChange={(e) => setValidator(new PublicKey(e.target.value))}
         />
 
         <TextArea
@@ -88,14 +86,9 @@ export default function ExploreModal({
 
         <Select
           label="Collection"
-          items={metadata?.map((item) => item.content.metadata.name) ?? []}
-          onClick={(v) =>
-            setCollection(
-              metadata.find((item) => item.content.metadata.name === v)?.id
-            )
-          }
+          items={[...metadata?.map((item) => item.content.metadata.name) ?? [], 'collection 2'] ?? []}
+          onClick={handleSelect}
         />
-        {/* <Image src={collection} alt="collection" />; */}
       </div>
     </AppModal>
   );

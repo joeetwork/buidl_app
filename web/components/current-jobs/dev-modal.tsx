@@ -7,13 +7,13 @@ interface HiringModalProps {
   hideModal: () => void;
 }
 
-export default function HiringModal({ show, hideModal }: HiringModalProps) {
-  const { uploadEmployerHistory } = useAccounts();
+export default function DevModal({ show, hideModal }: HiringModalProps) {
+  const { uploadDevHistory } = useAccounts();
 
   return (
     <AppModal title={`Upload History`} show={show} hide={hideModal}>
       <div className="flex flex-col">
-        {uploadEmployerHistory.data?.map((work) => {
+        {uploadDevHistory.data?.map((work) => {
           return (
             <div
               key={work.publicKey.toString()}

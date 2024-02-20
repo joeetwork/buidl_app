@@ -15,7 +15,7 @@ import {
 
 interface ValidateProps {
   escrow: PublicKey;
-  nftAddress: PublicKey;
+  nftAddress?: PublicKey;
 }
 
 export function useValidate(collection?: PublicKey) {
@@ -24,15 +24,16 @@ export function useValidate(collection?: PublicKey) {
   const { program } = useAccounts();
   const { publicKey } = useWallet();
   const { connection } = useConnection();
+  const { hiringEscrows, devEscrows } = useAccounts();
 
-  const validatorEscrows = useQuery({
-    queryKey: ['validateEscrow', { collection }],
+  const validatorCollectionEscrows = useQuery({
+    queryKey: ['validatorCollectionEscrows', { collection }],
     queryFn: () => {
       if (collection) {
         return program.account.escrow.all([
           {
             memcmp: {
-              offset: 121,
+              offset: 122,
               bytes: collection.toBase58(),
             },
           },
@@ -42,10 +43,27 @@ export function useValidate(collection?: PublicKey) {
     },
   });
 
-  const validateAccept = useMutation({
-    mutationKey: ['validateAccept', 'validate', { cluster }],
-    mutationFn: async ({ escrow, nftAddress }: ValidateProps) => {
+  const validatorUserEscrows = useQuery({
+    queryKey: ['validatorUserEscrows', { publicKey }],
+    queryFn: () => {
       if (publicKey) {
+        return program.account.escrow.all([
+          {
+            memcmp: {
+              offset: 123,
+              bytes: publicKey.toBase58(),
+            },
+          },
+        ]);
+      }
+      return null;
+    },
+  });
+
+  const acceptWithCollection = useMutation({
+    mutationKey: ['acceptWithCollection', 'validate', { cluster }],
+    mutationFn: async ({ escrow, nftAddress }: ValidateProps) => {
+      if (publicKey && nftAddress) {
         const validatePDA = PublicKey.findProgramAddressSync(
           [Buffer.from('validate'), publicKey?.toBuffer(), escrow.toBuffer()],
           program.programId
@@ -65,7 +83,7 @@ export function useValidate(collection?: PublicKey) {
         });
 
         return program.methods
-          .validateAccept()
+          .acceptWithCollection()
           .accounts({
             user: publicKey,
             escrowState: escrow,
@@ -83,55 +101,235 @@ export function useValidate(collection?: PublicKey) {
     },
     onSuccess: (tx) => {
       transactionToast(tx ?? '');
-      return validatorEscrows.refetch();
+      return validatorCollectionEscrows.refetch();
     },
   });
 
-  const validateDecline = useMutation({
-    mutationKey: ['validateDecline', 'validate', { cluster }],
+  const declineWithCollection = useMutation({
+    mutationKey: ['declineWithCollection', 'validate', { cluster }],
     mutationFn: async ({ escrow, nftAddress }: ValidateProps) => {
-      if (!publicKey) {
-        return Promise.resolve('');
-      }
+      if (publicKey && nftAddress) {
+        const validatePDA = PublicKey.findProgramAddressSync(
+          [Buffer.from('validate'), publicKey?.toBuffer(), escrow.toBuffer()],
+          program.programId
+        )[0];
 
-      const validatePDA = PublicKey.findProgramAddressSync(
-        [Buffer.from('validate'), publicKey?.toBuffer(), escrow.toBuffer()],
-        program.programId
-      )[0];
+        const nftTokenAccount = await getAssociatedTokenAddress(
+          nftAddress,
+          publicKey,
+          true,
+          TOKEN_PROGRAM_ID,
+          ASSOCIATED_TOKEN_PROGRAM_ID
+        );
 
-      const nftTokenAccount = await getAssociatedTokenAddress(
-        nftAddress,
-        publicKey,
-        true,
-        TOKEN_PROGRAM_ID,
-        ASSOCIATED_TOKEN_PROGRAM_ID
-      );
-
-      const metaplex = Metaplex.make(connection);
-      const metadataPda = metaplex.nfts().pdas().metadata({
-        mint: nftAddress,
-      });
-
-      return program.methods
-        .validateDecline()
-        .accounts({
-          user: publicKey,
-          escrowState: escrow,
-          nftMint: nftAddress,
-          nftTokenAccount: nftTokenAccount,
-          metadataAccount: metadataPda,
-          validateState: validatePDA,
-          systemProgram: anchor.web3.SystemProgram.programId,
-        })
-        .rpc({
-          skipPreflight: true,
+        const metaplex = Metaplex.make(connection);
+        const metadataPda = metaplex.nfts().pdas().metadata({
+          mint: nftAddress,
         });
+
+        return program.methods
+          .declineWithCollection()
+          .accounts({
+            user: publicKey,
+            escrowState: escrow,
+            nftMint: nftAddress,
+            nftTokenAccount: nftTokenAccount,
+            metadataAccount: metadataPda,
+            validateState: validatePDA,
+            systemProgram: anchor.web3.SystemProgram.programId,
+          })
+          .rpc({
+            skipPreflight: true,
+          });
+      }
+      return null;
     },
     onSuccess: (tx) => {
-      transactionToast(tx);
-      return validatorEscrows.refetch();
+      transactionToast(tx ?? '');
+      return validatorCollectionEscrows.refetch();
     },
   });
 
-  return { validateAccept, validateDecline, validatorEscrows };
+  const acceptWithUser = useMutation({
+    mutationKey: ['acceptWithUser', 'validate', { cluster }],
+    mutationFn: async ({ escrow }: ValidateProps) => {
+      if (publicKey) {
+        const validatePDA = PublicKey.findProgramAddressSync(
+          [Buffer.from('validate'), publicKey?.toBuffer(), escrow.toBuffer()],
+          program.programId
+        )[0];
+
+        return program.methods
+          .acceptWithUser()
+          .accounts({
+            user: publicKey,
+            escrowState: escrow,
+            validateState: validatePDA,
+            systemProgram: anchor.web3.SystemProgram.programId,
+          })
+          .rpc({
+            skipPreflight: true,
+          });
+      }
+      return null;
+    },
+    onSuccess: (tx) => {
+      transactionToast(tx ?? '');
+      return validatorUserEscrows.refetch();
+    },
+  });
+
+  const declineWithUser = useMutation({
+    mutationKey: ['declineWithUser', 'validate', { cluster }],
+    mutationFn: async ({ escrow }: ValidateProps) => {
+      if (publicKey) {
+        const validatePDA = PublicKey.findProgramAddressSync(
+          [Buffer.from('validate'), publicKey?.toBuffer(), escrow.toBuffer()],
+          program.programId
+        )[0];
+
+        return program.methods
+          .declineWithUser()
+          .accounts({
+            user: publicKey,
+            escrowState: escrow,
+            validateState: validatePDA,
+            systemProgram: anchor.web3.SystemProgram.programId,
+          })
+          .rpc({
+            skipPreflight: true,
+          });
+      }
+      return null;
+    },
+    onSuccess: (tx) => {
+      transactionToast(tx ?? '');
+      return validatorUserEscrows.refetch();
+    },
+  });
+
+  const validateWithEmployer = useMutation({
+    mutationKey: ['validateWithEmployer', { cluster }],
+    mutationFn: async (escrow: PublicKey) => {
+      if (publicKey) {
+        const validatePDA = PublicKey.findProgramAddressSync(
+          [Buffer.from('validate'), publicKey?.toBuffer(), escrow.toBuffer()],
+          program.programId
+        )[0];
+
+        return program.methods
+          .validateWithEmployer()
+          .accounts({
+            user: publicKey,
+            escrowState: escrow,
+            validateState: validatePDA,
+            systemProgram: anchor.web3.SystemProgram.programId,
+          })
+          .rpc({
+            skipPreflight: true,
+          });
+      }
+      return null;
+    },
+    onSuccess: (tx) => {
+      transactionToast(tx ?? '');
+      return hiringEscrows.refetch();
+    },
+  });
+
+  const countVote = useQuery({
+    queryKey: [
+      'countVote',
+      { validatorCollectionEscrows, validatorUserEscrows },
+    ],
+    queryFn: async () => {
+      if (validatorCollectionEscrows.data) {
+        validatorCollectionEscrows.data?.forEach((escrow) => {
+          if (
+            escrow.account.status === 'validate' &&
+            escrow.account.voteDeadline &&
+            escrow.account.voteDeadline.toNumber() < new Date().getTime() / 1000
+          ) {
+            fetch('/api/signer', {
+              method: 'POST',
+              body: JSON.stringify({
+                escrow: escrow,
+              }),
+            });
+            validatorCollectionEscrows.refetch();
+          }
+        });
+      } else if (validatorUserEscrows.data) {
+        if (validatorUserEscrows.data) {
+          validatorUserEscrows.data?.forEach((escrow) => {
+            if (
+              escrow.account.status === 'validate' &&
+              escrow.account.voteDeadline &&
+              escrow.account.voteDeadline.toNumber() <
+                new Date().getTime() / 1000
+            ) {
+              fetch('/api/signer', {
+                method: 'POST',
+                body: JSON.stringify({
+                  escrow: escrow,
+                }),
+              });
+              validatorUserEscrows.refetch();
+            }
+          });
+        }
+      } else if (hiringEscrows.data) {
+        if (hiringEscrows.data) {
+          hiringEscrows.data?.forEach((escrow) => {
+            if (
+              escrow.account.status === 'validate' &&
+              escrow.account.voteDeadline &&
+              escrow.account.voteDeadline.toNumber() <
+                new Date().getTime() / 1000
+            ) {
+              fetch('/api/signer', {
+                method: 'POST',
+                body: JSON.stringify({
+                  escrow: escrow,
+                }),
+              });
+              hiringEscrows.refetch();
+            }
+          });
+        }
+      }
+      else if (devEscrows.data) {
+        if (devEscrows.data) {
+          devEscrows.data?.forEach((escrow) => {
+            if (
+              escrow.account.status === 'validate' &&
+              escrow.account.voteDeadline &&
+              escrow.account.voteDeadline.toNumber() <
+                new Date().getTime() / 1000
+            ) {
+              fetch('/api/signer', {
+                method: 'POST',
+                body: JSON.stringify({
+                  escrow: escrow,
+                }),
+              });
+              devEscrows.refetch();
+            }
+          });
+        }
+      }
+      return null;
+    },
+  });
+
+  return {
+    acceptWithCollection,
+    declineWithCollection,
+    acceptWithUser,
+    declineWithUser,
+    validatorCollectionEscrows,
+    validatorUserEscrows,
+    validateWithEmployer,
+    countVote,
+  };
 }

@@ -4,10 +4,9 @@ use anchor_spl::metadata::MetadataAccount;
 
 use crate::states::{Escrow, Validate};
 use crate::constant::seeds::{METADATA, VALIDATE};
-use crate::constant::escrow_status::EXCHANGE;
 
 #[derive(Accounts)]
-pub struct ValidateWork<'info> {
+pub struct ValidateWithCollection<'info> {
     #[account(mut)]
     pub user: Signer<'info>,
 
@@ -25,7 +24,7 @@ pub struct ValidateWork<'info> {
         bump,
         constraint = metadata_account.collection.as_ref().unwrap().verified,
         constraint = metadata_account.collection.as_ref().unwrap().key ==
-        escrow_state.verified_collection.key(),
+        escrow_state.verified_collection.unwrap().key(),
         constraint = nft_token_account.owner == user.key(),
         constraint = nft_token_account.mint == nft_mint.key(),
         constraint = nft_token_account.amount == 1
@@ -35,7 +34,8 @@ pub struct ValidateWork<'info> {
     #[account(
         mut,
         constraint = metadata_account.collection.as_ref().unwrap().key ==
-        escrow_state.verified_collection.key()
+        escrow_state.verified_collection.unwrap().key(),
+        constraint = escrow_state.vote_deadline.unwrap() > Clock::get()?.unix_timestamp
     )]
     pub escrow_state: Box<Account<'info, Escrow>>,
 
@@ -47,31 +47,25 @@ pub struct ValidateWork<'info> {
         space = 8,
     )]
     pub validate_state: Box<Account<'info, Validate>>,
-    /// CHECK: This is not dangerous because we don't read or write from this account
+    
     pub system_program: Program<'info, System>,
 }
 
-impl<'info> ValidateWork<'info> {
-    pub fn validate_accept(
-         &mut self,
+impl<'info> ValidateWithCollection<'info> {
+    pub fn vote_accept(
+         &mut self
      ) -> Result<()> {
-        self.escrow_state.validator_count = self.escrow_state.validator_count.checked_add(1)
-        .unwrap();
-
-        if self.escrow_state.validator_total_count == self.escrow_state.validator_count {
-            self.escrow_state.status = EXCHANGE.to_string()
-        };
+        self.escrow_state.amount_of_voters = self.escrow_state.amount_of_voters.checked_add(1).unwrap();
+        self.escrow_state.validator_count = self.escrow_state.validator_count.checked_add(1).unwrap();
 
         Ok(())
      }
 
-     pub fn validate_decline(
-        &mut self,
+     pub fn vote_decline(
+        &mut self
     ) -> Result<()> {
-       self.escrow_state.validator_count = self.escrow_state.validator_count.checked_sub(1)
-       .unwrap();
-
-       self.escrow_state.status = EXCHANGE.to_string();
+        self.escrow_state.amount_of_voters = self.escrow_state.amount_of_voters.checked_add(1).unwrap();
+        self.escrow_state.validator_count = self.escrow_state.validator_count.checked_sub(1).unwrap();
 
        Ok(())
     }

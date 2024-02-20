@@ -19,24 +19,12 @@ export default function CreateUser() {
 
   return (
     <>
-      <div className="flex flex-col gap-4 pb-4">
-        <Input
-          label="Name:"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
+      <div className="flex flex-col gap-4 pb-4 items-center">
+        <Input label="Name:" onChange={(e) => setName(e.target.value)} />
 
-        <Input
-          label="About:"
-          value={about}
-          onChange={(e) => setAbout(e.target.value)}
-        />
+        <Input label="About:" onChange={(e) => setAbout(e.target.value)} />
 
-        <Select
-          label="Role:"
-          items={ROLES}
-          onClick={(v) => setRole(v)}
-        />
+        <Select label="Role:" items={ROLES} onClick={(v) => setRole(v)} />
       </div>
       <button onClick={handleSubmit} className="btn">
         Create account

@@ -8,6 +8,7 @@ import Input from '../shared/input';
 import { useUpload } from '@/hooks/upload';
 import { useRequests } from '@/hooks/requests';
 import { ellipsify } from '../shared/ellipsify';
+import DevModal from './dev-modal';
 
 interface EscrowProps {
   escrow: PublicKey;
@@ -20,6 +21,7 @@ export default function DevUi() {
   const { uploadWork } = useUpload();
   const { declineRequest, acceptRequest } = useRequests();
   const [link, setLink] = useState('');
+  const [showModal, setShowModal] = useState(false);
 
   const handleExchange = (data: EscrowProps) => {
     exchange.mutateAsync(data);
@@ -45,6 +47,9 @@ export default function DevUi() {
 
   return (
     <div className="flex flex-col gap-4">
+      <button onClick={() => setShowModal(true)} className="btn btn-primary">
+        Upload History
+      </button>
       {devEscrows.data?.map((escrow) => {
         return (
           <div
@@ -67,17 +72,30 @@ export default function DevUi() {
 
               <p>Amount: {escrow.account.initializerAmount.toString()}</p>
 
-              <p>No. Validators: {escrow.account.validatorTotalCount}</p>
+              <p>Validator Vote: {escrow.account.validatorCount}</p>
+              {escrow.account.validator ? (
+                <div
+                  className="tooltip before:max-w-none"
+                  data-tip={escrow.account.validator.toString()}
+                >
+                  <p>
+                    Collection id:{' '}
+                    {ellipsify(escrow.account.validator.toString())}
+                  </p>
+                </div>
+              ) : null}
 
-              <div
-                className="tooltip before:max-w-none"
-                data-tip={escrow.account.verifiedCollection.toString()}
-              >
-                <p>
-                  Collection id:{' '}
-                  {ellipsify(escrow.account.verifiedCollection.toString())}
-                </p>
-              </div>
+              {escrow.account.verifiedCollection ? (
+                <div
+                  className="tooltip before:max-w-none"
+                  data-tip={escrow.account.verifiedCollection.toString()}
+                >
+                  <p>
+                    Collection id:{' '}
+                    {ellipsify(escrow.account.verifiedCollection.toString())}
+                  </p>
+                </div>
+              ) : null}
               <p className="w-full break-words">{escrow.account.about}</p>
               <div className="card-actions">
                 {escrow.account.status === 'request' ? (
@@ -126,7 +144,6 @@ export default function DevUi() {
                   <div>
                     <Input
                       label="Upload work"
-                      value={link}
                       onChange={(e) => setLink(e.target.value)}
                     />
 
@@ -149,6 +166,8 @@ export default function DevUi() {
           </div>
         );
       })}
+
+      <DevModal show={showModal} hideModal={() => setShowModal(false)} />
     </div>
   );
 }

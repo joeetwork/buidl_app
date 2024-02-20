@@ -2,17 +2,17 @@
 
 import { useAccounts } from '@/hooks/get-accounts';
 import React, { useState } from 'react';
+import HistoryModal from './history-modal';
 import { ellipsify } from '../shared/ellipsify';
-import HiringModal from './hiring-modal';
-import { PublicKey } from '@solana/web3.js';
 import { useValidate } from '@/hooks/validate';
 import { useCancel } from '@/hooks/cancel';
+import { PublicKey } from '@solana/web3.js';
 
-export default function HiringUi() {
-  const { hiringEscrows } = useAccounts();
+export default function Hiring() {
   const [showModal, setShowModal] = useState(false);
+  const { hiringEscrows, uploadEmployerHistory } = useAccounts();
   const { validateWithEmployer } = useValidate();
-  const { cancel } = useCancel()
+  const { cancel } = useCancel();
 
   const handleAcceptClick = (escrow: PublicKey) => {
     validateWithEmployer.mutateAsync(escrow);
@@ -24,16 +24,32 @@ export default function HiringUi() {
 
   return (
     <>
-      <div>
-        <div className="text-center">
-          <button
-            onClick={() => setShowModal(true)}
-            className="btn btn-primary"
-          >
-            Upload History
-          </button>
+      <div className="flex justify-between gap-4">
+        <div className="card w-full bg-base-100 shadow-xl h-56">
+          <h1 className="text-center pt-2">Stats</h1>
+          <p className="text-center">
+            Lorem ipsum dolor sit, amet consectetur adipisicing elit.
+          </p>
         </div>
-        <div className="flex flex-col gap-4">
+        <div className="card w-full bg-base-100 shadow-xl h-56">
+          <h1 className="text-center pt-2">History</h1>
+          <button
+            className="btn btn-primary w-1/4 m-auto"
+            onClick={() => setShowModal(true)}
+          >
+            Show History
+          </button>
+          <HistoryModal
+            uploadHistory={uploadEmployerHistory?.data}
+            hideModal={() => setShowModal(false)}
+            show={showModal}
+          />
+        </div>
+      </div>
+
+      <div className="flex card w-full bg-base-100 shadow-xl min-h-[250px]">
+        <h1 className="text-center pt-2">Active</h1>
+        <div className="grid grid-cols-3 gap-4 items-stretch">
           {hiringEscrows.data?.map((escrow) => {
             return (
               <div
@@ -61,6 +77,13 @@ export default function HiringUi() {
                   {escrow.account.status === 'validate' ? (
                     <div className="card-actions justify-end">
                       <button
+                        onClick={() => window.open(escrow.account.uploadWork)}
+                        className={'btn btn-primary'}
+                        disabled={!escrow.account.uploadWork}
+                      >
+                        Check Uploaded work
+                      </button>
+                      <button
                         onClick={() => handleAcceptClick(escrow.publicKey)}
                         className="btn btn-primary"
                       >
@@ -74,8 +97,6 @@ export default function HiringUi() {
           })}
         </div>
       </div>
-
-      <HiringModal show={showModal} hideModal={() => setShowModal(false)} />
     </>
   );
 }

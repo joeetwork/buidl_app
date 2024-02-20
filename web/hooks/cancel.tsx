@@ -10,6 +10,7 @@ import {
   TOKEN_PROGRAM_ID,
   getAssociatedTokenAddressSync,
 } from '@solana/spl-token';
+import { PublicKey } from '@solana/web3.js';
 
 export function useCancel() {
   const { cluster } = useCluster();
@@ -21,17 +22,9 @@ export function useCancel() {
 
   const cancel = useMutation({
     mutationKey: ['escrow', 'cancel', { cluster }],
-    mutationFn: async () => {
-      if (
-        publicKey &&
-        Array.isArray(hiringEscrows.data) &&
-        hiringEscrows.data[0]
-      ) {
-        const vault = getAssociatedTokenAddressSync(
-          mint,
-          hiringEscrows.data[0].publicKey,
-          true
-        );
+    mutationFn: async (escrow: PublicKey) => {
+      if (publicKey && escrow) {
+        const vault = getAssociatedTokenAddressSync(mint, escrow, true);
 
         const initializerDepositTokenAccount = getAssociatedTokenAddressSync(
           mint,
@@ -46,7 +39,7 @@ export function useCancel() {
             mint: mint,
             initializerDepositTokenAccount: initializerDepositTokenAccount,
             vault: vault,
-            escrowState: hiringEscrows.data[0].publicKey,
+            escrowState: escrow,
             tokenProgram: TOKEN_PROGRAM_ID,
           })
           .rpc();

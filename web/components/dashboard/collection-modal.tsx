@@ -4,42 +4,56 @@ import React, { useEffect } from 'react';
 import { AppModal } from '../shared/app-modal';
 import { ellipsify } from '../shared/ellipsify';
 import { useValidate } from '@/hooks/validate';
+import { useCollection } from '@/hooks/get-collection';
 import { PublicKey } from '@solana/web3.js';
 
-interface ValidatorModalProps {
+interface CollectionModalProps {
   show: boolean;
+  selectedCollection?: PublicKey;
   hideModal: () => void;
 }
 
-export default function ValidatorModal({
+export default function CollectionModal({
   show,
+  selectedCollection,
   hideModal,
-}: ValidatorModalProps) {
+}: CollectionModalProps) {
   const {
-    acceptWithUser,
-    declineWithUser,
-    validatorUserEscrows,
-  } = useValidate();
+    acceptWithCollection,
+    declineWithCollection,
+    validatorCollectionEscrows,
+  } = useValidate(selectedCollection);
+  const { collection, isPending } = useCollection(selectedCollection);
 
   const handleAcceptClick = (escrow: PublicKey) => {
-    acceptWithUser.mutateAsync({
-      escrow,
-    });
+    if (collection.result && collection?.result?.items?.length >= 1) {
+      acceptWithCollection.mutateAsync({
+        escrow,
+        nftAddress: new PublicKey(collection?.result?.items[0]?.id),
+      });
+    }
   };
 
   const handleDeclineClick = (escrow: PublicKey) => {
-    declineWithUser.mutateAsync({
-      escrow,
-    });
+    if (collection.result && collection?.result?.items?.length >= 1) {
+      declineWithCollection.mutateAsync({
+        escrow,
+        nftAddress: new PublicKey(collection?.result?.items[0]?.id),
+      });
+    }
   };
 
   useEffect(() => {
     hideModal();
-  }, [acceptWithUser.isSuccess, declineWithUser.isSuccess, hideModal]);
+  }, [
+    acceptWithCollection.isSuccess,
+    declineWithCollection.isSuccess,
+    hideModal,
+  ]);
 
   return (
     <AppModal title={`Work to Validate`} show={show} hide={hideModal}>
-      {validatorUserEscrows.data?.map((escrow) => {
+      {validatorCollectionEscrows.data?.map((escrow) => {  
         return (
           <div
             key={escrow.publicKey.toString()}
@@ -67,7 +81,9 @@ export default function ValidatorModal({
                   onClick={() => handleAcceptClick(escrow.publicKey)}
                   className="btn btn-primary"
                   disabled={
-                    escrow.account.status !== 'validate'
+                    escrow.account.status !== 'validate' ||
+                    collection?.result.items.length < 1 ||
+                    isPending
                   }
                 >
                   Accept Work
@@ -77,7 +93,9 @@ export default function ValidatorModal({
                   onClick={() => handleDeclineClick(escrow.publicKey)}
                   className="btn btn-primary"
                   disabled={
-                    escrow.account.status !== 'validate'
+                    escrow.account.status !== 'validate' ||
+                    collection?.result.items.length < 1 ||
+                    isPending
                   }
                 >
                   Decline Work
