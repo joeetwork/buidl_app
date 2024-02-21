@@ -27,7 +27,7 @@ export function useAccounts() {
       return program.account.user.all();
     },
   });
-
+ 
   const userAccount = useQuery({
     queryKey: ['userAccount', {publicKey}, {cluster}],
     queryFn: () => {
