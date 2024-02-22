@@ -1,9 +1,13 @@
 'use client';
 
 import { useAccounts } from '@/hooks/get-accounts';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { PublicKey } from '@solana/web3.js';
 import ExploreModal from './explore-modal';
+import * as anchor from '@coral-xyz/anchor';
+import { AnchorEscrow } from '@buidl/anchor';
+
+type UserAccounts = anchor.IdlAccounts<AnchorEscrow>['user'][];
 
 export default function ExploreUi() {
   const { userAccounts } = useAccounts();
@@ -11,7 +15,7 @@ export default function ExploreUi() {
   const [taker, setTaker] = useState<PublicKey>();
   const [title, setTitle] = useState('');
   const [page, setPage] = useState(1);
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<UserAccounts>([]);
 
   const handleShowModal = (taker: PublicKey, name: string) => {
     setShowModal(true);
@@ -28,11 +32,16 @@ export default function ExploreUi() {
     userAccounts.mutateAsync({ page, perPage: 2 });
   };
 
+  const memoizedData = useMemo(() => userAccounts.data, [userAccounts.data]);
+
   useEffect(() => {
-    if (userAccounts.data) {
-      setUsers((prevUsers) => [...prevUsers, ...userAccounts.data]);
+    if (memoizedData) {
+      setUsers((prevUsers) => [
+        ...prevUsers,
+        ...(memoizedData as UserAccounts),
+      ]);
     }
-  }, [userAccounts.data?.length]);
+  }, [memoizedData]);
 
   return (
     <div>
