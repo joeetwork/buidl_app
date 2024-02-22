@@ -1,7 +1,7 @@
 'use client';
 
 import { useAccounts } from '@/hooks/get-accounts';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { PublicKey } from '@solana/web3.js';
 import ExploreModal from './explore-modal';
 
@@ -10,6 +10,7 @@ export default function ExploreUi() {
   const [showModal, setShowModal] = useState(false);
   const [taker, setTaker] = useState<PublicKey>();
   const [title, setTitle] = useState('');
+  const [page, setPage] = useState(1);
 
   const handleShowModal = (taker: PublicKey, name: string) => {
     setShowModal(true);
@@ -20,6 +21,16 @@ export default function ExploreUi() {
   const handleHideModal = useCallback(() => {
     setShowModal(false);
   }, [setShowModal]);
+
+  const handleClick = () => {
+    setPage((prevPage) => prevPage + 1);
+    userAccounts.mutateAsync({ page, perPage: 6 });
+  };
+
+  useEffect(() => {
+    userAccounts.mutateAsync({ page, perPage: 6 });
+    setPage((prevPage) => prevPage + 1);
+  }, []);
 
   return (
     <div>
@@ -55,6 +66,8 @@ export default function ExploreUi() {
             </div>
           );
         })}
+
+        <button onClick={handleClick}>test</button>
       </div>
 
       <ExploreModal
