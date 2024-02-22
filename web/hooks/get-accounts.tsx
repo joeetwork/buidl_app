@@ -22,14 +22,32 @@ export function useAccounts() {
   const program = new Program(BuidlIDL, programId, provider);
 
   const userAccounts = useQuery({
-    queryKey: ['userAccounts'],
-    queryFn: () => {
-      return program.account.user.all();
+    queryKey: ['userAccounts', { publicKey }],
+    queryFn: async () => {
+      const accountsWithoutData = await provider.connection.getProgramAccounts(
+        programId,
+        {
+          dataSlice: { offset: 0, length: 0 },
+          filters: [
+            {
+              dataSize: 1452,
+            },
+          ],
+        }
+      );
+
+      const paginatedPublicKeys = accountsWithoutData.map(
+        (account) => account.pubkey
+      );
+
+      const users = program.account.user.fetchMultiple(paginatedPublicKeys);
+
+      return users;
     },
   });
 
   const userAccount = useQuery({
-    queryKey: ['userAccount', {publicKey}, {cluster}],
+    queryKey: ['userAccount', { publicKey }, { cluster }],
     queryFn: () => {
       if (publicKey) {
         const userPDA = PublicKey.findProgramAddressSync(
@@ -78,7 +96,7 @@ export function useAccounts() {
   });
 
   const uploadEmployerHistory = useQuery({
-    queryKey: ['uploadEmployerHistory', {publicKey}],
+    queryKey: ['uploadEmployerHistory', { publicKey }],
     queryFn: () => {
       if (publicKey) {
         return program.account.upload.all([
@@ -95,7 +113,7 @@ export function useAccounts() {
   });
 
   const uploadDevHistory = useQuery({
-    queryKey: ['uploadDevHistory', {publicKey}],
+    queryKey: ['uploadDevHistory', { publicKey }],
     queryFn: () => {
       if (publicKey) {
         return program.account.upload.all([
@@ -125,7 +143,6 @@ export function useAccounts() {
     devEscrows,
     hiringEscrows,
     uploadEmployerHistory,
-    uploadDevHistory
-
+    uploadDevHistory,
   };
 }
