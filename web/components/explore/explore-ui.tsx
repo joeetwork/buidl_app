@@ -35,6 +35,12 @@ export default function ExploreUi() {
   const memoizedData = useMemo(() => userAccounts.data, [userAccounts.data]);
 
   useEffect(() => {
+    userAccounts.mutateAsync({ page, perPage: 2 });
+    setPage((prevPage) => prevPage + 1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     if (memoizedData) {
       setUsers((prevUsers) => [
         ...prevUsers,
