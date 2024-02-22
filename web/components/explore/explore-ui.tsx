@@ -1,7 +1,7 @@
 'use client';
 
 import { useAccounts } from '@/hooks/get-accounts';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { PublicKey } from '@solana/web3.js';
 import ExploreModal from './explore-modal';
 import * as anchor from '@coral-xyz/anchor';
@@ -29,25 +29,23 @@ export default function ExploreUi() {
 
   const handleClick = () => {
     setPage((prevPage) => prevPage + 1);
-    userAccounts.mutateAsync({ page, perPage: 2 });
   };
 
-  const memoizedData = useMemo(() => userAccounts.data, [userAccounts.data]);
-
   useEffect(() => {
-    userAccounts.mutateAsync({ page, perPage: 2 });
-    setPage((prevPage) => prevPage + 1);
+    const fetchAcounts = async () => {
+      try {
+        const result = await userAccounts.mutateAsync({ page, perPage: 2 });
+        if (result) {
+          setUsers((prevUsers) => [...prevUsers, ...(result as UserAccounts)]);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    fetchAcounts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (memoizedData) {
-      setUsers((prevUsers) => [
-        ...prevUsers,
-        ...(memoizedData as UserAccounts),
-      ]);
-    }
-  }, [memoizedData]);
+  }, [page]);
 
   return (
     <div>
