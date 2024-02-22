@@ -4,11 +4,10 @@ import { BuidlIDL, getBuidlProgramId } from '@buidl/anchor';
 import { Program } from '@coral-xyz/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Cluster, PublicKey } from '@solana/web3.js';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { useAnchorProvider } from '@/components/solana/anchor-provider';
 import { useCluster } from '@/components/cluster/cluster-data-access';
-import base58 from 'bs58';
 
 export function useAccounts() {
   const { connection } = useConnection();
@@ -22,53 +21,10 @@ export function useAccounts() {
 
   const program = new Program(BuidlIDL, programId, provider);
 
-  interface UserAccountsProps {
-    page: number;
-    perPage: number;
-    role?: string;
-  }
-
-  const userAccounts = useMutation({
-    mutationKey: ['userAccounts'],
-    mutationFn: async ({ page, perPage, role }: UserAccountsProps) => {
-      const accountsWithoutData = await provider.connection.getProgramAccounts(
-        programId,
-        {
-          dataSlice: { offset: 0, length: 0 },
-          filters: role
-            ? [
-                {
-                  dataSize: 1452,
-                  memcmp: {
-                    offset: 448,
-                    bytes: base58.encode(Buffer.from(role)),
-                  },
-                },
-              ]
-            : [
-                {
-                  dataSize: 1452,
-                },
-              ],
-        }
-      );
-
-      const accountPublicKeys = accountsWithoutData.map(
-        (account) => account.pubkey
-      );
-
-      const paginatedPublicKeys = accountPublicKeys.slice(
-        (page - 1) * perPage,
-        page * perPage
-      );
-
-      if (paginatedPublicKeys.length === 0) {
-        return [];
-      }
-
-      const users = program.account.user.fetchMultiple(paginatedPublicKeys);
-
-      return users;
+  const userAccounts = useQuery({
+    queryKey: ['userAccounts'],
+    queryFn: () => {
+      return program.account.user.all();
     },
   });
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useAccounts } from '@/hooks/get-accounts';
+import { usePagination } from '@/hooks/pagination';
 import React, { useCallback, useEffect, useState } from 'react';
 import { PublicKey } from '@solana/web3.js';
 import ExploreModal from './explore-modal';
@@ -10,12 +10,12 @@ import { AnchorEscrow } from '@buidl/anchor';
 type UserAccounts = anchor.IdlAccounts<AnchorEscrow>['user'][];
 
 export default function ExploreUi() {
-  const { userAccounts } = useAccounts();
   const [showModal, setShowModal] = useState(false);
   const [taker, setTaker] = useState<PublicKey>();
   const [title, setTitle] = useState('');
   const [page, setPage] = useState(1);
   const [users, setUsers] = useState<UserAccounts>([]);
+  const { userAccounts } = usePagination({ page: page, perPage: 2 });
 
   const handleShowModal = (taker: PublicKey, name: string) => {
     setShowModal(true);
@@ -32,20 +32,13 @@ export default function ExploreUi() {
   };
 
   useEffect(() => {
-    const fetchAcounts = async () => {
-      try {
-        const result = await userAccounts.mutateAsync({ page, perPage: 2 });
-        if (result) {
-          setUsers((prevUsers) => [...prevUsers, ...(result as UserAccounts)]);
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    };
-
-    fetchAcounts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page]);
+    if (userAccounts.data) {
+      setUsers((prevUsers) => [
+        ...prevUsers,
+        ...(userAccounts.data as UserAccounts),
+      ]);
+    }
+  }, [userAccounts.data]);
 
   return (
     <div>
