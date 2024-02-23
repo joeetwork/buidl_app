@@ -58,7 +58,7 @@ export default function ExploreUi() {
       <InfiniteScroll
         dataLength={maxAccounts}
         next={handleClick}
-        hasMore={true}
+        hasMore={maxAccounts !== users.length}
         loader={
           <div className="w-full text-center py-4">
             <Loadie />
