@@ -53,6 +53,10 @@ export default function ExploreModal({
 
   useEffect(() => {
     hideModal();
+    setAmount(0);
+    setAbout('');
+    setCollection(null);
+    setValidator(null);
   }, [initializeEscrow.isSuccess, hideModal]);
 
   return (
@@ -86,7 +90,12 @@ export default function ExploreModal({
 
         <Select
           label="Collection"
-          items={[...metadata?.map((item) => item.content.metadata.name) ?? [], 'collection 2'] ?? []}
+          items={
+            [
+              ...(metadata?.map((item) => item.content.metadata.name) ?? []),
+              'collection 2',
+            ] ?? []
+          }
           onClick={handleSelect}
         />
       </div>
