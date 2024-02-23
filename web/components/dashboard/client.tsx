@@ -7,8 +7,15 @@ import { ellipsify } from '../shared/ellipsify';
 import { useValidateClient } from '@/hooks/validate';
 import { useCancel } from '@/hooks/cancel';
 import { PublicKey } from '@solana/web3.js';
+import * as anchor from '@coral-xyz/anchor';
+import { AnchorEscrow } from '@buidl/anchor';
 
-export default function Hiring() {
+interface ClientProps {
+  account: anchor.IdlAccounts<AnchorEscrow>['upload'];
+  publicKey: PublicKey;
+}
+
+export default function Client() {
   const [showModal, setShowModal] = useState(false);
   const { clientEscrows, uploadClientHistory } = useClientAccounts();
   const { validateWithClient } = useValidateClient();
@@ -40,7 +47,7 @@ export default function Hiring() {
             Show History
           </button>
           <HistoryModal
-            uploadHistory={uploadClientHistory?.data}
+            uploadHistory={uploadClientHistory?.data as ClientProps[]}
             hideModal={() => setShowModal(false)}
             show={showModal}
           />

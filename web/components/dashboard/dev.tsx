@@ -11,10 +11,17 @@ import { PublicKey } from '@solana/web3.js';
 import { useExchange } from '@/hooks/exchange';
 import { useUpload } from '@/hooks/upload';
 import { useRequests } from '@/hooks/requests';
+import * as anchor from '@coral-xyz/anchor';
+import { AnchorEscrow } from '@buidl/anchor';
 
 interface EscrowProps {
   escrow: PublicKey;
   initializer: PublicKey;
+}
+
+interface DevProps {
+  account: anchor.IdlAccounts<AnchorEscrow>['upload'];
+  publicKey: PublicKey;
 }
 
 export default function Dev() {
@@ -68,7 +75,7 @@ export default function Dev() {
                 Show History
               </button>
               <HistoryModal
-                uploadHistory={uploadDevHistory?.data}
+                uploadHistory={uploadDevHistory?.data as DevProps[]}
                 hideModal={() => setShowModal(false)}
                 show={showModal}
               />

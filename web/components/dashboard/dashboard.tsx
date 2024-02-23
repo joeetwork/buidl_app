@@ -3,17 +3,17 @@
 import React, { useState } from 'react';
 import { ROLES } from '@/constants';
 import Dev from './dev';
-import Hiring from './hiring';
 import Validator from './validator';
 import Collection from './collection';
 import Tabs from '../shared/tabs';
+import Client from './client';
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState(0);
 
   const Roles = [
     <Dev key="dev" />,
-    <Hiring key="hiring" />,
+    <Client key="client" />,
     <Collection key="collection" />,
     <Validator key="validator" />,
   ];

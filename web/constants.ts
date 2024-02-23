@@ -6,4 +6,4 @@ export const PAGES = [
   { label: 'Dashboard', path: '/dashboard' }
 ];
 
-export const ROLES = ['Dev', 'Hiring', 'Collection', 'Validator'];
+export const ROLES = ['Dev', 'Client', 'Collection', 'Validator'];
