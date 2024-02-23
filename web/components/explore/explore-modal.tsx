@@ -72,12 +72,14 @@ export default function ExploreModal({
         <Input
           name="initializerAmount"
           label="Amount:"
+          value={amount.toString()}
           onChange={(e) => setAmount(Number(e.target.value))}
         />
 
         <Input
           name="validator"
           label="Validator Pubkey:"
+          value={validator?.toString() ?? ''}
           onChange={(e) => setValidator(new PublicKey(e.target.value))}
         />
 

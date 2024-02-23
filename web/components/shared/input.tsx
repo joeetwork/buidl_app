@@ -1,18 +1,16 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 
 interface InputProps {
   label?: string;
   name?: string;
+  value: string;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-export default function Input({ label, name, onChange }: InputProps) {
-  const [value, setValue] = useState('');
-
+export default function Input({ label, name, value, onChange }: InputProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(e.target.value);
     onChange(e);
   };
 

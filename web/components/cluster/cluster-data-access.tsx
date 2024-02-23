@@ -37,8 +37,7 @@ export function toWalletAdapterNetwork(
 export const defaultClusters: Cluster[] = [
   {
     name: 'devnet',
-    endpoint:
-      'https://devnet.helius-rpc.com/?api-key=9d426c84-c62e-4056-b47f-6ac4e07357bd',
+    endpoint: clusterApiUrl('devnet'),
     network: ClusterNetwork.Devnet,
   },
   { name: 'local', endpoint: 'http://localhost:8899' },

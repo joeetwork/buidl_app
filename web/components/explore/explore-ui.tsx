@@ -41,8 +41,6 @@ export default function ExploreUi() {
 
   useEffect(() => {
     if (userAccounts.data) {
-      console.log(userAccounts.data);
-
       setUsers((prevUsers) => {
         const updatedUsersMap = prevUsers ? new Map(prevUsers) : new Map();
 
