@@ -33,8 +33,6 @@ export default function ExploreUi() {
   }, [setShowModal]);
 
   const handleClick = () => {
-    console.log('gj');
-
     setPage((prevPage) => prevPage + 1);
   };
 
