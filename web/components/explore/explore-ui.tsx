@@ -1,13 +1,14 @@
 'use client';
 
 import { usePagination } from '@/hooks/pagination';
-import React, { useCallback, useEffect, useState } from 'react';
-import { PublicKey } from '@solana/web3.js';
-import ExploreModal from './explore-modal';
+import React, { useEffect, useState } from 'react';
+// import { PublicKey } from '@solana/web3.js';
+// import ExploreModal from './explore-modal';
 import * as anchor from '@coral-xyz/anchor';
 import { AnchorEscrow } from '@buidl/anchor';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Loadie from '../shared/loadie';
+import Link from 'next/link';
 
 type UserMap =
   | Map<string, anchor.IdlAccounts<AnchorEscrow>['user']>
@@ -15,9 +16,9 @@ type UserMap =
 type UserAccounts = anchor.IdlAccounts<AnchorEscrow>['user'][];
 
 export default function ExploreUi() {
-  const [showModal, setShowModal] = useState(false);
-  const [taker, setTaker] = useState<PublicKey>();
-  const [title, setTitle] = useState('');
+  // const [showModal, setShowModal] = useState(false);
+  // const [taker, setTaker] = useState<PublicKey>();
+  // const [title, setTitle] = useState('');
   const [page, setPage] = useState(1);
   const [users, setUsers] = useState<UserMap>();
   const { userAccounts, maxAccounts } = usePagination({
@@ -25,15 +26,15 @@ export default function ExploreUi() {
     perPage: 2,
   });
 
-  const handleShowModal = (taker: PublicKey, name: string) => {
-    setShowModal(true);
-    setTaker(taker);
-    setTitle(name);
-  };
+  // const handleShowModal = (taker: PublicKey, name: string) => {
+  //   setShowModal(true);
+  //   setTaker(taker);
+  //   setTitle(name);
+  // };
 
-  const handleHideModal = useCallback(() => {
-    setShowModal(false);
-  }, [setShowModal]);
+  // const handleHideModal = useCallback(() => {
+  //   setShowModal(false);
+  // }, [setShowModal]);
 
   const handleClick = () => {
     setPage((prevPage) => prevPage + 1);
@@ -83,19 +84,13 @@ export default function ExploreUi() {
                       <h2 className="card-title">{user?.username}</h2>
                       <p className="w-full break-words">{user?.about}</p>
                       <div className="card-actions">
-                        <button
-                          onClick={() =>
-                            user
-                              ? handleShowModal(
-                                  user.initializerKey,
-                                  user.username
-                                )
-                              : null
-                          }
-                          className="btn btn-primary"
+                        <Link
+                          href={`offer/${user.username}/${user.initializerKey}`}
                         >
-                          Make offer
-                        </button>
+                          <button className="btn btn-primary">
+                            Make offer
+                          </button>
+                        </Link>
                       </div>
                     </div>
                   </div>
@@ -104,12 +99,12 @@ export default function ExploreUi() {
             : null}
         </div>
       </InfiniteScroll>
-      <ExploreModal
+      {/* <ExploreModal
         show={showModal}
         hideModal={handleHideModal}
         taker={taker}
         title={title}
-      />
+      /> */}
     </div>
   );
 }

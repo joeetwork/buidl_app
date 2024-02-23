@@ -14,7 +14,7 @@ export default function TextArea({
   onChange,
 }: TextAreaProps) {
   return (
-    <label className="form-control w-full max-w-xs">
+    <label className="form-control w-full">
       {label && (
         <div className="label">
           <span className="label-text">{label}</span>
@@ -24,7 +24,7 @@ export default function TextArea({
       <textarea
         placeholder="About"
         name={name}
-        className="textarea textarea-bordered textarea-md w-full max-w-xs"
+        className="textarea textarea-bordered textarea-md w-full focus:outline-none max-w-x resize-none"
         onChange={(e) => onChange(e)}
         value={value}
       />
