@@ -1,21 +1,21 @@
 'use client';
 
-import { useAccounts } from '@/hooks/get-accounts';
+import { useClientAccounts } from '@/hooks/get-accounts';
 import React, { useState } from 'react';
 import HistoryModal from './history-modal';
 import { ellipsify } from '../shared/ellipsify';
-import { useValidate } from '@/hooks/validate';
+import { useValidateClient } from '@/hooks/validate';
 import { useCancel } from '@/hooks/cancel';
 import { PublicKey } from '@solana/web3.js';
 
 export default function Hiring() {
   const [showModal, setShowModal] = useState(false);
-  const { hiringEscrows, uploadEmployerHistory } = useAccounts();
-  const { validateWithEmployer } = useValidate();
+  const { clientEscrows, uploadClientHistory } = useClientAccounts();
+  const { validateWithClient } = useValidateClient();
   const { cancel } = useCancel();
 
   const handleAcceptClick = (escrow: PublicKey) => {
-    validateWithEmployer.mutateAsync(escrow);
+    validateWithClient.mutateAsync(escrow);
   };
 
   const handleCancelClick = (escrow: PublicKey) => {
@@ -40,7 +40,7 @@ export default function Hiring() {
             Show History
           </button>
           <HistoryModal
-            uploadHistory={uploadEmployerHistory?.data}
+            uploadHistory={uploadClientHistory?.data}
             hideModal={() => setShowModal(false)}
             show={showModal}
           />
@@ -50,7 +50,7 @@ export default function Hiring() {
       <div className="flex card w-full bg-base-100 shadow-xl min-h-[250px]">
         <h1 className="text-center pt-2">Active</h1>
         <div className="grid grid-cols-3 gap-4 items-stretch">
-          {hiringEscrows.data?.map((escrow) => {
+          {clientEscrows.data?.map((escrow) => {
             return (
               <div
                 key={escrow.publicKey.toString()}

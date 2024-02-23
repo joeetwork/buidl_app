@@ -1,13 +1,13 @@
 'use client';
 
-import { useValidate } from '@/hooks/validate';
+import { useValidateUser } from '@/hooks/validate';
 import React from 'react';
 import { ellipsify } from '../shared/ellipsify';
 import { PublicKey } from '@solana/web3.js';
 
 export default function Validator() {
   const { acceptWithUser, declineWithUser, validatorUserEscrows } =
-    useValidate();
+    useValidateUser();
 
   const handleAcceptClick = (escrow: PublicKey) => {
     acceptWithUser.mutateAsync({

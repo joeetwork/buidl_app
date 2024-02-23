@@ -1,70 +1,59 @@
 'use client';
 
-import { BuidlIDL, getBuidlProgramId } from '@buidl/anchor';
-import { Program } from '@coral-xyz/anchor';
-import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { Cluster, PublicKey } from '@solana/web3.js';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { PublicKey } from '@solana/web3.js';
 import { useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
-import { useAnchorProvider } from '@/components/solana/anchor-provider';
 import { useCluster } from '@/components/cluster/cluster-data-access';
+import { useProgram } from './get-program';
 
 export function useAccounts() {
-  const { connection } = useConnection();
   const { cluster } = useCluster();
-  const provider = useAnchorProvider();
-  const programId = useMemo(
-    () => getBuidlProgramId(cluster.network as Cluster),
-    [cluster]
-  );
+  const { program, programId } = useProgram();
   const { publicKey } = useWallet();
-
-  const program = new Program(BuidlIDL, programId, provider);
 
   const userAccounts = useQuery({
     queryKey: ['userAccounts'],
-    queryFn: () => {
-      return program.account.user.all();
+    queryFn: async () => {
+      const res = await program.account.user.all();
+
+      return res.length > 0 ? res : [];
     },
   });
 
   const userAccount = useQuery({
     queryKey: ['userAccount', { publicKey }, { cluster }],
-    queryFn: () => {
+    queryFn: async () => {
       if (publicKey) {
         const userPDA = PublicKey.findProgramAddressSync(
           [Buffer.from('user'), publicKey?.toBuffer()],
           program.programId
         )[0];
 
-        return program.account.user.fetch(userPDA);
+        const res = await program.account.user.fetch(userPDA);
+
+        return res ?? {};
       }
       return null;
     },
   });
 
-  const devEscrows = useQuery({
-    queryKey: ['devEscrows', { publicKey }],
-    queryFn: () => {
-      if (publicKey) {
-        return program.account.escrow.all([
-          {
-            memcmp: {
-              offset: 49,
-              bytes: publicKey?.toBase58(),
-            },
-          },
-        ]);
-      }
-      return null;
-    },
-  });
+  return {
+    program,
+    programId,
+    userAccounts,
+    userAccount,
+  };
+}
 
-  const hiringEscrows = useQuery({
-    queryKey: ['hiringEscrows', { publicKey }],
-    queryFn: () => {
+export function useClientAccounts() {
+  const { program, programId } = useProgram();
+  const { publicKey } = useWallet();
+
+  const clientEscrows = useQuery({
+    queryKey: ['clientEscrows', { publicKey }],
+    queryFn: async () => {
       if (publicKey) {
-        return program.account.escrow.all([
+        const res = await program.account.escrow.all([
           {
             memcmp: {
               offset: 17,
@@ -72,16 +61,18 @@ export function useAccounts() {
             },
           },
         ]);
+
+        return res.length > 0 ? res : [];
       }
       return null;
     },
   });
 
-  const uploadEmployerHistory = useQuery({
-    queryKey: ['uploadEmployerHistory', { publicKey }],
-    queryFn: () => {
+  const uploadClientHistory = useQuery({
+    queryKey: ['uploadClientHistory', { publicKey }],
+    queryFn: async () => {
       if (publicKey) {
-        return program.account.upload.all([
+        const res = await program.account.upload.all([
           {
             memcmp: {
               offset: 8,
@@ -89,6 +80,39 @@ export function useAccounts() {
             },
           },
         ]);
+
+        return res.length > 0 ? res : [];
+      }
+      return null;
+    },
+  });
+
+  return {
+    program,
+    programId,
+    clientEscrows,
+    uploadClientHistory,
+  };
+}
+
+export function useDevAccounts() {
+  const { program, programId } = useProgram();
+  const { publicKey } = useWallet();
+
+  const devEscrows = useQuery({
+    queryKey: ['devEscrows', { publicKey }],
+    queryFn: async () => {
+      if (publicKey) {
+        const res = await program.account.escrow.all([
+          {
+            memcmp: {
+              offset: 49,
+              bytes: publicKey?.toBase58(),
+            },
+          },
+        ]);
+
+        return res.length > 0 ? res : [];
       }
       return null;
     },
@@ -96,9 +120,9 @@ export function useAccounts() {
 
   const uploadDevHistory = useQuery({
     queryKey: ['uploadDevHistory', { publicKey }],
-    queryFn: () => {
+    queryFn: async () => {
       if (publicKey) {
-        return program.account.upload.all([
+        const res = await program.account.upload.all([
           {
             memcmp: {
               offset: 40,
@@ -106,25 +130,17 @@ export function useAccounts() {
             },
           },
         ]);
+
+        return res.length > 0 ? res : [];
       }
       return null;
     },
   });
 
-  const getProgramAccount = useQuery({
-    queryKey: ['get-program-account', { cluster }],
-    queryFn: () => connection.getParsedAccountInfo(programId),
-  });
-
   return {
     program,
     programId,
-    getProgramAccount,
-    userAccounts,
-    userAccount,
     devEscrows,
-    hiringEscrows,
-    uploadEmployerHistory,
     uploadDevHistory,
   };
 }

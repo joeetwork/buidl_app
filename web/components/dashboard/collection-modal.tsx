@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react';
 import { AppModal } from '../shared/app-modal';
 import { ellipsify } from '../shared/ellipsify';
-import { useValidate } from '@/hooks/validate';
+import { useValidateCollection } from '@/hooks/validate';
 import { useCollection } from '@/hooks/get-collection';
 import { PublicKey } from '@solana/web3.js';
 
@@ -22,7 +22,7 @@ export default function CollectionModal({
     acceptWithCollection,
     declineWithCollection,
     validatorCollectionEscrows,
-  } = useValidate(selectedCollection);
+  } = useValidateCollection(selectedCollection);
   const { collection, isPending } = useCollection(selectedCollection);
 
   const handleAcceptClick = (escrow: PublicKey) => {
@@ -53,7 +53,7 @@ export default function CollectionModal({
 
   return (
     <AppModal title={`Work to Validate`} show={show} hide={hideModal}>
-      {validatorCollectionEscrows.data?.map((escrow) => {  
+      {validatorCollectionEscrows.data?.map((escrow) => {
         return (
           <div
             key={escrow.publicKey.toString()}

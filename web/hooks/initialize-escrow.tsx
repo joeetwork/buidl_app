@@ -2,7 +2,7 @@
 
 import { useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey, SystemProgram } from '@solana/web3.js';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import * as anchor from '@coral-xyz/anchor';
 import { useTransactionToast } from '@/components/shared/use-transaction-toast';
@@ -11,9 +11,8 @@ import {
   TOKEN_PROGRAM_ID,
   getAssociatedTokenAddress,
 } from '@solana/spl-token';
-import { useAccounts } from './get-accounts';
-import { useCluster } from '@/components/cluster/cluster-data-access';
 import { usePDAs } from './get-PDAs';
+import { useProgram } from './get-program';
 
 interface InitializeEscrowProps {
   initializerAmount: number;
@@ -24,14 +23,32 @@ interface InitializeEscrowProps {
 }
 
 export function useInitialiseEscrow() {
-  const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
-  const { program, devEscrows } = useAccounts();
+  const { program } = useProgram();
   const { publicKey } = useWallet();
   const { mint, seed, escrowPDA, vaultPDA } = usePDAs();
 
+  const devEscrows = useQuery({
+    queryKey: ['devEscrows', { publicKey }],
+    queryFn: async () => {
+      if (publicKey) {
+        const res = await program.account.escrow.all([
+          {
+            memcmp: {
+              offset: 49,
+              bytes: publicKey?.toBase58(),
+            },
+          },
+        ]);
+
+        return res.length > 0 ? res : [];
+      }
+      return null;
+    },
+  });
+
   const initializeEscrow = useMutation({
-    mutationKey: ['initializeEscrow', 'initialize', { cluster }],
+    mutationKey: ['initializeEscrow', 'initialize'],
     mutationFn: async ({
       initializerAmount,
       taker,

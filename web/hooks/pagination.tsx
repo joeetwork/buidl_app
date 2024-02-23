@@ -1,13 +1,10 @@
 'use client';
 
-import { BuidlIDL, getBuidlProgramId } from '@buidl/anchor';
-import { Program } from '@coral-xyz/anchor';
-import { Cluster } from '@solana/web3.js';
 import { useQuery } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useAnchorProvider } from '@/components/solana/anchor-provider';
-import { useCluster } from '@/components/cluster/cluster-data-access';
 import base58 from 'bs58';
+import { useProgram } from './get-program';
 
 interface UserAccountsProps {
   page: number;
@@ -16,18 +13,12 @@ interface UserAccountsProps {
 }
 
 export function usePagination({ page, perPage, role }: UserAccountsProps) {
-  const { cluster } = useCluster();
+  const { program, programId } = useProgram();
   const provider = useAnchorProvider();
-  const programId = useMemo(
-    () => getBuidlProgramId(cluster.network as Cluster),
-    [cluster]
-  );
   const [maxAccounts, setMaxAccounts] = useState(0);
 
-  const program = new Program(BuidlIDL, programId, provider);
-
   const userAccounts = useQuery({
-    queryKey: ['userAccounts', { page }, { perPage }, { role }],
+    queryKey: ['userPagination', { page }, { perPage }, { role }],
     queryFn: async () => {
       const accountsWithoutData = await provider.connection.getProgramAccounts(
         programId,
@@ -66,7 +57,9 @@ export function usePagination({ page, perPage, role }: UserAccountsProps) {
         return [];
       }
 
-      return program.account.user.fetchMultiple(paginatedPublicKeys);
+      const res = await program.account.user.fetchMultiple(paginatedPublicKeys);
+
+      return res.length > 0 ? res : [];
     },
   });
 

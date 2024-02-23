@@ -1,6 +1,6 @@
 'use client';
 
-import { useAccounts } from '@/hooks/get-accounts';
+import { useAccounts, useDevAccounts } from '@/hooks/get-accounts';
 import React, { useState } from 'react';
 import { AppHero } from '../shared/app-hero';
 import CreateUser from '../user/create-user';
@@ -19,7 +19,8 @@ interface EscrowProps {
 
 export default function Dev() {
   const [showModal, setShowModal] = useState(false);
-  const { uploadDevHistory, devEscrows, userAccount } = useAccounts();
+  const { userAccount } = useAccounts();
+  const { uploadDevHistory, devEscrows } = useDevAccounts();
   const { exchange } = useExchange();
   const { uploadWork } = useUpload();
   const { declineRequest, acceptRequest } = useRequests();

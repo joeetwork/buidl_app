@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import { useTransactionToast } from '@/components/shared/use-transaction-toast';
 import { useAccounts } from './get-accounts';
 import { usePDAs } from './get-PDAs';
+import { useProgram } from './get-program';
 
 interface InitialiseUserProps {
   name: string;
@@ -16,7 +17,8 @@ interface InitialiseUserProps {
 
 export function useInitialiseUser() {
   const transactionToast = useTransactionToast();
-  const { program, userAccounts } = useAccounts();
+  const { userAccounts } = useAccounts();
+  const { program } = useProgram();
   const { publicKey } = useWallet();
   const { userPDA } = usePDAs();
 
