@@ -9,6 +9,9 @@ import { AnchorEscrow } from '@buidl/anchor';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Loadie from '../shared/loadie';
 
+type UserMap =
+  | Map<string, anchor.IdlAccounts<AnchorEscrow>['user']>
+  | undefined;
 type UserAccounts = anchor.IdlAccounts<AnchorEscrow>['user'][];
 
 export default function ExploreUi() {
@@ -16,7 +19,7 @@ export default function ExploreUi() {
   const [taker, setTaker] = useState<PublicKey>();
   const [title, setTitle] = useState('');
   const [page, setPage] = useState(1);
-  const [users, setUsers] = useState<UserAccounts>([]);
+  const [users, setUsers] = useState<UserMap>();
   const { userAccounts, maxAccounts } = usePagination({
     page: page,
     perPage: 2,
@@ -40,10 +43,15 @@ export default function ExploreUi() {
     if (userAccounts.data) {
       console.log(userAccounts.data);
 
-      setUsers((prevUsers) => [
-        ...prevUsers,
-        ...(userAccounts.data as UserAccounts),
-      ]);
+      setUsers((prevUsers) => {
+        const updatedUsersMap = prevUsers ? new Map(prevUsers) : new Map();
+
+        (userAccounts.data as UserAccounts).forEach((user) => {
+          updatedUsersMap.set(user.initializerKey.toString(), user);
+        });
+
+        return updatedUsersMap;
+      });
     }
   }, [userAccounts.data]);
 
@@ -58,7 +66,7 @@ export default function ExploreUi() {
       <InfiniteScroll
         dataLength={maxAccounts}
         next={handleClick}
-        hasMore={maxAccounts !== users.length}
+        hasMore={maxAccounts !== users?.size}
         loader={
           <div className="w-full text-center py-4">
             <Loadie />
@@ -66,8 +74,8 @@ export default function ExploreUi() {
         }
       >
         <div className="grid grid-cols-3 gap-4 items-stretch w-10/12 m-auto max-[480px]:grid-cols-1 max-[480px]:gap-y-4 max-[768px]:grid-cols-2">
-          {users.length > 0
-            ? users.map((user) => {
+          {users && users?.size > 0
+            ? [...users.values()].map((user) => {
                 return (
                   <div
                     key={user?.initializerKey.toString()}
