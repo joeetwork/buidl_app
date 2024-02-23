@@ -4,7 +4,7 @@ import { BuidlIDL, getBuidlProgramId } from '@buidl/anchor';
 import { Program } from '@coral-xyz/anchor';
 import { Cluster } from '@solana/web3.js';
 import { useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useAnchorProvider } from '@/components/solana/anchor-provider';
 import { useCluster } from '@/components/cluster/cluster-data-access';
 import base58 from 'bs58';
@@ -22,6 +22,7 @@ export function usePagination({ page, perPage, role }: UserAccountsProps) {
     () => getBuidlProgramId(cluster.network as Cluster),
     [cluster]
   );
+  const [maxAccounts, setMaxAccounts] = useState(0);
 
   const program = new Program(BuidlIDL, programId, provider);
 
@@ -50,6 +51,8 @@ export function usePagination({ page, perPage, role }: UserAccountsProps) {
         }
       );
 
+      setMaxAccounts(accountsWithoutData.length);
+
       const accountPublicKeys = accountsWithoutData.map(
         (account) => account.pubkey
       );
@@ -63,13 +66,12 @@ export function usePagination({ page, perPage, role }: UserAccountsProps) {
         return [];
       }
 
-      const users = program.account.user.fetchMultiple(paginatedPublicKeys);
-
-      return users;
+      return program.account.user.fetchMultiple(paginatedPublicKeys);
     },
   });
 
   return {
     userAccounts,
+    maxAccounts,
   };
 }
