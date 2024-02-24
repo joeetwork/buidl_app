@@ -50,7 +50,7 @@ export function AppModal({
   }, [show, dialogRef, hide]);
 
   return (
-    <dialog className="modal cursor-default" ref={dialogRef}>
+    <dialog className="modal" ref={dialogRef}>
       <div className="modal-box space-y-5">
         <div className="flex justify-between w-full">
           <h3 className="font-bold text-lg">{title}</h3>
