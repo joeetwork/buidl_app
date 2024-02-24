@@ -3,6 +3,7 @@ import { AppModal } from '../shared/app-modal';
 import { PublicKey } from '@solana/web3.js';
 import { useMetadata } from '@/hooks/get-metadata';
 import { COLLECTIONS } from '@/constants';
+import Image from 'next/image';
 
 interface OfferModalProps {
   hideModal: () => void;
@@ -41,13 +42,15 @@ export default function OfferModal({
               onClick={() => handleClick(data.content.metadata.name)}
             >
               <div className="flex gap-6 items-center px-6 py-2">
-                <div className="w-10">
-                  <img
-                    src={data.content.links.image}
-                    alt="Shoes"
-                    className="rounded-full"
-                  />
-                </div>
+                <Image
+                  unoptimized={true}
+                  loader={() => data.content.links.image ?? ''}
+                  src={data.content.links.image ?? ''}
+                  alt="Shoes"
+                  className="rounded-full"
+                  width={40}
+                  height={40}
+                />
 
                 {data.content.metadata.name}
               </div>
