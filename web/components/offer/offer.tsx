@@ -9,14 +9,13 @@ import { ellipsify } from '../shared/ellipsify';
 import OfferModal from './offer-modal';
 
 interface InputFieldProps {
-  collection: PublicKey | null;
+  token?: PublicKey | null;
   onChange: (e: number) => void;
-  onModalChange: () => void;
+  onModalChange?: () => void;
 }
 
-function InputField({ collection, onChange, onModalChange }: InputFieldProps) {
+function InputField({ token, onChange, onModalChange }: InputFieldProps) {
   const [isHighlighted, setIsHighlighted] = useState(false);
-  const { metadata } = useMetadata(COLLECTIONS);
   const [inputValue, setInputValue] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,40 +40,95 @@ function InputField({ collection, onChange, onModalChange }: InputFieldProps) {
         <span className="label-text cursor-default">You pay</span>
       </div>
       <div className="flex justify-between w-full">
-        <input
-          name="initializerAmount"
-          value={inputValue}
-          onChange={(e) => handleChange(e)}
-          onFocus={() => setIsHighlighted(true)}
-          onBlur={() => setIsHighlighted(false)}
-          type="text"
-          placeholder="0"
-          className="input input-ghost input-lg p-0 text-4xl bg-gray-500 focus:outline-none w-full"
-        />
+        <div className="flex flex-col">
+          <input
+            name="initializerAmount"
+            value={inputValue}
+            onChange={(e) => handleChange(e)}
+            onFocus={() => setIsHighlighted(true)}
+            onBlur={() => setIsHighlighted(false)}
+            type="text"
+            placeholder="0"
+            className="input input-ghost input-lg p-0 text-4xl bg-gray-500 focus:outline-none w-full"
+          />
+          {inputValue && <p>{`$${Number(inputValue).toFixed(2)}`}</p>}
+        </div>
 
         <button
-          className="flex items-center gap-4 btn m-auto focus:outline-none"
-          onClick={onModalChange}
+          className="flex items-center gap-4 btn m-auto focus:outline-none tooltip before:max-w-none"
+          data-tip={'More Tokens coming soon'}
         >
-          {collection?.toString() ?? metadata
-            ? metadata[0].content.metadata.name
-            : ''}
-
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            className="w-6 h-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="m19.5 8.25-7.5 7.5-7.5-7.5"
+          <div className="w-6">
+            <img
+              src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png"
+              alt="USDC Logo"
             />
-          </svg>
+          </div>
+          USDC
         </button>
+      </div>
+    </div>
+  );
+}
+
+interface ValidatorFieldProps {
+  showCollection: boolean;
+  collection: PublicKey | null;
+  onModalChange: () => void;
+  onInputChange: (e: string) => void;
+}
+
+function ValidatorField({
+  showCollection,
+  collection,
+  onModalChange,
+  onInputChange,
+}: ValidatorFieldProps) {
+  const { metadata } = useMetadata(COLLECTIONS);
+  const [isHighlighted, setIsHighlighted] = useState(false);
+
+  return (
+    <div
+      className={`bg-gray-500 rounded-lg p-4 w-full hover:ring ${
+        isHighlighted ? 'ring ring-gray-400 ' : 'hover:ring-gray-700'
+      }`}
+    >
+      <div className="w-full">
+        <span className="label-text cursor-default">Add Validator</span>
+      </div>
+      <div className="flex justify-between w-full">
+        {showCollection ? (
+          <button className="btn focus:outline-none" onClick={onModalChange}>
+            {collection?.toString() ?? metadata
+              ? metadata[0].content.metadata.name
+              : ''}
+
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth="1.5"
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m19.5 8.25-7.5 7.5-7.5-7.5"
+              />
+            </svg>
+          </button>
+        ) : (
+          <input
+            name="initializerAmount"
+            onChange={(e) => onInputChange(e.target.value)}
+            onFocus={() => setIsHighlighted(true)}
+            onBlur={() => setIsHighlighted(false)}
+            type="text"
+            placeholder="SoliRxTzQ3sbz4it..."
+            className="input input-ghost input-md p-0 text-lg bg-gray-500 focus:outline-none w-full"
+          />
+        )}
       </div>
     </div>
   );
@@ -118,7 +172,7 @@ export default function Offer() {
   const [amount, setAmount] = useState<number>();
   const [about, setAbout] = useState('');
   const [collection, setCollection] = useState<PublicKey | null>(null);
-  const [validator, setValidator] = useState<PublicKey | null>(null);
+  const [validator, setValidator] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [showCollection, setShowCollection] = useState(true);
 
@@ -132,17 +186,21 @@ export default function Offer() {
         initializerAmount: amount,
         collection,
         about,
-        validator,
+        validator: new PublicKey(validator),
         taker: new PublicKey(pubkey),
       });
     }
   };
 
+  const handleInputChange = useCallback((v: string) => {
+    setValidator(v);
+  }, []);
+
   useEffect(() => {
     setAmount(0);
     setAbout('');
     setCollection(null);
-    setValidator(null);
+    setValidator('');
   }, [initializeEscrow.isSuccess]);
 
   return (
@@ -170,10 +228,13 @@ export default function Offer() {
           </div>
         </div>
 
-        <InputField
-          collection={collection}
-          onChange={(e) => setAmount(e)}
+        <InputField onChange={(e) => setAmount(e)} />
+
+        <ValidatorField
           onModalChange={handleModalClick}
+          collection={collection}
+          showCollection={showCollection}
+          onInputChange={handleInputChange}
         />
 
         <TextAreaInput onChange={(e) => setAbout(e)} />
