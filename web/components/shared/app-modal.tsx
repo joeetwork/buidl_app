@@ -51,8 +51,8 @@ export function AppModal({
 
   return (
     <dialog className="modal" ref={dialogRef}>
-      <div className="modal-box space-y-5 h-3/4 w-[30%]">
-        <div className="flex justify-between w-full">
+      <div className="modal-box space-y-5 h-3/4 w-[30%] px-0">
+        <div className="flex justify-between w-full px-4">
           <h3 className="font-bold text-lg">{title}</h3>
           <button onClick={hide} className="focus:outline-none">
             <svg
