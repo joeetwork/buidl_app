@@ -2,8 +2,6 @@
 
 import { usePagination } from '@/hooks/pagination';
 import React, { useEffect, useState } from 'react';
-// import { PublicKey } from '@solana/web3.js';
-// import ExploreModal from './explore-modal';
 import * as anchor from '@coral-xyz/anchor';
 import { AnchorEscrow } from '@buidl/anchor';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -16,25 +14,12 @@ type UserMap =
 type UserAccounts = anchor.IdlAccounts<AnchorEscrow>['user'][];
 
 export default function ExploreUi() {
-  // const [showModal, setShowModal] = useState(false);
-  // const [taker, setTaker] = useState<PublicKey>();
-  // const [title, setTitle] = useState('');
   const [page, setPage] = useState(1);
   const [users, setUsers] = useState<UserMap>();
   const { userAccounts, maxAccounts } = usePagination({
     page: page,
     perPage: 2,
   });
-
-  // const handleShowModal = (taker: PublicKey, name: string) => {
-  //   setShowModal(true);
-  //   setTaker(taker);
-  //   setTitle(name);
-  // };
-
-  // const handleHideModal = useCallback(() => {
-  //   setShowModal(false);
-  // }, [setShowModal]);
 
   const handleClick = () => {
     setPage((prevPage) => prevPage + 1);
@@ -99,12 +84,6 @@ export default function ExploreUi() {
             : null}
         </div>
       </InfiniteScroll>
-      {/* <ExploreModal
-        show={showModal}
-        hideModal={handleHideModal}
-        taker={taker}
-        title={title}
-      /> */}
     </div>
   );
 }
