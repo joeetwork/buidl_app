@@ -38,7 +38,7 @@ function InputField({ collection, onChange, onModalChange }: InputFieldProps) {
       }`}
     >
       <div className="w-full">
-        <span className="label-text">You pay</span>
+        <span className="label-text cursor-default">You pay</span>
       </div>
       <div className="flex justify-between w-full">
         <input
@@ -98,7 +98,7 @@ function TextAreaInput({ onChange }: TextFieldProps) {
       }`}
     >
       <div className="w-full">
-        <span className="label-text">Your offer</span>
+        <span className="label-text cursor-default">Your offer</span>
       </div>
       <textarea
         className="textarea textarea-lg w-full p-0 resize-none bg-gray-500 focus:outline-none"
