@@ -50,7 +50,7 @@ export function AppModal({
   }, [show, dialogRef, hide]);
 
   return (
-    <dialog className="modal" ref={dialogRef}>
+    <dialog className="modal cursor-default" ref={dialogRef}>
       <div className="modal-box space-y-5">
         <div className="flex justify-between w-full">
           <h3 className="font-bold text-lg">{title}</h3>
@@ -88,7 +88,9 @@ export function AppModal({
       </div>
 
       <form method="dialog" className="modal-backdrop">
-        <button onClick={hide}>close</button>
+        <button className="cursor-default" onClick={hide}>
+          close
+        </button>
       </form>
     </dialog>
   );
