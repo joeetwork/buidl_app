@@ -12,7 +12,12 @@ import { useProgram } from './get-program';
 interface InitialiseUserProps {
   name: string;
   about: string;
-  role: string;
+  freelancer: boolean;
+  pfp: string | null;
+  twitter: string | null;
+  discord: string | null;
+  telegram: string | null;
+  github: string | null;
 }
 
 export function useInitialiseUser() {
@@ -24,10 +29,28 @@ export function useInitialiseUser() {
 
   const initializeUser = useMutation({
     mutationKey: ['initializeUser'],
-    mutationFn: async ({ name, about, role }: InitialiseUserProps) => {
+    mutationFn: async ({
+      name,
+      about,
+      freelancer,
+      pfp,
+      twitter,
+      discord,
+      telegram,
+      github,
+    }: InitialiseUserProps) => {
       if (publicKey) {
         return program.methods
-          .initializeUser(name, about, role)
+          .initializeUser(
+            name,
+            about,
+            freelancer,
+            pfp,
+            twitter,
+            discord,
+            telegram,
+            github
+          )
           .accounts({
             initializer: publicKey,
             userState: userPDA,

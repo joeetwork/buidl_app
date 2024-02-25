@@ -9,34 +9,38 @@ import { useProgram } from './get-program';
 interface UserAccountsProps {
   page: number;
   perPage: number;
-  role?: string;
+  freelancer?: boolean;
 }
 
-export function usePagination({ page, perPage, role }: UserAccountsProps) {
+export function usePagination({
+  page,
+  perPage,
+  freelancer,
+}: UserAccountsProps) {
   const { program, programId } = useProgram();
   const provider = useAnchorProvider();
   const [maxAccounts, setMaxAccounts] = useState(0);
 
   const userAccounts = useQuery({
-    queryKey: ['userPagination', { page }, { perPage }, { role }],
+    queryKey: ['userPagination', { page }, { perPage }, { freelancer }],
     queryFn: async () => {
       const accountsWithoutData = await provider.connection.getProgramAccounts(
         programId,
         {
           dataSlice: { offset: 0, length: 0 },
-          filters: role
+          filters: freelancer
             ? [
                 {
-                  dataSize: 1452,
+                  dataSize: 2477,
                   memcmp: {
                     offset: 448,
-                    bytes: base58.encode(Buffer.from(role)),
+                    bytes: base58.encode(Buffer.from(true)),
                   },
                 },
               ]
             : [
                 {
-                  dataSize: 1452,
+                  dataSize: 2477,
                 },
               ],
         }

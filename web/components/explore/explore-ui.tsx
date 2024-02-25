@@ -31,7 +31,7 @@ export default function ExploreUi() {
         const updatedUsersMap = prevUsers ? new Map(prevUsers) : new Map();
 
         (userAccounts.data as UserAccounts).forEach((user) => {
-          updatedUsersMap.set(user.initializerKey.toString(), user);
+          updatedUsersMap.set(user.initializer.toString(), user);
         });
 
         return updatedUsersMap;
@@ -62,7 +62,7 @@ export default function ExploreUi() {
             ? [...users.values()].map((user) => {
                 return (
                   <div
-                    key={user?.initializerKey.toString()}
+                    key={user?.initializer.toString()}
                     className="card w-full bg-base-100 shadow-xl"
                   >
                     <div className="card-body items-center text-center">
@@ -70,7 +70,11 @@ export default function ExploreUi() {
                       <p className="w-full break-words">{user?.about}</p>
                       <div className="card-actions">
                         <Link
-                          href={`offer/${user.username}/${user.initializerKey}`}
+                          href={`offer/${
+                            user.username === user.initializer.toString()
+                              ? 'guest'
+                              : user.username
+                          }/${user.initializer}`}
                         >
                           <button className="btn btn-primary">
                             Make offer
