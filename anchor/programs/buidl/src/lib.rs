@@ -5,7 +5,7 @@ use contexts::*;
 mod states;
 mod constant;
 
-declare_id!("6FJ5uuAfaAVEr8hY7JD2BjFoAC8n6FMRgziif9VFN2v7");
+declare_id!("4wyUbUA2f3rzLTrT8PFvYYv1dEqbd46QbSswua85UdVm");
 
 #[program]
 pub mod anchor_escrow {
@@ -21,7 +21,6 @@ pub mod anchor_escrow {
         verified_collection: Option<Pubkey>,
         about: String
     ) -> Result<()> {
-
         ctx.accounts
         .initialize_escrow(
             seed, 
@@ -36,8 +35,25 @@ pub mod anchor_escrow {
         ctx.accounts.deposit(initializer_amount)
     }
 
-    pub fn initialize_user(ctx: Context<InitializeUser>, username: String, about: String, role: String) -> Result<()> {
-        ctx.accounts.initialize_user(username, about, role)
+    pub fn initialize_user(ctx: Context<InitializeUser>, 
+        username: String, 
+        about: String, 
+        freelancer: bool, 
+        pfp: Option<String>, 
+        twitter: Option<String>, 
+        discord: Option<String>, 
+        telegram: Option<String>, 
+        github: Option<String>
+    ) -> Result<()> {
+        ctx.accounts.initialize_user(
+            username, 
+            about, 
+            freelancer,
+            pfp,
+            twitter,
+            discord,
+            telegram,
+            github)
     }
 
     pub fn cancel(ctx: Context<Cancel>) -> Result<()> {
