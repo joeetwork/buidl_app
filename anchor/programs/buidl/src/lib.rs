@@ -2,10 +2,10 @@ use anchor_lang::prelude::*;
 
 mod contexts;
 use contexts::*;
-mod states;
 mod constant;
+mod states;
 
-declare_id!("4wyUbUA2f3rzLTrT8PFvYYv1dEqbd46QbSswua85UdVm");
+declare_id!("EMcsB3bCqjcok7fsq72kxTP8wGgNfPci9mX1QVUzNT7B");
 
 #[program]
 pub mod anchor_escrow {
@@ -19,41 +19,35 @@ pub mod anchor_escrow {
         validator: Option<Pubkey>,
         taker: Pubkey,
         verified_collection: Option<Pubkey>,
-        about: String
+        about: String,
     ) -> Result<()> {
-        ctx.accounts
-        .initialize_escrow(
-            seed, 
-            &ctx.bumps, 
-            initializer_amount, 
+        ctx.accounts.initialize_escrow(
+            seed,
+            &ctx.bumps,
+            initializer_amount,
             taker,
             verified_collection,
             validator,
-            about
+            about,
         )?;
 
         ctx.accounts.deposit(initializer_amount)
     }
 
-    pub fn initialize_user(ctx: Context<InitializeUser>, 
-        username: String, 
-        about: String, 
-        freelancer: bool, 
-        pfp: Option<String>, 
-        twitter: Option<String>, 
-        discord: Option<String>, 
-        telegram: Option<String>, 
-        github: Option<String>
+    pub fn initialize_user(
+        ctx: Context<InitializeUser>,
+        username: String,
+        about: String,
+        freelancer: bool,
+        pfp: Option<String>,
+        twitter: Option<String>,
+        discord: Option<String>,
+        telegram: Option<String>,
+        github: Option<String>,
     ) -> Result<()> {
         ctx.accounts.initialize_user(
-            username, 
-            about, 
-            freelancer,
-            pfp,
-            twitter,
-            discord,
-            telegram,
-            github)
+            username, about, freelancer, pfp, twitter, discord, telegram, github,
+        )
     }
 
     pub fn cancel(ctx: Context<Cancel>) -> Result<()> {

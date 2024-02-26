@@ -4,8 +4,8 @@ use anchor_spl::{
     token::{transfer_checked, Mint, Token, TokenAccount, TransferChecked},
 };
 
-use crate::states::Escrow;
 use crate::constant::*;
+use crate::states::*;
 
 #[derive(Accounts)]
 #[instruction(seed: u64, initializer_amount: u64)]
@@ -24,10 +24,17 @@ pub struct Initialize<'info> {
         init_if_needed,
         payer = initializer,
         space = Escrow::INIT_SPACE,
+        constraint = user_state.telegram.is_some() || user_state.twitter.is_some() || user_state.discord.is_some(),
         seeds = [ESCROW.as_ref(), &seed.to_le_bytes()],
         bump
     )]
     pub escrow_state: Box<Account<'info, Escrow>>,
+    #[account(
+        mut,
+        seeds = [USER.as_ref(), initializer.key().as_ref()],
+        bump,
+    )]
+    pub user_state: Box<Account<'info, User>>,
     #[account(
         init_if_needed,
         payer = initializer,
@@ -41,7 +48,6 @@ pub struct Initialize<'info> {
 }
 
 impl<'info> Initialize<'info> {
-
     pub fn initialize_escrow(
         &mut self,
         seed: u64,
@@ -50,7 +56,7 @@ impl<'info> Initialize<'info> {
         taker: Pubkey,
         verified_collection: Option<Pubkey>,
         validator: Option<Pubkey>,
-        about: String
+        about: String,
     ) -> Result<()> {
         self.escrow_state.set_inner(Escrow {
             seed,
@@ -66,14 +72,15 @@ impl<'info> Initialize<'info> {
             vote_deadline: None,
             about,
             status: REQUEST.to_string(),
-            amount_of_voters: 0
+            amount_of_voters: 0,
+            discord: self.user_state.discord.clone(),
+            twitter: self.user_state.twitter.clone(),
+            telegram: self.user_state.telegram.clone(),
         });
         Ok(())
     }
 
-   pub fn into_deposit_context(
-        &self,
-    ) -> CpiContext<'_, '_, '_, 'info, TransferChecked<'info>> {
+    pub fn into_deposit_context(&self) -> CpiContext<'_, '_, '_, 'info, TransferChecked<'info>> {
         let cpi_accounts = TransferChecked {
             from: self.initializer_deposit_token_account.to_account_info(),
             mint: self.mint.to_account_info(),
@@ -83,7 +90,7 @@ impl<'info> Initialize<'info> {
         CpiContext::new(self.token_program.to_account_info(), cpi_accounts)
     }
 
-   pub fn deposit(&mut self, initializer_amount: u64) -> Result<()> {
+    pub fn deposit(&mut self, initializer_amount: u64) -> Result<()> {
         transfer_checked(
             self.into_deposit_context(),
             initializer_amount,
