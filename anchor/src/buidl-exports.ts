@@ -6,7 +6,7 @@ import type { AnchorEscrow } from '../target/types/anchor_escrow';
 export { AnchorEscrow, BuidlIDL };
 export type BuidlProgram = Program<AnchorEscrow>;
 export const BUIDL_PROGRAM_ID = new PublicKey(
-  '4wyUbUA2f3rzLTrT8PFvYYv1dEqbd46QbSswua85UdVm'
+  'EMcsB3bCqjcok7fsq72kxTP8wGgNfPci9mX1QVUzNT7B'
 );
 
 export function getBuidlProgramId(cluster: Cluster) {
@@ -14,7 +14,7 @@ export function getBuidlProgramId(cluster: Cluster) {
     case 'devnet':
     case 'testnet':
     case 'mainnet-beta':
-      return new PublicKey('4wyUbUA2f3rzLTrT8PFvYYv1dEqbd46QbSswua85UdVm');
+      return new PublicKey('EMcsB3bCqjcok7fsq72kxTP8wGgNfPci9mX1QVUzNT7B');
     default:
       return BUIDL_PROGRAM_ID;
   }
