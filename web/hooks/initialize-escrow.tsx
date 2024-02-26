@@ -26,7 +26,7 @@ export function useInitialiseEscrow() {
   const transactionToast = useTransactionToast();
   const { program } = useProgram();
   const { publicKey } = useWallet();
-  const { mint, seed, escrowPDA, vaultPDA } = usePDAs();
+  const { mint, seed, escrowPDA, vaultPDA, userPDA } = usePDAs();
 
   const devEscrows = useQuery({
     queryKey: ['devEscrows', { publicKey }],
@@ -80,6 +80,7 @@ export function useInitialiseEscrow() {
             mint: mint,
             initializerDepositTokenAccount: initializerTokenAccount,
             escrowState: escrowPDA,
+            userState: userPDA,
             associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
             tokenProgram: TOKEN_PROGRAM_ID,
             systemProgram: SystemProgram.programId,
