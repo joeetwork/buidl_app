@@ -1,97 +1,39 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useInitialiseUser } from '@/hooks/initialize-user';
+import React from 'react';
+import { useAccounts } from '@/hooks/get-accounts';
+import Avatar from '../shared/avatar';
 
 export default function Profile() {
-  const [name, setName] = useState('');
-  const [about, setAbout] = useState('');
-  const [isFreelance, setIsFreelance] = useState(false);
-  const [pfp, setPfp] = useState<string | null>(null);
-  const [discord, setDiscord] = useState<string | null>(null);
-  const [telegram, setTelegram] = useState<string | null>(null);
-  const [twitter, setTwitter] = useState<string | null>(null);
-  const [github, setGithub] = useState<string | null>(null);
+  const { userAccount } = useAccounts();
 
-  const { initializeUser } = useInitialiseUser();
-
-  const handleSubmit = () => {
-    initializeUser.mutateAsync({
-      name,
-      about,
-      freelancer: isFreelance,
-      pfp,
-      discord,
-      telegram,
-      twitter,
-      github,
-    });
-  };
+  const pfp = `${
+    userAccount.data?.pfp ??
+    'https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg'
+  }`;
 
   return (
-    <>
-      <div className="flex flex-col gap-4 pb-4 items-center">
-        <input
-          onChange={(e) => setName(e.target.value)}
-          type="text"
-          placeholder="John Doe"
-          className="input input-ghost input-lg p-0 text-4xl bg-gray-500 focus:outline-none w-full"
-        />
-
-        <input
-          onChange={(e) => setAbout(e.target.value)}
-          type="text"
-          placeholder="Tell us about you/your company"
-          className="input input-ghost input-lg p-0 text-4xl bg-gray-500 focus:outline-none w-full"
-        />
-        <span>
-          {isFreelance ? 'Freelancer' : 'Other'}
-          <input
-            type="checkbox"
-            className="toggle"
-            checked={isFreelance}
-            onChange={() => setIsFreelance(!isFreelance)}
-          />
-        </span>
-
-        <input
-          onChange={(e) => setPfp(e.target.value)}
-          type="text"
-          placeholder="Add your pfp"
-          className="input input-ghost input-lg p-0 text-4xl bg-gray-500 focus:outline-none w-full"
-        />
-
-        <input
-          onChange={(e) => setDiscord(e.target.value)}
-          type="text"
-          placeholder="Add your discord"
-          className="input input-ghost input-lg p-0 text-4xl bg-gray-500 focus:outline-none w-full"
-        />
-
-        <input
-          onChange={(e) => setTelegram(e.target.value)}
-          type="text"
-          placeholder="add your telegram"
-          className="input input-ghost input-lg p-0 text-4xl bg-gray-500 focus:outline-none w-full"
-        />
-
-        <input
-          onChange={(e) => setTwitter(e.target.value)}
-          type="text"
-          placeholder="Add your twitter"
-          className="input input-ghost input-lg p-0 text-4xl bg-gray-500 focus:outline-none w-full"
-        />
-
-        <input
-          onChange={(e) => setGithub(e.target.value)}
-          type="text"
-          placeholder="Add your github"
-          className="input input-ghost input-lg p-0 text-4xl bg-gray-500 focus:outline-none w-full"
-        />
+    <div className="flex flex-col mx-[10%] h-full pt-4">
+      <div className="relative w-full h-[170px]">
+        <div className="bg-red-500 w-full h-3/4" />
+        <div className="absolute top-[65px] left-[33px]">
+          <Avatar src={pfp} />
+        </div>
       </div>
-      <button onClick={handleSubmit} className="btn">
-        Create account
-      </button>
-    </>
+
+      <div className="h-full flex ">
+        <div className="w-1/4 ml-2">
+          <h1 className="text-2xl truncate">
+            {userAccount.data?.username ==
+            userAccount.data?.initializer.toString()
+              ? 'Guest'
+              : userAccount.data?.username}
+          </h1>
+          <h3 className="text-lg truncate">
+            {userAccount.data?.initializer.toString()}
+          </h3>
+        </div>
+      </div>
+    </div>
   );
 }
