@@ -40,9 +40,9 @@ export default function Offer() {
   }, []);
 
   return (
-    <div className="flex flex-col justify-center items-center w-full h-full">
+    <div className="h-full">
       {!initializeEscrow.isSuccess ? (
-        <div className="flex flex-col gap-2 items-center w-2/6">
+        <div className="mx-auto pt-16 pb-6 flex flex-col gap-2 items-center lg:w-2/6 md:w-1/2">
           <div className="flex justify-between w-full">
             <h3 className="font-bold text-lg">
               Name: {`${decodeURIComponent(name)}`}{' '}
