@@ -8,14 +8,14 @@ interface AvatarProps {
 export default function Avatar({ src }: AvatarProps) {
   return (
     <div className="avatar">
-      <div className="w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+      <div className="w-28 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
         <Image
           unoptimized={true}
           loader={() => src}
           src={src}
           alt="pfp"
-          width={20}
-          height={20}
+          width={25}
+          height={25}
         />
       </div>
     </div>
