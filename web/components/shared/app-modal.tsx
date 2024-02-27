@@ -10,6 +10,7 @@ interface ModalProps {
   submit?: () => void;
   submitDisabled?: boolean;
   submitLabel?: string;
+  width?: string;
 }
 
 export function AppModal({
@@ -20,6 +21,7 @@ export function AppModal({
   submit,
   submitDisabled,
   submitLabel,
+  width,
 }: ModalProps) {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
 
@@ -51,7 +53,7 @@ export function AppModal({
 
   return (
     <dialog className="modal" ref={dialogRef}>
-      <div className="modal-box space-y-5 h-3/4 w-[30%] px-0">
+      <div className={`modal-box space-y-5 h-3/4 px-0 ${width ?? 'w-[30%]'}`}>
         <div className="flex justify-between w-full px-4">
           <h3 className="font-bold text-lg">{title}</h3>
           <button onClick={hide} className="focus:outline-none">

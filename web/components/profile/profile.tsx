@@ -5,10 +5,12 @@ import { useAccounts } from '@/hooks/get-accounts';
 import Avatar from '../shared/avatar';
 import Image from 'next/image';
 import HistoryModal from './history-modal';
+import ProfileModal from './profile-modal';
 
 export default function Profile() {
   const { userAccount } = useAccounts();
-  const [showModal, setShowModal] = useState(false);
+  const [historyModal, setHistoryModal] = useState(false);
+  const [profileModal, setProfileModal] = useState(false);
   const [modalData, setModalData] = useState<string>();
 
   const pfp =
@@ -21,7 +23,7 @@ export default function Profile() {
       : userAccount.data?.username;
 
   const showHistory = (role: string) => {
-    setShowModal(true);
+    setHistoryModal(true);
     setModalData(role);
   };
 
@@ -41,7 +43,12 @@ export default function Profile() {
               </h3>
             </div>
 
-            <button className="w-[40%] ml-auto btn">Edit Profile</button>
+            <button
+              className="w-[40%] ml-auto btn"
+              onClick={() => setProfileModal(true)}
+            >
+              Edit Profile
+            </button>
           </div>
         </div>
 
@@ -120,10 +127,15 @@ export default function Profile() {
         </div>
       </div>
 
+      <ProfileModal
+        hideModal={() => setProfileModal(false)}
+        show={profileModal}
+      />
+
       <HistoryModal
         role={modalData}
-        hideModal={() => setShowModal(false)}
-        show={showModal}
+        hideModal={() => setHistoryModal(false)}
+        show={historyModal}
       />
     </>
   );
