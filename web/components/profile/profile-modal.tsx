@@ -111,8 +111,6 @@ export default function ProfileModal({ show, hideModal }: ProfileModalProps) {
     ),
   };
 
-  console.log(selectedContacts);
-
   return (
     <AppModal
       title={`Edit Profile`}
