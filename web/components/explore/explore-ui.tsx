@@ -18,7 +18,7 @@ export default function ExploreUi() {
   const [users, setUsers] = useState<UserMap>();
   const { userAccounts, maxAccounts } = usePagination({
     page: page,
-    perPage: 2,
+    perPage: 8,
   });
 
   const handleClick = () => {

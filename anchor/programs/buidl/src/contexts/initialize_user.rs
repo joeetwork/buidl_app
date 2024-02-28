@@ -1,6 +1,7 @@
 use anchor_lang::prelude::*;
 
 use crate::constant::USER;
+use crate::states::user::UserLinks;
 use crate::states::User;
 
 #[derive(Accounts)]
@@ -25,23 +26,17 @@ impl<'info> InitializeUser<'info> {
         &mut self,
         username: String,
         about: String,
-        freelancer: bool,
+        role: String,
         pfp: Option<String>,
-        twitter: Option<String>,
-        discord: Option<String>,
-        telegram: Option<String>,
-        github: Option<String>,
+        links: UserLinks,
     ) -> Result<()> {
         self.user_state.set_inner(User {
             initializer: self.initializer.key(),
             username,
             about,
-            freelancer,
+            role,
             pfp,
-            twitter,
-            discord,
-            telegram,
-            github,
+            links,
         });
 
         Ok(())

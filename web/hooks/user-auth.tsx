@@ -41,12 +41,14 @@ export function useAuth() {
             await initializeUser.mutateAsync({
               name: publicKey?.toString() ?? '',
               about: '',
-              freelancer: false,
+              role: 'Voter',
               pfp: null,
-              discord: null,
-              telegram: null,
-              twitter: null,
-              github: null,
+              links: {
+                discord: null,
+                telegram: null,
+                twitter: null,
+                github: null,
+              },
             });
           }
 

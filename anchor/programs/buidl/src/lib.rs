@@ -5,7 +5,9 @@ use contexts::*;
 mod constant;
 mod states;
 
-declare_id!("EMcsB3bCqjcok7fsq72kxTP8wGgNfPci9mX1QVUzNT7B");
+use crate::states::UserLinks;
+
+declare_id!("9NAwEwr2LKAfP9tCT6HHFmfb4f5sUeZRj6zSGmB1e85N");
 
 #[program]
 pub mod anchor_escrow {
@@ -38,16 +40,12 @@ pub mod anchor_escrow {
         ctx: Context<InitializeUser>,
         username: String,
         about: String,
-        freelancer: bool,
+        role: String,
         pfp: Option<String>,
-        twitter: Option<String>,
-        discord: Option<String>,
-        telegram: Option<String>,
-        github: Option<String>,
+        links: UserLinks,
     ) -> Result<()> {
-        ctx.accounts.initialize_user(
-            username, about, freelancer, pfp, twitter, discord, telegram, github,
-        )
+        ctx.accounts
+            .initialize_user(username, about, role, pfp, links)
     }
 
     pub fn cancel(ctx: Context<Cancel>) -> Result<()> {

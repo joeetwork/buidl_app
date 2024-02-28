@@ -31,7 +31,7 @@ export function usePagination({
           filters: freelancer
             ? [
                 {
-                  dataSize: 2477,
+                  dataSize: 1485,
                   memcmp: {
                     offset: 448,
                     bytes: base58.encode(Buffer.from(true)),
@@ -40,7 +40,7 @@ export function usePagination({
               ]
             : [
                 {
-                  dataSize: 2477,
+                  dataSize: 1485,
                 },
               ],
         }

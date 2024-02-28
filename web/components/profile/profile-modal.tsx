@@ -16,7 +16,7 @@ export default function ProfileModal({ show, hideModal }: ProfileModalProps) {
   const { userAccount } = useAccounts();
   const [name, setName] = useState('');
   const [about, setAbout] = useState('');
-  const [isFreelance, setIsFreelance] = useState(false);
+  const [role, setRole] = useState('Voter');
   const [pfp, setPfp] = useState(
     userAccount.data?.pfp ||
       'https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg'
@@ -55,24 +55,21 @@ export default function ProfileModal({ show, hideModal }: ProfileModalProps) {
 
   const handleRole = ({ role, index }: RoleProps) => {
     setSelectedBtn(index);
-
-    if (role === 'freelancer') {
-      setIsFreelance(true);
-    } else {
-      setIsFreelance(false);
-    }
+    setRole(role);
   };
 
   const handleSubmit = () => {
     initializeUser.mutateAsync({
       name,
       about,
-      freelancer: isFreelance,
+      role,
       pfp,
-      discord,
-      telegram,
-      twitter,
-      github,
+      links: {
+        discord,
+        telegram,
+        twitter,
+        github,
+      },
     });
   };
 
@@ -153,7 +150,7 @@ export default function ProfileModal({ show, hideModal }: ProfileModalProps) {
           <div className="w-full">
             Role
             <div className="grid grid-cols-3 gap-2 mt-2">
-              {['Freelancer', 'Client', 'Votorrr'].map((role, i) => (
+              {['Freelancer', 'Client', 'Voter'].map((role, i) => (
                 <button
                   key={role}
                   className={`btn ${i === selectedBtn && 'btn-primary'}`}

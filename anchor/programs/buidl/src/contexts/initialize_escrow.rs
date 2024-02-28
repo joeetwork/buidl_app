@@ -24,7 +24,6 @@ pub struct Initialize<'info> {
         init_if_needed,
         payer = initializer,
         space = Escrow::INIT_SPACE,
-        constraint = user_state.telegram.is_some() || user_state.twitter.is_some() || user_state.discord.is_some(),
         seeds = [ESCROW.as_ref(), &seed.to_le_bytes()],
         bump
     )]
@@ -73,9 +72,7 @@ impl<'info> Initialize<'info> {
             about,
             status: REQUEST.to_string(),
             amount_of_voters: 0,
-            discord: self.user_state.discord.clone(),
-            twitter: self.user_state.twitter.clone(),
-            telegram: self.user_state.telegram.clone(),
+            links: self.user_state.links.clone(),
         });
         Ok(())
     }

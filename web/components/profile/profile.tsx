@@ -75,30 +75,28 @@ export default function Profile() {
             </div>
 
             <div className="row-span-5">
-              <h1 className="text-xl">Links</h1>
-              <div className="flex flex-col mt-2 gap-4">
-                {['twitter', 'discord', 'telegram', 'github'].map((link) => {
-                  const linkKey = link as
-                    | 'twitter'
-                    | 'discord'
-                    | 'telegram'
-                    | 'github';
-
-                  return (
-                    userAccount.data?.[linkKey] && (
-                      <div key={link} className="flex items-center gap-2">
-                        <Image
-                          src={`/${link}.png`}
-                          alt={link}
-                          width={30}
-                          height={30}
-                        />
-                        <p>{userAccount.data[linkKey]}</p>
-                      </div>
-                    )
-                  );
-                })}
-              </div>
+              {userAccount.data?.links &&
+                Object.values(userAccount.data?.links).some(Boolean) && (
+                  <>
+                    <h1 className="text-xl">Links</h1>
+                    <div className="flex flex-col mt-2 gap-4">
+                      {Object.entries(userAccount.data?.links).map(
+                        ([link, value]) =>
+                          value && (
+                            <div key={link} className="flex items-center gap-2">
+                              <Image
+                                src={`/${link}.png`}
+                                alt={link}
+                                width={30}
+                                height={30}
+                              />
+                              <p>{value}</p>
+                            </div>
+                          )
+                      )}
+                    </div>
+                  </>
+                )}
             </div>
           </div>
 
