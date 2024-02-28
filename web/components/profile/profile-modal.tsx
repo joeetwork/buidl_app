@@ -16,7 +16,7 @@ export default function ProfileModal({ show, hideModal }: ProfileModalProps) {
   const { userAccount } = useAccounts();
   const [name, setName] = useState('');
   const [about, setAbout] = useState('');
-  const [role, setRole] = useState('Voter');
+  const [role, setRole] = useState<string>();
   const [pfp, setPfp] = useState(
     userAccount.data?.pfp ||
       'https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg'
@@ -25,8 +25,10 @@ export default function ProfileModal({ show, hideModal }: ProfileModalProps) {
   const [telegram, setTelegram] = useState<string | null>(null);
   const [twitter, setTwitter] = useState<string | null>(null);
   const [github, setGithub] = useState<string | null>(null);
-  const [selectedBtn, setSelectedBtn] = useState<number>();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedContacts, setSelectedContacts] = useState<
+    ('twitter' | 'discord' | 'telegram' | undefined)[]
+  >([]);
 
   const renderUsername =
     userAccount.data?.username === userAccount.data?.initializer?.toString()
@@ -48,30 +50,68 @@ export default function ProfileModal({ show, hideModal }: ProfileModalProps) {
     }
   };
 
-  interface RoleProps {
-    role: string;
-    index: number;
-  }
-
-  const handleRole = ({ role, index }: RoleProps) => {
-    setSelectedBtn(index);
+  const handleRole = (role: string) => {
     setRole(role);
   };
 
   const handleSubmit = () => {
-    initializeUser.mutateAsync({
-      name,
-      about,
-      role,
-      pfp,
-      links: {
-        discord,
-        telegram,
-        twitter,
-        github,
-      },
-    });
+    if (role) {
+      initializeUser.mutateAsync({
+        name,
+        about,
+        role,
+        pfp,
+        links: {
+          discord,
+          telegram,
+          twitter,
+          github,
+        },
+      });
+    }
   };
+
+  interface ContactElements {
+    [key: string]: JSX.Element;
+  }
+
+  const contactElements = {
+    discord: (
+      <div className="w-full">
+        Discord
+        <input
+          onChange={(e) => setDiscord(e.target.value)}
+          type="text"
+          placeholder="Add your discord"
+          className="input input-ghost bg-gray-500 w-full"
+        />
+      </div>
+    ),
+    telegram: (
+      <div className="w-full">
+        Telegram
+        <input
+          onChange={(e) => setTelegram(e.target.value)}
+          type="text"
+          placeholder="add your telegram"
+          className="input input-ghost bg-gray-500 w-full"
+        />
+      </div>
+    ),
+    twitter: (
+      <div className="w-full">
+        Twitter
+        <input
+          onChange={(e) => setTwitter(e.target.value)}
+          type="text"
+          placeholder="Add your twitter"
+          className="input input-ghost bg-gray-500 w-full"
+        />
+      </div>
+    ),
+  };
+
+  console.log(selectedContacts);
 
   return (
     <AppModal
@@ -150,61 +190,96 @@ export default function ProfileModal({ show, hideModal }: ProfileModalProps) {
           <div className="w-full">
             Role
             <div className="grid grid-cols-3 gap-2 mt-2">
-              {['Freelancer', 'Client', 'Voter'].map((role, i) => (
+              {['Freelancer', 'Client', 'Voter'].map((userRole) => (
                 <button
-                  key={role}
-                  className={`btn ${i === selectedBtn && 'btn-primary'}`}
-                  onClick={() => handleRole({ role, index: i })}
+                  key={userRole}
+                  className={`btn ${
+                    !role &&
+                    userAccount.data?.role === userRole &&
+                    'btn-primary'
+                  } ${role === userRole && 'btn-primary'}`}
+                  onClick={() => handleRole(userRole)}
                 >
-                  {role}
+                  {userRole}
                 </button>
               ))}
             </div>
           </div>
 
-          <div className="w-full">
-            Discord
-            <input
-              onChange={(e) => setDiscord(e.target.value)}
-              type="text"
-              placeholder="Add your discord"
-              className="input input-ghost bg-gray-500 w-full"
-            />
+          <div>
+            Please select a minimum of one communicatin method
+            <div className="flex w-full justify-evenly py-4">
+              {['twitter', 'discord', 'telegram'].map((img, i) => (
+                <label key={i} className="swap swap-flip text-9xl">
+                  <input
+                    type="checkbox"
+                    checked={selectedContacts.includes(
+                      img as 'twitter' | 'discord' | 'telegram'
+                    )}
+                    onChange={() => {
+                      setSelectedContacts((prevContacts) =>
+                        prevContacts.includes(
+                          img as 'twitter' | 'discord' | 'telegram'
+                        )
+                          ? prevContacts.filter((contact) => contact !== img)
+                          : [
+                              ...prevContacts,
+                              img as 'twitter' | 'discord' | 'telegram',
+                            ]
+                      );
+                    }}
+                  />
+                  <div className="swap-on ring ring-green-600 rounded-full p-2">
+                    <Image
+                      src={`/${img}.png`}
+                      alt={img}
+                      width={40}
+                      height={40}
+                    />
+                  </div>
+                  <div className="swap-off m-auto">
+                    <Image
+                      src={`/${img}.png`}
+                      alt={img}
+                      width={40}
+                      height={40}
+                    />
+                  </div>
+                </label>
+              ))}
+            </div>
+            {selectedContacts.length > 0 &&
+              selectedContacts.map((contact, i) => {
+                return (
+                  <div key={i}>
+                    {
+                      contactElements[
+                        contact as 'twitter' | 'discord' | 'telegram'
+                      ]
+                    }
+                  </div>
+                );
+              })}
           </div>
 
-          <div className="w-full">
-            Telegram
-            <input
-              onChange={(e) => setTelegram(e.target.value)}
-              type="text"
-              placeholder="add your telegram"
-              className="input input-ghost bg-gray-500 w-full"
-            />
-          </div>
-
-          <div className="w-full">
-            Twitter
-            <input
-              onChange={(e) => setTwitter(e.target.value)}
-              type="text"
-              placeholder="Add your twitter"
-              className="input input-ghost bg-gray-500 w-full"
-            />
-          </div>
-
-          <div className="w-full">
-            Github
-            <input
-              onChange={(e) => setGithub(e.target.value)}
-              type="text"
-              placeholder="Add your github"
-              className="input input-ghost bg-gray-500 w-full"
-            />
-          </div>
+          {userAccount.data?.role === 'Freelancer' ||
+            (role === 'Freelancer' && (
+              <div className="w-full">
+                Github
+                <input
+                  onChange={(e) => setGithub(e.target.value)}
+                  type="text"
+                  placeholder="Add your github"
+                  className="input input-ghost bg-gray-500 w-full"
+                />
+              </div>
+            ))}
         </div>
-        <button onClick={handleSubmit} className="btn">
-          Create account
-        </button>
+        <div className="w-full text-end mt-4">
+          <button onClick={handleSubmit} className="btn">
+            Create account
+          </button>
+        </div>
       </div>
     </AppModal>
   );
