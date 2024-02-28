@@ -26,8 +26,7 @@ pub struct Initialize<'info> {
         space = Escrow::INIT_SPACE,
         constraint = user_state.links.twitter.is_some() ||
         user_state.links.discord.is_some() ||
-        user_state.links.telegram.is_some() ||
-        user_state.links.github.is_some(),
+        user_state.links.telegram.is_some(),
         seeds = [ESCROW.as_ref(), &seed.to_le_bytes()],
         bump
     )]
