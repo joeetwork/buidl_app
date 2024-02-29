@@ -33,18 +33,19 @@ function Links({ linkValue, userAccountLinks, onInputChange }: LinksProps) {
     const userLinks = userAccountLinks
       ? Object.entries(userAccountLinks).map(([key, value]) => value && key)
       : [];
-    const filteredLinks = userLinks.filter(
-      (link) => link !== 'github' && link !== null && link !== undefined
-    );
 
-    setSelectedContacts(
-      (prevContacts) => [...prevContacts, ...filteredLinks] as FilteredProps[]
-    );
+    const filteredLinks = userLinks.filter(
+      (link) => link !== 'github' && link !== null
+    ) as FilteredProps[];
+
+    filteredLinks.forEach((link) => {
+      handleCommunicationMethodChange(link);
+    });
   }, [userAccountLinks]);
 
   return (
-    <div>
-      Select a minimum of one social
+    <div className="w-full px-6">
+      <div className="text-center">Select a minimum of one social</div>
       <div className="flex w-full justify-evenly py-4">
         {['twitter', 'discord', 'telegram'].map((img, i) => {
           const contact = img as FilteredProps;
@@ -200,13 +201,12 @@ export default function ProfileModal({ show, hideModal }: ProfileModalProps) {
               handleRole={handleRole}
             />
           </div>
-          <div>
-            <Links
-              linkValue={links}
-              userAccountLinks={userAccount.data?.links as UserLinkProps}
-              onInputChange={handleInputChange}
-            />
-          </div>
+
+          <Links
+            linkValue={links}
+            userAccountLinks={userAccount.data?.links as UserLinkProps}
+            onInputChange={handleInputChange}
+          />
         </div>
         <div className="w-full text-end mt-4">
           <button onClick={handleSubmit} className="btn">
