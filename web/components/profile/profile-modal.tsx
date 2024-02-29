@@ -1,6 +1,6 @@
 'use client';
 
-import React, { ChangeEvent, useRef, useState } from 'react';
+import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useInitialiseUser } from '@/hooks/initialize-user';
 import { useAccounts } from '@/hooks/get-accounts';
 import { AppModal } from '../shared/app-modal';
@@ -71,9 +71,25 @@ export default function ProfileModal({ show, hideModal }: ProfileModalProps) {
     }
   };
 
-  interface ContactElements {
-    [key: string]: JSX.Element;
-  }
+  useEffect(() => {
+    const userLinks = userAccount.data?.links
+      ? Object.entries(userAccount.data?.links).map(
+          ([key, value]) => value && key
+        )
+      : [];
+    const filteredLinks = userLinks.filter(
+      (link) => link !== 'github' && link !== null && link !== undefined
+    );
+
+    setSelectedContacts(
+      (prevContacts) =>
+        [...prevContacts, ...filteredLinks] as (
+          | 'twitter'
+          | 'discord'
+          | 'telegram'
+        )[]
+    );
+  }, [userAccount.data?.links]);
 
   const contactElements = {
     discord: (
@@ -110,6 +126,7 @@ export default function ProfileModal({ show, hideModal }: ProfileModalProps) {
       </div>
     ),
   };
+  console.log(selectedContacts);
 
   return (
     <AppModal
