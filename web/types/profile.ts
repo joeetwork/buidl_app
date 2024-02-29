@@ -10,8 +10,7 @@ export interface UserLinkProps {
 }
 
 export interface LinksProps {
-  userAccountLinks?: UserLinkProps;
-  linkValue: UserLinkProps;
+  userAccountLinks: UserLinkProps;
   onInputChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 

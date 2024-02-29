@@ -57,21 +57,13 @@ export default function Profile() {
             <div className="row-span-5">
               <h1 className="text-xl">Bio</h1>
               <p className="text-sm mt-2">
-                {userAccount.data?.about
-                  ? userAccount.data.about
-                  : 'Edit profile to add a bio'}
+                {userAccount.data?.about ?? 'Edit profile to add a bio'}
               </p>
             </div>
 
             <div className="row-span-2">
               <h1 className="text-xl">Role</h1>
-              <div className="grid grid-rows-3 md:grid-rows-1 lg:grid lg:grid-cols-3 gap-2 mt-2">
-                {['Freelancer', 'Client', 'Votorrr'].map((role) => (
-                  <button key={role} className="btn">
-                    {role}
-                  </button>
-                ))}
-              </div>
+              <button className="btn">{userAccount.data?.role}</button>
             </div>
 
             <div className="row-span-5">

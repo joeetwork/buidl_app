@@ -16,8 +16,9 @@ import {
   UserLinkProps,
 } from '@/types/profile';
 
-function Links({ linkValue, userAccountLinks, onInputChange }: LinksProps) {
+function Links({ userAccountLinks, onInputChange }: LinksProps) {
   const [selectedContacts, setSelectedContacts] = useState<FilteredProps[]>([]);
+  const [linkValue, setLinkValues] = useState<UserLinkProps>();
 
   const handleCommunicationMethodChange = (img: FilteredProps) => {
     setSelectedContacts((prevContacts) => {
@@ -31,16 +32,16 @@ function Links({ linkValue, userAccountLinks, onInputChange }: LinksProps) {
 
   useEffect(() => {
     const userLinks = userAccountLinks
-      ? Object.entries(userAccountLinks).map(([key, value]) => value && key)
+      ? Object.entries(userAccountLinks).filter(
+          ([key, value]) => value !== 'github' && value !== null
+        )
       : [];
 
-    const filteredLinks = userLinks.filter(
-      (link) => link !== 'github' && link !== null
-    ) as FilteredProps[];
-
-    filteredLinks.forEach((link) => {
-      handleCommunicationMethodChange(link);
+    userLinks.forEach(([key, value]) => {
+      handleCommunicationMethodChange(key as FilteredProps);
     });
+
+    setLinkValues(userAccountLinks);
   }, [userAccountLinks]);
 
   return (
@@ -72,7 +73,7 @@ function Links({ linkValue, userAccountLinks, onInputChange }: LinksProps) {
           selectedContacts.map((contact, i) => (
             <Input
               key={i}
-              value={linkValue[contact] ?? ''}
+              value={linkValue?.[contact] ?? ''}
               name={contact}
               label={`${contact.charAt(0).toUpperCase()}${contact.slice(1)}`}
               onChange={onInputChange}
@@ -81,7 +82,7 @@ function Links({ linkValue, userAccountLinks, onInputChange }: LinksProps) {
         <Input
           label="Github"
           name="github"
-          value={linkValue.github || ''}
+          value={linkValue?.github || ''}
           onChange={(e) => onInputChange(e)}
         />
       </div>
@@ -203,7 +204,6 @@ export default function ProfileModal({ show, hideModal }: ProfileModalProps) {
           </div>
 
           <Links
-            linkValue={links}
             userAccountLinks={userAccount.data?.links as UserLinkProps}
             onInputChange={handleInputChange}
           />
