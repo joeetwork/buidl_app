@@ -6,6 +6,8 @@ import Avatar from '../shared/avatar';
 import Image from 'next/image';
 import HistoryModal from './history-modal';
 import ProfileModal from './profile-modal';
+import Freelancer from './freelancer';
+import Client from './client';
 
 export default function Profile() {
   const { userAccount } = useAccounts();
@@ -52,7 +54,7 @@ export default function Profile() {
           </div>
         </div>
 
-        <div className="flex flex-col md:grid md:grid-cols-5 gap-4 pb-4">
+        <div className="flex flex-col md:grid md:grid-cols-5 gap-4 pb-4 min-h-[500px]">
           <div className="grid grid-rows-12 gap-4 md:col-span-2 bg-red-800 p-6 lg:p-2 xl:p-6">
             <div className="row-span-5">
               <h1 className="text-xl">Bio</h1>
@@ -93,9 +95,13 @@ export default function Profile() {
           </div>
 
           <div className="contents md:grid md:grid-row-2 gap-4 md:col-span-3">
-            <div className="flex flex-col md:row-span-1 bg-gray-800">
-              <h2 className="mt-2 ml-2">Badges</h2>
-              <p className="m-auto">Coming Soon</p>
+            <div className="flex flex-col gap-14 md:row-span-1 bg-gray-800">
+              <h2 className="mt-2 ml-2">Status</h2>
+              {userAccount.data?.role === 'freelancer' ? (
+                <Freelancer />
+              ) : (
+                <Client />
+              )}
             </div>
 
             <div className="flex flex-col md:row-span-1 bg-gray-800">
