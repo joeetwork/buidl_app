@@ -1,33 +1,28 @@
-import React from 'react';
+'use client';
+
+import React, { ChangeEvent } from 'react';
 
 interface TextAreaProps {
-  label?: string;
-  value: string;
-  name?: string;
-  onChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  label: string;
+  value?: string;
+  onChange: (e: ChangeEvent<HTMLTextAreaElement>) => void;
+  placeholder?: string;
 }
 
 export default function TextArea({
   label,
-  value,
-  name,
   onChange,
+  placeholder,
 }: TextAreaProps) {
   return (
-    <label className="form-control w-full">
-      {label && (
-        <div className="label">
-          <span className="label-text">{label}</span>
-        </div>
-      )}
-
+    <div className="w-full">
+      {label}
       <textarea
-        placeholder="About"
-        name={name}
-        className="textarea textarea-bordered textarea-md w-full focus:outline-none max-w-x resize-none"
-        onChange={(e) => onChange(e)}
-        value={value}
+        className="textarea textarea-lg w-full resize-none bg-gray-500"
+        name={label.toLowerCase()}
+        placeholder={placeholder}
+        onChange={onChange}
       />
-    </label>
+    </div>
   );
 }

@@ -1,35 +1,33 @@
 'use client';
 
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 
 interface InputProps {
-  label?: string;
-  name?: string;
+  label: string;
   value: string;
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  placeholder?: string;
+  name?: string;
 }
 
-export default function Input({ label, name, value, onChange }: InputProps) {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(e);
-  };
-
+export default function Input({
+  label,
+  value,
+  onChange,
+  placeholder,
+  name,
+}: InputProps) {
   return (
-    <label className="form-control w-full max-w-xs">
-      {label && (
-        <div>
-          <span className="label-text">{label}</span>
-        </div>
-      )}
-
+    <div className="w-full">
+      {label}
       <input
         name={name}
+        onChange={onChange}
         type="text"
-        placeholder="Type here"
-        value={value}
-        className="input input-ghost input-lg p-0 text-4xl focus:outline-none w-full max-w-xs"
-        onChange={handleChange}
+        defaultValue={value}
+        placeholder={placeholder}
+        className="input input-ghost bg-gray-500 w-full"
       />
-    </label>
+    </div>
   );
 }
