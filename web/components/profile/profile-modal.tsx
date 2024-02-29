@@ -44,7 +44,7 @@ function Links({ linkValue, userAccountLinks, onInputChange }: LinksProps) {
 
   return (
     <div>
-      Please select a minimum of one communication method
+      Select a minimum of one social
       <div className="flex w-full justify-evenly py-4">
         {['twitter', 'discord', 'telegram'].map((img, i) => {
           const contact = img as FilteredProps;
@@ -91,6 +91,7 @@ function Links({ linkValue, userAccountLinks, onInputChange }: LinksProps) {
 function Roles({ roles, role, userAccountRole, handleRole }: RolesProps) {
   return (
     <div className="Role">
+      Role
       <div className="grid grid-cols-3 gap-2 mt-2">
         {roles.map((userRole) => (
           <button
