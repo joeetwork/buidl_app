@@ -1,22 +1,17 @@
 'use client';
 
-import React, { useEffect } from 'react';
-import { AppModal } from '../shared/app-modal';
+import React from 'react';
 import { ellipsify } from '../shared/ellipsify';
 import { useValidateCollection } from '@/hooks/validate';
 import { useCollection } from '@/hooks/get-collection';
 import { PublicKey } from '@solana/web3.js';
 
 interface CollectionModalProps {
-  show: boolean;
-  selectedCollection?: PublicKey;
-  hideModal: () => void;
+  selectedCollection: PublicKey | null;
 }
 
 export default function CollectionModal({
-  show,
   selectedCollection,
-  hideModal,
 }: CollectionModalProps) {
   const {
     acceptWithCollection,
@@ -43,16 +38,8 @@ export default function CollectionModal({
     }
   };
 
-  useEffect(() => {
-    hideModal();
-  }, [
-    acceptWithCollection.isSuccess,
-    declineWithCollection.isSuccess,
-    hideModal,
-  ]);
-
   return (
-    <AppModal title={`Work to Validate`} show={show} hide={hideModal}>
+    <>
       {validatorCollectionEscrows.data?.map((escrow) => {
         return (
           <div
@@ -105,6 +92,6 @@ export default function CollectionModal({
           </div>
         );
       })}
-    </AppModal>
+    </>
   );
 }
