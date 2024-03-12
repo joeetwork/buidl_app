@@ -193,7 +193,7 @@ export function useValidateClient() {
   };
 }
 
-export function useValidateCollection(collection?: PublicKey) {
+export function useValidateCollection(collection: PublicKey | null) {
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
   const { program } = useProgram();
@@ -214,6 +214,20 @@ export function useValidateCollection(collection?: PublicKey) {
         ]);
 
         return res.length > 0 ? res : [];
+      }
+      return null;
+    },
+  });
+
+  const validatorCollectionEscrow = useQuery({
+    queryKey: ['validatorCollectionEscrows', { collection }],
+    queryFn: async () => {
+      console.log(collection);
+
+      if (collection) {
+        const test = await program.account.escrow.fetch(collection);
+        console.log(test);
+        return test;
       }
       return null;
     },
@@ -334,6 +348,7 @@ export function useValidateCollection(collection?: PublicKey) {
     acceptWithCollection,
     declineWithCollection,
     validatorCollectionEscrows,
+    validatorCollectionEscrow,
     countVote,
   };
 }

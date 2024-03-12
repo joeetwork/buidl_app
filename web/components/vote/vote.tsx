@@ -1,5 +1,4 @@
 'use client';
-import { useParams } from 'next/navigation';
 import React, { useCallback, useState } from 'react';
 import { useInitialiseEscrow } from '@/hooks/initialize-escrow';
 import { PublicKey } from '@solana/web3.js';
@@ -8,29 +7,35 @@ import VoteModal from './vote-modal';
 import VoteValidator from './vote-validator';
 import VoteWork from './vote-work';
 import VoteInfo from './vote-info';
+import { useValidateCollection } from '@/hooks/validate';
 
 export default function Vote() {
-  const { name, pubkey } = useParams();
   const { initializeEscrow } = useInitialiseEscrow();
-  const [amount, setAmount] = useState<number>();
-  const [about, setAbout] = useState('');
   const [collection, setCollection] = useState<PublicKey | null>(null);
-  const [validator, setValidator] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [showCollection, setShowCollection] = useState(true);
+  const [contract, setContract] = useState<PublicKey | null>(null);
+  const { acceptWithCollection, declineWithCollection } =
+    useValidateCollection(contract);
 
   const handleModalClick = useCallback(() => {
     setShowModal(!showModal);
   }, [showModal]);
 
-  const handleSubmit = () => {
-    if (amount) {
-      initializeEscrow.mutateAsync({
-        initializerAmount: amount * 1000000,
-        collection,
-        about,
-        validator: validator ? new PublicKey(validator) : null,
-        taker: new PublicKey(pubkey),
+  const handleAcceptClick = () => {
+    if (contract && collection) {
+      acceptWithCollection.mutateAsync({
+        escrow: contract,
+        nftAddress: collection,
+      });
+    }
+  };
+
+  const handleDeclineClick = () => {
+    if (contract && collection) {
+      declineWithCollection.mutateAsync({
+        escrow: collection,
+        nftAddress: contract,
       });
     }
   };
@@ -64,13 +69,16 @@ export default function Vote() {
 
           {collection ? (
             <>
-              <VoteWork onChange={(e) => setAbout(e)} />
+              <VoteWork
+                selectedCollection={collection}
+                onChange={(e) => setContract(e)}
+              />
 
-              <VoteInfo />
+              <VoteInfo contract={contract} />
 
               <div className="card-actions flex w-full">
                 <button
-                  onClick={() => handleAcceptClick(escrow.publicKey)}
+                  onClick={() => handleAcceptClick()}
                   className="btn btn-primary w-[49%]"
                   // disabled={
                   //   escrow.account.status !== 'validate' ||
@@ -82,7 +90,7 @@ export default function Vote() {
                 </button>
 
                 <button
-                  onClick={() => handleDeclineClick(escrow.publicKey)}
+                  onClick={() => handleDeclineClick()}
                   className="btn btn-primary w-[49%]"
                   // disabled={
                   //   escrow.account.status !== 'validate' ||
