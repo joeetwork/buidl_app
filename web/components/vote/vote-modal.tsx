@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { AppModal } from '../shared/app-modal';
 import { PublicKey } from '@solana/web3.js';

@@ -13,6 +13,7 @@ import {
   getAssociatedTokenAddress,
 } from '@solana/spl-token';
 import { useProgram } from './get-program';
+import { useCollection } from './get-collection';
 
 interface ValidateProps {
   escrow: PublicKey;
@@ -193,12 +194,19 @@ export function useValidateClient() {
   };
 }
 
-export function useValidateCollection(collection: PublicKey | null) {
+export function useValidateCollection({
+  collection,
+  contract,
+}: {
+  collection?: PublicKey | null;
+  contract?: PublicKey | null;
+}) {
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
   const { program } = useProgram();
   const { publicKey } = useWallet();
   const { connection } = useConnection();
+  const { collections } = useCollection(collection);
 
   const validatorCollectionEscrows = useQuery({
     queryKey: ['validatorCollectionEscrows', { collection }],
@@ -212,8 +220,17 @@ export function useValidateCollection(collection: PublicKey | null) {
             },
           },
         ]);
-
         return res.length > 0 ? res : [];
+      }
+      return null;
+    },
+  });
+
+  const validatorCollectionEscrow = useQuery({
+    queryKey: ['validatorCollectionEscrows', { contract }],
+    queryFn: async () => {
+      if (contract) {
+        return await program.account.escrow.fetch(contract);
       }
       return null;
     },
@@ -334,6 +351,8 @@ export function useValidateCollection(collection: PublicKey | null) {
     acceptWithCollection,
     declineWithCollection,
     validatorCollectionEscrows,
+    validatorCollectionEscrow,
+    collections,
     // countVote,
   };
 }

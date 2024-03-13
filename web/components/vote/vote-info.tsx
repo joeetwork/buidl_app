@@ -1,25 +1,16 @@
 'use client';
 
 import React from 'react';
-import { useProgram } from '@/hooks/get-program';
-import { useQuery } from '@tanstack/react-query';
+import { useValidateCollection } from '@/hooks/validate';
 import { PublicKey } from '@solana/web3.js';
 
-interface VoteInfo {
-  contract?: PublicKey | null;
+interface VoteContractsProps {
+  contract: PublicKey | null;
 }
 
-export default function VoteInfo({ contract }: VoteInfo) {
-  const { program } = useProgram();
-
-  const validatorCollectionEscrow = useQuery({
-    queryKey: ['validatorCollectionEscrows', { contract }],
-    queryFn: async () => {
-      if (contract) {
-        return await program.account.escrow.fetch(contract);
-      }
-      return null;
-    },
+export default function VoteInfo({ contract }: VoteContractsProps) {
+  const { validatorCollectionEscrow } = useValidateCollection({
+    contract,
   });
 
   return (

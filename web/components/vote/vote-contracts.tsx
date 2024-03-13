@@ -1,24 +1,21 @@
 'use client';
-import { useValidateCollection } from '@/hooks/validate';
 import React from 'react';
-import { PublicKey } from '@solana/web3.js';
 import { ellipsify } from '../shared/ellipsify';
+import { PublicKey } from '@solana/web3.js';
+import { useValidateCollection } from '@/hooks/validate';
 
-interface VoteWorkProps {
-  selectedCollection: PublicKey | null;
-  onChange: (e: PublicKey) => void;
+interface VoteContractsProps {
+  collection: PublicKey | null;
+  onClick: (e: PublicKey) => void;
 }
 
-export default function VoteWork({
-  selectedCollection,
-  onChange,
-}: VoteWorkProps) {
-  const { validatorCollectionEscrows } =
-    useValidateCollection(selectedCollection);
-
-  const handleChange = (pubkey: PublicKey) => {
-    onChange(pubkey);
-  };
+export default function VoteContracts({
+  collection,
+  onClick,
+}: VoteContractsProps) {
+  const { validatorCollectionEscrows } = useValidateCollection({
+    collection,
+  });
 
   return (
     <div
@@ -32,7 +29,7 @@ export default function VoteWork({
               <div
                 key={escrow.publicKey.toString()}
                 className="card w-40 bg-base-300 shadow-xl m-auto"
-                onClick={() => handleChange(escrow.publicKey)}
+                onClick={() => onClick(escrow.publicKey)}
               >
                 <div className="card-body items-center text-center">
                   <p>{ellipsify(escrow.account.initializer.toString())}</p>
