@@ -219,20 +219,6 @@ export function useValidateCollection(collection: PublicKey | null) {
     },
   });
 
-  const validatorCollectionEscrow = useQuery({
-    queryKey: ['validatorCollectionEscrows', { collection }],
-    queryFn: async () => {
-      console.log(collection);
-
-      if (collection) {
-        const test = await program.account.escrow.fetch(collection);
-        console.log(test);
-        return test;
-      }
-      return null;
-    },
-  });
-
   const acceptWithCollection = useMutation({
     mutationKey: ['acceptWithCollection', 'validate', { cluster }],
     mutationFn: async ({ escrow, nftAddress }: ValidateProps) => {
@@ -323,32 +309,31 @@ export function useValidateCollection(collection: PublicKey | null) {
     },
   });
 
-  const countVote = useQuery({
-    queryKey: ['countVote', { validatorCollectionEscrows }],
-    queryFn: async () => {
-      validatorCollectionEscrows.data?.forEach((escrow) => {
-        if (
-          escrow.account.status === 'validate' &&
-          escrow.account.voteDeadline &&
-          escrow.account.voteDeadline.toNumber() < new Date().getTime() / 1000
-        ) {
-          fetch('/api/signer', {
-            method: 'POST',
-            body: JSON.stringify({
-              escrow: escrow,
-            }),
-          });
-          validatorCollectionEscrows.refetch();
-        }
-      });
-    },
-  });
+  // const countVote = useQuery({
+  //   queryKey: ['countVote', { validatorCollectionEscrows }],
+  //   queryFn: async () => {
+  //     validatorCollectionEscrows.data?.forEach((escrow) => {
+  //       if (
+  //         escrow.account.status === 'validate' &&
+  //         escrow.account.voteDeadline &&
+  //         escrow.account.voteDeadline.toNumber() < new Date().getTime() / 1000
+  //       ) {
+  //         fetch('/api/signer', {
+  //           method: 'POST',
+  //           body: JSON.stringify({
+  //             escrow: escrow,
+  //           }),
+  //         });
+  //         validatorCollectionEscrows.refetch();
+  //       }
+  //     });
+  //   },
+  // });
 
   return {
     acceptWithCollection,
     declineWithCollection,
     validatorCollectionEscrows,
-    validatorCollectionEscrow,
-    countVote,
+    // countVote,
   };
 }

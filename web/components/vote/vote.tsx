@@ -8,6 +8,9 @@ import VoteValidator from './vote-validator';
 import VoteWork from './vote-work';
 import VoteInfo from './vote-info';
 import { useValidateCollection } from '@/hooks/validate';
+import { useCollection } from '@/hooks/get-collection';
+import { useProgram } from '@/hooks/get-program';
+import { useQuery } from '@tanstack/react-query';
 
 export default function Vote() {
   const { initializeEscrow } = useInitialiseEscrow();
@@ -17,28 +20,49 @@ export default function Vote() {
   const [contract, setContract] = useState<PublicKey | null>(null);
   const { acceptWithCollection, declineWithCollection } =
     useValidateCollection(contract);
+  const { collections } = useCollection(collection);
 
   const handleModalClick = useCallback(() => {
     setShowModal(!showModal);
   }, [showModal]);
 
   const handleAcceptClick = () => {
-    if (contract && collection) {
+    if (
+      contract &&
+      collections.result &&
+      collections?.result?.items?.length >= 1
+    ) {
       acceptWithCollection.mutateAsync({
         escrow: contract,
-        nftAddress: collection,
+        nftAddress: new PublicKey(collections?.result?.items[0]?.id),
       });
     }
   };
 
   const handleDeclineClick = () => {
-    if (contract && collection) {
+    if (
+      contract &&
+      collections.result &&
+      collections?.result?.items?.length >= 1
+    ) {
       declineWithCollection.mutateAsync({
-        escrow: collection,
-        nftAddress: contract,
+        escrow: contract,
+        nftAddress: new PublicKey(collections?.result?.items[0]?.id),
       });
     }
   };
+
+  const { program } = useProgram();
+
+  const validatorCollectionEscrow = useQuery({
+    queryKey: ['validatorCollectionEscrows', { contract }],
+    queryFn: async () => {
+      if (contract) {
+        return await program.account.escrow.fetch(contract);
+      }
+      return null;
+    },
+  });
 
   return (
     <div className="h-full">
@@ -80,11 +104,11 @@ export default function Vote() {
                 <button
                   onClick={() => handleAcceptClick()}
                   className="btn btn-primary w-[49%]"
-                  // disabled={
-                  //   escrow.account.status !== 'validate' ||
-                  //   collection?.result.items.length < 1 ||
-                  //   isPending
-                  // }
+                  disabled={
+                    validatorCollectionEscrow.data?.status !== 'validate' ||
+                    collections?.result.items.length < 1 ||
+                    validatorCollectionEscrow.isPending
+                  }
                 >
                   Accept Work
                 </button>
@@ -92,11 +116,11 @@ export default function Vote() {
                 <button
                   onClick={() => handleDeclineClick()}
                   className="btn btn-primary w-[49%]"
-                  // disabled={
-                  //   escrow.account.status !== 'validate' ||
-                  //   collection?.result.items.length < 1 ||
-                  //   isPending
-                  // }
+                  disabled={
+                    validatorCollectionEscrow.data?.status !== 'validate' ||
+                    collections?.result.items.length < 1 ||
+                    validatorCollectionEscrow.isPending
+                  }
                 >
                   Decline Work
                 </button>
