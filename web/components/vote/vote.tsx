@@ -100,7 +100,7 @@ export default function Vote() {
 
               <VoteInfo contract={contract} />
 
-              <div className="card-actions flex w-full">
+              <div className="flex w-full justify-between">
                 <button
                   onClick={() => handleAcceptClick()}
                   className="btn btn-primary w-[49%]"
