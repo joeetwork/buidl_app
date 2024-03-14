@@ -6,7 +6,7 @@ import * as anchor from '@coral-xyz/anchor';
 import { AnchorEscrow } from '@buidl/anchor';
 
 interface VoteContractsProps {
-  escrow?:
+  escrows?:
     | {
         account: anchor.IdlAccounts<AnchorEscrow>['escrow'];
         publicKey: PublicKey;
@@ -15,7 +15,10 @@ interface VoteContractsProps {
   onClick: (e: PublicKey) => void;
 }
 
-export default function VoteContracts({ escrow, onClick }: VoteContractsProps) {
+export default function VoteContracts({
+  escrows,
+  onClick,
+}: VoteContractsProps) {
   return (
     <div
       className={`bg-gray-500 rounded-lg p-4 w-full hover:ring hover:ring-gray-700`}
@@ -23,7 +26,7 @@ export default function VoteContracts({ escrow, onClick }: VoteContractsProps) {
       <div className="w-full">
         <span className="label-text cursor-default">Contracts</span>
         <div className="flex gap-4 overflow-x-scroll">
-          {escrow?.map((escrow) => {
+          {escrows?.map((escrow) => {
             return (
               <div
                 key={escrow.publicKey.toString()}

@@ -20,7 +20,7 @@ interface ValidateProps {
   nftAddress?: PublicKey;
 }
 
-export function useValidateUser() {
+export function useValidateUser(contract: PublicKey | null) {
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
   const { program } = useProgram();
@@ -39,6 +39,16 @@ export function useValidateUser() {
           },
         ]);
         return res.length > 0 ? res : [];
+      }
+      return null;
+    },
+  });
+
+  const validatorUserEscrow = useQuery({
+    queryKey: ['validatorUserEscrow', { contract }],
+    queryFn: async () => {
+      if (contract) {
+        return await program.account.escrow.fetch(contract);
       }
       return null;
     },
@@ -127,6 +137,7 @@ export function useValidateUser() {
     acceptWithUser,
     declineWithUser,
     validatorUserEscrows,
+    validatorUserEscrow,
     countVote,
   };
 }

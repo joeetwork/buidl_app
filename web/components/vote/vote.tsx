@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useInitialiseEscrow } from '@/hooks/initialize-escrow';
 import CollectionVote from './collection-vote';
+import UserVote from './user-vote';
 
 export default function Vote() {
   const { initializeEscrow } = useInitialiseEscrow();
@@ -27,15 +28,7 @@ export default function Vote() {
             </div>
           </div>
 
-          {showCollection ? (
-            <CollectionVote />
-          ) : (
-            <div
-              className={`bg-gray-500 rounded-lg p-4 hover:ring hover:ring-gray-700 w-full`}
-            >
-              <div>No contracts to validate</div>
-            </div>
-          )}
+          {showCollection ? <CollectionVote /> : <UserVote />}
         </div>
       ) : (
         <div>Congrats request sent</div>

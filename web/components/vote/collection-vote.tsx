@@ -53,7 +53,7 @@ export default function CollectionVote() {
       <VoteSelect onChange={setCollection} collection={collection} />
 
       <VoteContracts
-        escrow={validatorCollectionEscrows.data}
+        escrows={validatorCollectionEscrows.data}
         onClick={(e) => setContract(e)}
       />
 
