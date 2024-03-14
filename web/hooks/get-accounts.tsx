@@ -95,7 +95,7 @@ export function useClientAccounts() {
   };
 }
 
-export function useDevAccounts() {
+export function useDevAccounts(contract?: PublicKey | null) {
   const { program, programId } = useProgram();
   const { publicKey } = useWallet();
 
@@ -113,6 +113,16 @@ export function useDevAccounts() {
         ]);
 
         return res.length > 0 ? res : [];
+      }
+      return null;
+    },
+  });
+
+  const devEscrow = useQuery({
+    queryKey: ['devEscrow', { contract }],
+    queryFn: async () => {
+      if (contract) {
+        return await program.account.escrow.fetch(contract);
       }
       return null;
     },
@@ -141,6 +151,7 @@ export function useDevAccounts() {
     program,
     programId,
     devEscrows,
+    devEscrow,
     uploadDevHistory,
   };
 }
