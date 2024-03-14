@@ -53,7 +53,9 @@ export default function CollectionVote() {
       <VoteSelect onChange={setCollection} collection={collection} />
 
       <VoteContracts
-        escrows={validatorCollectionEscrows.data}
+        escrows={validatorCollectionEscrows.data?.filter(
+          (escrow) => escrow.account.status === 'validate'
+        )}
         onClick={(e) => setContract(e)}
       />
 

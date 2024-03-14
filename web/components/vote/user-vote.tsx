@@ -35,7 +35,9 @@ export default function UserVote() {
   return (
     <>
       <VoteContracts
-        escrows={validatorUserEscrows.data}
+        escrows={validatorUserEscrows.data?.filter(
+          (escrow) => escrow.account.status === 'validate'
+        )}
         onClick={(e) => setContract(e)}
       />
 
