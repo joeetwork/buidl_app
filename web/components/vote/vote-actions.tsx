@@ -1,49 +1,31 @@
 'use client';
 
-import { useValidateCollection } from '@/hooks/validate';
-import { PublicKey } from '@solana/web3.js';
 import React from 'react';
+import * as anchor from '@coral-xyz/anchor';
+import { AnchorEscrow } from '@buidl/anchor';
+import { Assets } from '@/types/search-assets';
 
 interface VoteActionsProps {
-  contract: PublicKey | null;
-  collection: PublicKey | null;
+  onAcceptClick: () => void;
+  onDeclineClick: () => void;
+  escrow?: anchor.IdlAccounts<AnchorEscrow>['escrow'] | null;
+  collections?: Assets;
+  isPending: boolean;
 }
 
 export default function VoteActions({
-  collection,
-  contract,
+  onAcceptClick,
+  onDeclineClick,
+  escrow,
+  collections,
+  isPending,
 }: VoteActionsProps) {
-  const {
-    acceptWithCollection,
-    declineWithCollection,
-    validatorCollectionEscrow,
-    collections,
-  } = useValidateCollection({ collection, contract });
-
   const handleAcceptClick = () => {
-    if (
-      contract &&
-      collections.result &&
-      collections?.result?.items?.length >= 1
-    ) {
-      acceptWithCollection.mutateAsync({
-        escrow: contract,
-        nftAddress: new PublicKey(collections?.result?.items[0]?.id),
-      });
-    }
+    onAcceptClick();
   };
 
   const handleDeclineClick = () => {
-    if (
-      contract &&
-      collections.result &&
-      collections?.result?.items?.length >= 1
-    ) {
-      declineWithCollection.mutateAsync({
-        escrow: contract,
-        nftAddress: new PublicKey(collections?.result?.items[0]?.id),
-      });
-    }
+    onDeclineClick();
   };
 
   return (
@@ -52,9 +34,11 @@ export default function VoteActions({
         onClick={() => handleAcceptClick()}
         className="btn btn-primary w-[49%]"
         disabled={
-          validatorCollectionEscrow.data?.status !== 'validate' ||
-          collections?.result.items.length < 1 ||
-          validatorCollectionEscrow.isPending
+          collections
+            ? escrow?.status !== 'validate' ||
+              collections?.result.items.length < 1 ||
+              isPending
+            : escrow?.status !== 'validate' || isPending
         }
       >
         Accept Work
@@ -64,9 +48,11 @@ export default function VoteActions({
         onClick={() => handleDeclineClick()}
         className="btn btn-primary w-[49%]"
         disabled={
-          validatorCollectionEscrow.data?.status !== 'validate' ||
-          collections?.result.items.length < 1 ||
-          validatorCollectionEscrow.isPending
+          collections
+            ? escrow?.status !== 'validate' ||
+              collections?.result.items.length < 1 ||
+              isPending
+            : escrow?.status !== 'validate' || isPending
         }
       >
         Decline Work

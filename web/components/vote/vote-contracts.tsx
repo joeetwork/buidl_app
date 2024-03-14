@@ -2,21 +2,20 @@
 import React from 'react';
 import { ellipsify } from '../shared/ellipsify';
 import { PublicKey } from '@solana/web3.js';
-import { useValidateCollection } from '@/hooks/validate';
+import * as anchor from '@coral-xyz/anchor';
+import { AnchorEscrow } from '@buidl/anchor';
 
 interface VoteContractsProps {
-  collection: PublicKey | null;
+  escrow?:
+    | {
+        account: anchor.IdlAccounts<AnchorEscrow>['escrow'];
+        publicKey: PublicKey;
+      }[]
+    | null;
   onClick: (e: PublicKey) => void;
 }
 
-export default function VoteContracts({
-  collection,
-  onClick,
-}: VoteContractsProps) {
-  const { validatorCollectionEscrows } = useValidateCollection({
-    collection,
-  });
-
+export default function VoteContracts({ escrow, onClick }: VoteContractsProps) {
   return (
     <div
       className={`bg-gray-500 rounded-lg p-4 w-full hover:ring hover:ring-gray-700`}
@@ -24,7 +23,7 @@ export default function VoteContracts({
       <div className="w-full">
         <span className="label-text cursor-default">Contracts</span>
         <div className="flex gap-4 overflow-x-scroll">
-          {validatorCollectionEscrows.data?.map((escrow) => {
+          {escrow?.map((escrow) => {
             return (
               <div
                 key={escrow.publicKey.toString()}
