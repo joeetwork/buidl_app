@@ -5,7 +5,7 @@ import { useInitialiseEscrow } from '@/hooks/initialize-escrow';
 import { PublicKey } from '@solana/web3.js';
 import { ellipsify } from '../shared/ellipsify';
 import OfferAmount from './offer-amount';
-import SelectCollection from './select-collection.tsx';
+import SelectCollection from '../shared/select-collection.tsx';
 import Input from '../shared/input';
 import TextArea from '../shared/text-area';
 

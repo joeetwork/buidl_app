@@ -1,20 +1,25 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { PublicKey } from '@solana/web3.js';
 import { useValidateCollection, useValidateUser } from '@/hooks/validate';
-import EscrowInfo from './escrow-info';
-import EscrowsDisplay from './escrow-display';
-import EscrowActions from './escrow-actions';
-import SelectCollection from './select-collection.tsx';
+import SelectCollection from '../shared/select-collection.tsx';
+import * as anchor from '@coral-xyz/anchor';
+import { AnchorEscrow } from '@buidl/anchor';
+import EscrowsDisplay from '../shared/escrow-display.jsx';
+import EscrowActions from '../shared/escrow-actions.jsx';
+
+type Escrow =
+  | {
+      account: anchor.IdlAccounts<AnchorEscrow>['escrow'];
+      publicKey: PublicKey;
+    }
+  | null
+  | undefined;
 
 function UserVote() {
   const [userEscrow, setUserEscrow] = useState<PublicKey | null>(null);
-  const {
-    validatorUserEscrows,
-    validatorUserEscrow,
-    acceptWithUser,
-    declineWithUser,
-  } = useValidateUser(userEscrow);
+  const [escrow, setEscrow] = useState<Escrow>();
+  const { userEscrows, acceptWithUser, declineWithUser } = useValidateUser();
 
   const handleAcceptClick = () => {
     if (userEscrow) {
@@ -32,22 +37,25 @@ function UserVote() {
     }
   };
 
+  useEffect(() => {
+    setEscrow(userEscrows.data?.find((e) => e.publicKey === userEscrow));
+  }, [userEscrow]);
+
   return (
     <>
       <EscrowsDisplay
-        escrows={validatorUserEscrows.data?.filter(
+        escrows={userEscrows.data?.filter(
           (escrow) => escrow.account.status === 'validate'
         )}
+        escrow={escrow?.account}
         onClick={(e) => setUserEscrow(e)}
       />
-
-      <EscrowInfo escrow={validatorUserEscrow.data} />
 
       <EscrowActions
         onAcceptClick={handleAcceptClick}
         onDeclineClick={handleDeclineClick}
-        escrow={validatorUserEscrow.data}
-        isPending={validatorUserEscrow.isPending}
+        escrow={escrow?.account}
+        isPending={acceptWithUser.isPending || declineWithUser.isPending}
       />
     </>
   );
@@ -58,16 +66,14 @@ function CollectionVote() {
   const [collectionEscrow, setCollectionEscrow] = useState<PublicKey | null>(
     null
   );
+  const [escrow, setEscrow] = useState<Escrow>();
+
   const {
-    validatorCollectionEscrows,
-    validatorCollectionEscrow,
+    collectionEscrows,
     collections,
     acceptWithCollection,
     declineWithCollection,
-  } = useValidateCollection({
-    collection,
-    escrow: collectionEscrow,
-  });
+  } = useValidateCollection(collection);
 
   const handleAcceptClick = () => {
     if (
@@ -95,6 +101,12 @@ function CollectionVote() {
     }
   };
 
+  useEffect(() => {
+    setEscrow(
+      collectionEscrows.data?.find((e) => e.publicKey === collectionEscrow)
+    );
+  }, [collectionEscrow]);
+
   return (
     <>
       <SelectCollection
@@ -103,20 +115,19 @@ function CollectionVote() {
       />
 
       <EscrowsDisplay
-        escrows={validatorCollectionEscrows.data?.filter(
-          (escrow) => escrow.account.status === 'validate'
-        )}
+        escrows={collectionEscrows.data}
+        escrow={escrow?.account}
         onClick={(e) => setCollectionEscrow(e)}
       />
-
-      <EscrowInfo escrow={validatorCollectionEscrow.data} />
 
       <EscrowActions
         onAcceptClick={handleAcceptClick}
         onDeclineClick={handleDeclineClick}
         collections={collections}
-        escrow={validatorCollectionEscrow.data}
-        isPending={validatorCollectionEscrow.isPending}
+        escrow={escrow?.account}
+        isPending={
+          acceptWithCollection.isPending || declineWithCollection.isPending
+        }
       />
     </>
   );

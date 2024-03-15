@@ -1,4 +1,4 @@
-import Offer from '@/components/status/offer';
+import Offer from '@/components/offer/offer';
 import React from 'react';
 
 export default function Page() {

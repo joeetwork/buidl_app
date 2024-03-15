@@ -118,16 +118,6 @@ export function useDevAccounts(contract?: PublicKey | null) {
     },
   });
 
-  const devEscrow = useQuery({
-    queryKey: ['devEscrow', { contract }],
-    queryFn: async () => {
-      if (contract) {
-        return await program.account.escrow.fetch(contract);
-      }
-      return null;
-    },
-  });
-
   const uploadDevHistory = useQuery({
     queryKey: ['uploadDevHistory', { publicKey }],
     queryFn: async () => {
@@ -151,7 +141,6 @@ export function useDevAccounts(contract?: PublicKey | null) {
     program,
     programId,
     devEscrows,
-    devEscrow,
     uploadDevHistory,
   };
 }

@@ -1,36 +1,53 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { PublicKey } from '@solana/web3.js';
 import { useRequests } from '@/hooks/requests';
 import { useDevAccounts } from '@/hooks/get-accounts';
-import EscrowInfo from './escrow-info';
-import EscrowActions from './escrow-actions';
-import EscrowsDisplay from './escrow-display';
+import * as anchor from '@coral-xyz/anchor';
+import { AnchorEscrow } from '@buidl/anchor';
+import EscrowsDisplay from '../shared/escrow-display';
+import EscrowActions from '../shared/escrow-actions';
+
+type Escrow =
+  | {
+      account: anchor.IdlAccounts<AnchorEscrow>['escrow'];
+      publicKey: PublicKey;
+    }
+  | null
+  | undefined;
 
 export default function Requests() {
   const [contract, setContract] = useState<PublicKey | null>(null);
-  const { devEscrows, devEscrow } = useDevAccounts(contract);
-
+  const [escrow, setEscrow] = useState<Escrow>();
+  const { devEscrows } = useDevAccounts(contract);
   const { declineRequest, acceptRequest } = useRequests();
 
   const handleAcceptClick = () => {
-    if (contract && devEscrow.data) {
+    if (contract && escrow) {
       acceptRequest.mutateAsync({
         escrow: contract,
-        initializer: devEscrow.data.initializer,
+        initializer: escrow.account.initializer,
       });
     }
   };
 
   const handleDeclineClick = () => {
-    if (contract && devEscrow.data) {
+    if (contract && escrow) {
       declineRequest.mutateAsync({
         escrow: contract,
-        initializer: devEscrow.data.initializer,
+        initializer: escrow.account.initializer,
       });
     }
   };
+
+  const handleContract = (e: PublicKey, i: number) => {
+    setContract(e);
+  };
+
+  useEffect(() => {
+    setEscrow(devEscrows.data?.find((e) => e.publicKey === contract));
+  }, [contract]);
 
   return (
     <div className="h-full">
@@ -42,16 +59,15 @@ export default function Requests() {
           escrows={devEscrows.data?.filter(
             (escrow) => escrow.account.status === 'request'
           )}
-          onClick={(e) => setContract(e)}
+          escrow={escrow?.account}
+          onClick={handleContract}
         />
-
-        <EscrowInfo escrow={devEscrow.data} />
 
         <EscrowActions
           onAcceptClick={handleAcceptClick}
           onDeclineClick={handleDeclineClick}
-          escrow={devEscrow.data}
-          isPending={devEscrow.isPending}
+          escrow={escrow?.account}
+          isPending={acceptRequest.isPending || declineRequest.isPending}
         />
       </div>
     </div>

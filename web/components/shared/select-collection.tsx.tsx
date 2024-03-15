@@ -4,7 +4,7 @@ import { COLLECTIONS } from '@/constants';
 import { useMetadata } from '@/hooks/get-metadata';
 import { PublicKey } from '@solana/web3.js';
 import Image from 'next/image';
-import OfferModal from './collection-modal';
+import CollectionModal from './collection-modal';
 
 interface SelectCollectionProps {
   collection: PublicKey | null;
@@ -78,7 +78,7 @@ export default function SelectCollection({
         </button>
       </div>
 
-      <OfferModal
+      <CollectionModal
         show={showModal}
         hideModal={handleModalClick}
         onClick={(e) => onClick(e)}

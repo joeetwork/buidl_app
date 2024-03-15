@@ -20,14 +20,14 @@ interface ValidateProps {
   nftAddress?: PublicKey;
 }
 
-export function useValidateUser(escrow: PublicKey | null) {
+export function useValidateUser() {
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
   const { program } = useProgram();
   const { publicKey } = useWallet();
 
-  const validatorUserEscrows = useQuery({
-    queryKey: ['validatorUserEscrows', { publicKey }],
+  const userEscrows = useQuery({
+    queryKey: ['userEscrows', { publicKey }],
     queryFn: async () => {
       if (publicKey) {
         const res = await program.account.escrow.all([
@@ -39,16 +39,6 @@ export function useValidateUser(escrow: PublicKey | null) {
           },
         ]);
         return res.length > 0 ? res : [];
-      }
-      return null;
-    },
-  });
-
-  const validatorUserEscrow = useQuery({
-    queryKey: ['validatorUserEscrow', { escrow }],
-    queryFn: async () => {
-      if (escrow) {
-        return await program.account.escrow.fetch(escrow);
       }
       return null;
     },
@@ -79,7 +69,7 @@ export function useValidateUser(escrow: PublicKey | null) {
     },
     onSuccess: (tx) => {
       transactionToast(tx ?? '');
-      return validatorUserEscrows.refetch();
+      return userEscrows.refetch();
     },
   });
 
@@ -108,14 +98,14 @@ export function useValidateUser(escrow: PublicKey | null) {
     },
     onSuccess: (tx) => {
       transactionToast(tx ?? '');
-      return validatorUserEscrows.refetch();
+      return userEscrows.refetch();
     },
   });
 
   const countVote = useQuery({
-    queryKey: ['countVote', { validatorUserEscrows }],
+    queryKey: ['countVote', { userEscrows }],
     queryFn: async () => {
-      validatorUserEscrows.data?.forEach((escrow) => {
+      userEscrows.data?.forEach((escrow) => {
         if (
           escrow.account.status === 'validate' &&
           escrow.account.voteDeadline &&
@@ -127,7 +117,7 @@ export function useValidateUser(escrow: PublicKey | null) {
               escrow: escrow,
             }),
           });
-          validatorUserEscrows.refetch();
+          userEscrows.refetch();
         }
       });
     },
@@ -136,8 +126,7 @@ export function useValidateUser(escrow: PublicKey | null) {
   return {
     acceptWithUser,
     declineWithUser,
-    validatorUserEscrows,
-    validatorUserEscrow,
+    userEscrows,
     countVote,
   };
 }
@@ -205,13 +194,7 @@ export function useValidateClient() {
   };
 }
 
-export function useValidateCollection({
-  collection,
-  escrow,
-}: {
-  collection?: PublicKey | null;
-  escrow?: PublicKey | null;
-}) {
+export function useValidateCollection(collection?: PublicKey | null) {
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
   const { program } = useProgram();
@@ -219,8 +202,8 @@ export function useValidateCollection({
   const { connection } = useConnection();
   const { collections } = useCollection(collection);
 
-  const validatorCollectionEscrows = useQuery({
-    queryKey: ['validatorCollectionEscrows', { collection }],
+  const collectionEscrows = useQuery({
+    queryKey: ['collectionEscrows', { collection }],
     queryFn: async () => {
       if (collection) {
         const res = await program.account.escrow.all([
@@ -232,16 +215,6 @@ export function useValidateCollection({
           },
         ]);
         return res.length > 0 ? res : [];
-      }
-      return null;
-    },
-  });
-
-  const validatorCollectionEscrow = useQuery({
-    queryKey: ['validatorCollectionEscrows', { escrow }],
-    queryFn: async () => {
-      if (escrow) {
-        return await program.account.escrow.fetch(escrow);
       }
       return null;
     },
@@ -288,7 +261,7 @@ export function useValidateCollection({
     },
     onSuccess: (tx) => {
       transactionToast(tx ?? '');
-      return validatorCollectionEscrows.refetch();
+      return collectionEscrows.refetch();
     },
   });
 
@@ -333,14 +306,14 @@ export function useValidateCollection({
     },
     onSuccess: (tx) => {
       transactionToast(tx ?? '');
-      return validatorCollectionEscrows.refetch();
+      return collectionEscrows.refetch();
     },
   });
 
   // const countVote = useQuery({
-  //   queryKey: ['countVote', { validatorCollectionEscrows }],
+  //   queryKey: ['countVote', { collectionEscrows }],
   //   queryFn: async () => {
-  //     validatorCollectionEscrows.data?.forEach((escrow) => {
+  //     collectionEscrows.data?.forEach((escrow) => {
   //       if (
   //         escrow.account.status === 'validate' &&
   //         escrow.account.voteDeadline &&
@@ -352,7 +325,7 @@ export function useValidateCollection({
   //             escrow: escrow,
   //           }),
   //         });
-  //         validatorCollectionEscrows.refetch();
+  //         collectionEscrows.refetch();
   //       }
   //     });
   //   },
@@ -361,8 +334,7 @@ export function useValidateCollection({
   return {
     acceptWithCollection,
     declineWithCollection,
-    validatorCollectionEscrows,
-    validatorCollectionEscrow,
+    collectionEscrows,
     collections,
     // countVote,
   };

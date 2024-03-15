@@ -1,5 +1,5 @@
 import React from 'react';
-import { AppModal } from '../shared/app-modal';
+import { AppModal } from './app-modal';
 import { PublicKey } from '@solana/web3.js';
 import { useMetadata } from '@/hooks/get-metadata';
 import { COLLECTIONS } from '@/constants';
