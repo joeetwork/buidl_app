@@ -5,8 +5,8 @@ import { useValidateCollection, useValidateUser } from '@/hooks/validate';
 import SelectCollection from '../shared/select-collection.tsx';
 import * as anchor from '@coral-xyz/anchor';
 import { AnchorEscrow } from '@buidl/anchor';
-import EscrowsDisplay from '../shared/escrow-display.jsx';
-import EscrowActions from '../shared/escrow-actions.jsx';
+import EscrowsDisplay from '../shared/escrow-display';
+import EscrowActions from '../shared/escrow-actions';
 
 type Escrow =
   | {
