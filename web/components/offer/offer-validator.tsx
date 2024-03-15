@@ -1,25 +1,31 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { COLLECTIONS } from '@/constants';
 import { useMetadata } from '@/hooks/get-metadata';
 import { PublicKey } from '@solana/web3.js';
 import Image from 'next/image';
+import OfferModal from './offer-modal';
 
 interface OfferValidatorProps {
   showCollection: boolean;
   collection: PublicKey | null;
-  onModalChange: () => void;
-  onInputChange: (e: string) => void;
+  onChange: (e: string) => void;
+  onClick: (e: PublicKey) => void;
 }
 
 export default function OfferValidator({
   showCollection,
   collection,
-  onModalChange,
-  onInputChange,
+  onChange,
+  onClick,
 }: OfferValidatorProps) {
   const { metadata } = useMetadata(COLLECTIONS);
   const [isHighlighted, setIsHighlighted] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+
+  const handleModalClick = useCallback(() => {
+    setShowModal(!showModal);
+  }, [showModal]);
 
   function imageLink() {
     const collectionId = collection?.toString();
@@ -44,7 +50,7 @@ export default function OfferValidator({
       </div>
       <div className="flex justify-between w-full">
         {showCollection ? (
-          <button className="btn focus:outline-none" onClick={onModalChange}>
+          <button className="btn focus:outline-none" onClick={handleModalClick}>
             {metadata ? (
               <Image
                 unoptimized={true}
@@ -78,7 +84,7 @@ export default function OfferValidator({
         ) : (
           <input
             name="initializerAmount"
-            onChange={(e) => onInputChange(e.target.value)}
+            onChange={(e) => onChange(e.target.value)}
             onFocus={() => setIsHighlighted(true)}
             onBlur={() => setIsHighlighted(false)}
             type="text"
@@ -87,6 +93,12 @@ export default function OfferValidator({
           />
         )}
       </div>
+
+      <OfferModal
+        show={showModal}
+        hideModal={handleModalClick}
+        onClick={(e) => onClick(e)}
+      />
     </div>
   );
 }

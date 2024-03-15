@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import VoteInfo from './vote-info';
-import VoteActions from './vote-actions';
-import VoteContracts from './vote-contracts';
 import { PublicKey } from '@solana/web3.js';
 import { useRequests } from '@/hooks/requests';
 import { useDevAccounts } from '@/hooks/get-accounts';
+import EscrowInfo from '../shared/escrow-info';
+import DisplayEscrows from '../shared/display-escrows';
+import EscrowActions from '../shared/escrow-actions';
 
 export default function Requests() {
   const [contract, setContract] = useState<PublicKey | null>(null);
@@ -38,16 +38,16 @@ export default function Requests() {
         <div className="flex justify-between w-full">
           <h3 className="font-bold text-lg">Requests</h3>
         </div>
-        <VoteContracts
+        <DisplayEscrows
           escrows={devEscrows.data?.filter(
             (escrow) => escrow.account.status === 'request'
           )}
           onClick={(e) => setContract(e)}
         />
 
-        <VoteInfo escrow={devEscrow.data} />
+        <EscrowInfo escrow={devEscrow.data} />
 
-        <VoteActions
+        <EscrowActions
           onAcceptClick={handleAcceptClick}
           onDeclineClick={handleDeclineClick}
           escrow={devEscrow.data}

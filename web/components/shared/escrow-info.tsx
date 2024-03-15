@@ -4,11 +4,11 @@ import React from 'react';
 import * as anchor from '@coral-xyz/anchor';
 import { AnchorEscrow } from '@buidl/anchor';
 
-interface VoteContractsProps {
+interface EscrowInfoProps {
   escrow?: anchor.IdlAccounts<AnchorEscrow>['escrow'] | null;
 }
 
-export default function VoteInfo({ escrow }: VoteContractsProps) {
+export default function EscrowInfo({ escrow }: EscrowInfoProps) {
   return (
     <div
       className={`bg-gray-500 rounded-lg p-4 hover:ring hover:ring-gray-700 w-full h-[210px]`}

@@ -4,10 +4,9 @@ import React, { useCallback, useState } from 'react';
 import { useInitialiseEscrow } from '@/hooks/initialize-escrow';
 import { PublicKey } from '@solana/web3.js';
 import { ellipsify } from '../shared/ellipsify';
-import OfferModal from './offer-modal';
 import OfferAmount from './offer-amount';
-import OfferValidator from './offer-validator';
 import OfferAboutInput from './offer-about';
+import OfferValidator from './offer-validator';
 
 export default function Offer() {
   const { name, pubkey } = useParams();
@@ -18,10 +17,6 @@ export default function Offer() {
   const [validator, setValidator] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [showCollection, setShowCollection] = useState(true);
-
-  const handleModalClick = useCallback(() => {
-    setShowModal(!showModal);
-  }, [showModal]);
 
   const handleSubmit = () => {
     if (amount) {
@@ -68,10 +63,10 @@ export default function Offer() {
           <OfferAmount onChange={(e) => setAmount(e)} />
 
           <OfferValidator
-            onModalChange={handleModalClick}
+            onChange={(e) => handleInputChange(e)}
+            onClick={(e) => setCollection(e)}
             collection={collection}
             showCollection={showCollection}
-            onInputChange={handleInputChange}
           />
 
           <OfferAboutInput onChange={(e) => setAbout(e)} />
@@ -91,12 +86,6 @@ export default function Offer() {
       ) : (
         <div>Congrats request sent</div>
       )}
-
-      <OfferModal
-        show={showModal}
-        hideModal={handleModalClick}
-        onClick={(e) => setCollection(e)}
-      />
     </div>
   );
 }

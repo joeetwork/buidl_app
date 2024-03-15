@@ -5,7 +5,7 @@ import { PublicKey } from '@solana/web3.js';
 import * as anchor from '@coral-xyz/anchor';
 import { AnchorEscrow } from '@buidl/anchor';
 
-interface VoteContractsProps {
+interface DisplayEscrowsProps {
   escrows?:
     | {
         account: anchor.IdlAccounts<AnchorEscrow>['escrow'];
@@ -15,10 +15,10 @@ interface VoteContractsProps {
   onClick: (e: PublicKey) => void;
 }
 
-export default function VoteContracts({
+export default function DisplayEscrows({
   escrows,
   onClick,
-}: VoteContractsProps) {
+}: DisplayEscrowsProps) {
   return (
     <div
       className={`bg-gray-500 rounded-lg p-4 w-full hover:ring hover:ring-gray-700`}
