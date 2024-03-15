@@ -20,7 +20,7 @@ interface ValidateProps {
   nftAddress?: PublicKey;
 }
 
-export function useValidateUser(contract: PublicKey | null) {
+export function useValidateUser(escrow: PublicKey | null) {
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
   const { program } = useProgram();
@@ -45,10 +45,10 @@ export function useValidateUser(contract: PublicKey | null) {
   });
 
   const validatorUserEscrow = useQuery({
-    queryKey: ['validatorUserEscrow', { contract }],
+    queryKey: ['validatorUserEscrow', { escrow }],
     queryFn: async () => {
-      if (contract) {
-        return await program.account.escrow.fetch(contract);
+      if (escrow) {
+        return await program.account.escrow.fetch(escrow);
       }
       return null;
     },
@@ -207,10 +207,10 @@ export function useValidateClient() {
 
 export function useValidateCollection({
   collection,
-  contract,
+  escrow,
 }: {
   collection?: PublicKey | null;
-  contract?: PublicKey | null;
+  escrow?: PublicKey | null;
 }) {
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
@@ -238,10 +238,10 @@ export function useValidateCollection({
   });
 
   const validatorCollectionEscrow = useQuery({
-    queryKey: ['validatorCollectionEscrows', { contract }],
+    queryKey: ['validatorCollectionEscrows', { escrow }],
     queryFn: async () => {
-      if (contract) {
-        return await program.account.escrow.fetch(contract);
+      if (escrow) {
+        return await program.account.escrow.fetch(escrow);
       }
       return null;
     },

@@ -5,18 +5,18 @@ import { useMetadata } from '@/hooks/get-metadata';
 import { COLLECTIONS } from '@/constants';
 import Image from 'next/image';
 
-interface OfferModalProps {
+interface CollectionModalProps {
   hideModal: () => void;
   onClick: (collection: PublicKey) => void;
   show: boolean;
   taker?: PublicKey;
 }
 
-export default function OfferModal({
+export default function CollectionModal({
   hideModal,
   onClick,
   show,
-}: OfferModalProps) {
+}: CollectionModalProps) {
   const { metadata } = useMetadata(COLLECTIONS);
 
   const handleClick = (v: string) => {

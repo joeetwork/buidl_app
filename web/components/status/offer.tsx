@@ -5,8 +5,9 @@ import { useInitialiseEscrow } from '@/hooks/initialize-escrow';
 import { PublicKey } from '@solana/web3.js';
 import { ellipsify } from '../shared/ellipsify';
 import OfferAmount from './offer-amount';
-import OfferAboutInput from './offer-about';
-import OfferValidator from './offer-validator';
+import SelectCollection from './select-collection.tsx';
+import Input from '../shared/input';
+import TextArea from '../shared/text-area';
 
 export default function Offer() {
   const { name, pubkey } = useParams();
@@ -15,7 +16,6 @@ export default function Offer() {
   const [about, setAbout] = useState('');
   const [collection, setCollection] = useState<PublicKey | null>(null);
   const [validator, setValidator] = useState('');
-  const [showModal, setShowModal] = useState(false);
   const [showCollection, setShowCollection] = useState(true);
 
   const handleSubmit = () => {
@@ -62,14 +62,26 @@ export default function Offer() {
 
           <OfferAmount onChange={(e) => setAmount(e)} />
 
-          <OfferValidator
-            onChange={(e) => handleInputChange(e)}
-            onClick={(e) => setCollection(e)}
-            collection={collection}
-            showCollection={showCollection}
-          />
+          {showCollection ? (
+            <SelectCollection
+              onClick={(e) => setCollection(e)}
+              collection={collection}
+            />
+          ) : (
+            <Input
+              onChange={(e) => handleInputChange(e.target.value)}
+              contained={true}
+              label="Add Validator"
+              placeholder="SoliRxTzQ3sbz4it..."
+            />
+          )}
 
-          <OfferAboutInput onChange={(e) => setAbout(e)} />
+          <TextArea
+            label="You Offer"
+            placeholder={`Gm, I've got an exciting opportunity for you...`}
+            onChange={(e) => setAbout(e.target.value)}
+            contained={true}
+          />
 
           <button
             className="btn btn-primary mt-2 w-full mx-4"

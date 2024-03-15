@@ -1,13 +1,14 @@
 'use client';
 
-import React, { ChangeEvent } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 
 interface InputProps {
   label: string;
-  value: string;
+  value?: string;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
   placeholder?: string;
   name?: string;
+  contained?: boolean;
 }
 
 export default function Input({
@@ -16,18 +17,38 @@ export default function Input({
   onChange,
   placeholder,
   name,
+  contained = false,
 }: InputProps) {
+  const [isHighlighted, setIsHighlighted] = useState(false);
+
   return (
-    <div className="w-full">
-      {label}
-      <input
-        name={name}
-        onChange={onChange}
-        type="text"
-        defaultValue={value}
-        placeholder={placeholder}
-        className="input input-ghost bg-gray-500 w-full"
-      />
+    <div
+      className={
+        contained
+          ? `bg-gray-500 rounded-lg p-4 w-full hover:ring ${
+              isHighlighted ? 'ring ring-gray-400 ' : 'hover:ring-gray-700'
+            }`
+          : ''
+      }
+    >
+      <div className="w-full">
+        <span className="label-text cursor-default">{label}</span>
+      </div>
+      <div className="flex justify-between w-full">
+        <input
+          name={name}
+          value={value}
+          onChange={onChange}
+          onFocus={() => setIsHighlighted(true)}
+          onBlur={() => setIsHighlighted(false)}
+          type="text"
+          placeholder={placeholder}
+          className={`input input-ghost bg-gray-500 w-full ${
+            contained &&
+            'input-md p-0 text-lg bg-gray-500 focus:outline-none w-full'
+          }`}
+        />
+      </div>
     </div>
   );
 }

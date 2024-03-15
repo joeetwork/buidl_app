@@ -1,4 +1,4 @@
-import Requests from '@/components/requests/requests';
+import Requests from '@/components/status/requests';
 import React from 'react';
 
 export default function Page() {

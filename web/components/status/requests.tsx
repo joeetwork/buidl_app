@@ -4,9 +4,9 @@ import React, { useState } from 'react';
 import { PublicKey } from '@solana/web3.js';
 import { useRequests } from '@/hooks/requests';
 import { useDevAccounts } from '@/hooks/get-accounts';
-import EscrowInfo from '../shared/escrow-info';
-import DisplayEscrows from '../shared/display-escrows';
-import EscrowActions from '../shared/escrow-actions';
+import EscrowInfo from './escrow-info';
+import EscrowActions from './escrow-actions';
+import EscrowsDisplay from './escrow-display';
 
 export default function Requests() {
   const [contract, setContract] = useState<PublicKey | null>(null);
@@ -38,7 +38,7 @@ export default function Requests() {
         <div className="flex justify-between w-full">
           <h3 className="font-bold text-lg">Requests</h3>
         </div>
-        <DisplayEscrows
+        <EscrowsDisplay
           escrows={devEscrows.data?.filter(
             (escrow) => escrow.account.status === 'request'
           )}
