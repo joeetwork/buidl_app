@@ -4,11 +4,7 @@ import { PublicKey } from '@solana/web3.js';
 import * as anchor from '@coral-xyz/anchor';
 import { AnchorEscrow } from '@buidl/anchor';
 import EscrowsDisplay from '../shared/escrow-display';
-import {
-  useAccounts,
-  useClientAccounts,
-  useDevAccounts,
-} from '@/hooks/get-accounts';
+import { useClientAccounts, useDevAccounts } from '@/hooks/get-accounts';
 import { useValidateClient } from '@/hooks/validate';
 import { useCancel } from '@/hooks/cancel';
 import { useExchange } from '@/hooks/exchange';
@@ -203,28 +199,10 @@ type Escrow =
 
 export default function Status() {
   const [isClient, setIsClient] = useState(true);
-  const { userAccount } = useAccounts();
-
-  useEffect(() => {
-    setIsClient(userAccount.data?.role === 'Client' ? true : false);
-  }, [userAccount.data?.role]);
 
   return (
     <div className="h-full">
       <div className="mx-auto pt-16 pb-6 flex flex-col gap-2 items-center lg:w-2/6 md:w-1/2">
-        <div className="flex justify-between w-full">
-          <h3 className="font-bold text-lg">Validate work</h3>
-
-          <div className="flex">
-            <span className="pr-2">{isClient ? 'Client' : 'Freelancer'}</span>
-            <input
-              type="checkbox"
-              className="toggle"
-              checked={!isClient}
-              onChange={() => setIsClient(!isClient)}
-            />
-          </div>
-        </div>
         {isClient ? <Client /> : <Freelancer />}
       </div>
     </div>
