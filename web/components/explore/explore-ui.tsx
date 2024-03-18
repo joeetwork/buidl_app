@@ -68,7 +68,11 @@ export default function ExploreUi() {
                   >
                     <div className="card-body items-center text-center">
                       <Avatar src={user.pfp ?? ''} />
-                      <h2 className="card-title">{user?.username}</h2>
+                      <h2 className="card-title">
+                        {user?.username === user.initializer.toString()
+                          ? 'Guest'
+                          : user.username}
+                      </h2>
                       <p className="w-full break-words">{user?.about}</p>
                       <div className="card-actions">
                         <Link
