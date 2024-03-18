@@ -62,8 +62,8 @@ export default function Avatar({ onFileUpload, src }: AvatarProps) {
         )}
         <Image
           unoptimized={true}
-          loader={() => src}
-          src={src}
+          loader={() => (src ? src : '/template_pfp.png')}
+          src={src ? src : '/template_pfp.png'}
           alt="pfp"
           width={20}
           height={20}

@@ -117,10 +117,7 @@ export default function ProfileModal({ show, hideModal }: ProfileModalProps) {
   const [name, setName] = useState('');
   const [about, setAbout] = useState('');
   const [role, setRole] = useState<string | undefined>();
-  const [pfp, setPfp] = useState<string>(
-    userAccount.data?.pfp ||
-      'https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg'
-  );
+  const [pfp, setPfp] = useState<string>('');
   const [github, setGithub] = useState<string | null>(null);
 
   const [links, setLinks] = useState<UserLinkProps>({

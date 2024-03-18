@@ -15,9 +15,7 @@ export default function Profile() {
   const [profileModal, setProfileModal] = useState(false);
   const [modalData, setModalData] = useState<string>();
 
-  const pfp =
-    userAccount.data?.pfp ||
-    'https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg';
+  const pfp = userAccount.data?.pfp || '';
 
   const renderUsername =
     userAccount.data?.username === userAccount.data?.initializer?.toString()

@@ -7,6 +7,7 @@ import { AnchorEscrow } from '@buidl/anchor';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Loadie from '../shared/loadie';
 import Link from 'next/link';
+import Avatar from '../shared/avatar';
 
 type UserMap =
   | Map<string, anchor.IdlAccounts<AnchorEscrow>['user']>
@@ -66,6 +67,7 @@ export default function ExploreUi() {
                     className="card w-full bg-base-100 shadow-xl"
                   >
                     <div className="card-body items-center text-center">
+                      <Avatar src={user.pfp ?? ''} />
                       <h2 className="card-title">{user?.username}</h2>
                       <p className="w-full break-words">{user?.about}</p>
                       <div className="card-actions">
