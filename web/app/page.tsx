@@ -1,5 +1,5 @@
-import Vote from '@/components/vote/vote';
+import Status from '@/components/status/status';
 
 export default function Page() {
-  return <Vote />;
+  return <Status />;
 }
