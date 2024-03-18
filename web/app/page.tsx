@@ -1,5 +1,5 @@
-import ExploreUi from '@/components/explore/explore-ui';
+import Vote from '@/components/vote/vote';
 
 export default function Page() {
-  return <ExploreUi />;
+  return <Vote />;
 }
