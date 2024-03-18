@@ -1,9 +1,5 @@
-import { AppHero } from '@/components/shared/app-hero';
+import ExploreUi from '@/components/explore/explore-ui';
 
 export default function Page() {
-  return (
-      <AppHero title={'Title'} subtitle={'Subtitle'}>
-        <div>new</div>
-      </AppHero>
-  );
+  return <ExploreUi />;
 }
