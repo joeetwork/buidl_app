@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import React from 'react';
 
-import { ClusterUiSelect } from '../cluster/cluster-ui';
 import WalletButton from '../shared/wallet-button';
 import Image from 'next/image';
 import { PAGES } from '@/constants';

@@ -24,7 +24,7 @@ interface InitialiseUserProps {
 
 export function useInitialiseUser() {
   const transactionToast = useTransactionToast();
-  const { userAccounts } = useAccounts();
+  const { userAccounts, userAccount } = useAccounts();
   const { program } = useProgram();
   const { publicKey } = useWallet();
   const { userPDA } = usePDAs();
@@ -52,6 +52,7 @@ export function useInitialiseUser() {
     },
     onSuccess: (signature) => {
       transactionToast(signature ?? '');
+      userAccount.refetch();
       return userAccounts.refetch();
     },
     onError: () => toast.error('Failed to initialize counter'),

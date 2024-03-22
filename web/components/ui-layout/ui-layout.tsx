@@ -6,11 +6,13 @@ import { ReactNode, Suspense } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { Navbar } from './navbar';
 import { Footer } from './footer';
+import DashboardNav from './dashboard-nav';
 
 export function UiLayout({ children }: { children: ReactNode }) {
   return (
     <div className="h-full flex flex-col">
       <Navbar />
+      <DashboardNav />
       <main className="flex-grow mx-4">
         <Suspense
           fallback={

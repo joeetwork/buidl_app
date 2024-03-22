@@ -12,12 +12,9 @@ export function UserType() {
   const { initializeUser } = useInitialiseUser();
   const { userAccount } = useAccounts();
 
-  const [role, setRole] = useState<string>();
-
   const [account, setAccount] = useState<UserProps>();
 
   const handleSubmit = (role: string) => {
-    setRole(role);
     if (account && role) {
       initializeUser.mutateAsync({
         name: account.username,
@@ -30,16 +27,15 @@ export function UserType() {
   };
 
   useEffect(() => {
-    setRole(userAccount.data?.role);
     setAccount(userAccount.data);
-  }, [userAccount.data]);
+  }, [userAccount.data?.role]);
 
   const USERTYPES = ['Freelancer', 'Client'];
 
   return (
     <div className="dropdown dropdown-end">
       <label tabIndex={0} className="btn btn-primary rounded-btn">
-        {role}
+        {userAccount.data?.role}
       </label>
       <ul
         tabIndex={0}
@@ -49,7 +45,7 @@ export function UserType() {
           <li key={name}>
             <button
               className={`btn btn-sm ${
-                role === name ? 'btn-primary' : 'btn-ghost'
+                userAccount.data?.role === name ? 'btn-primary' : 'btn-ghost'
               }`}
               onClick={() => handleSubmit(name)}
             >
