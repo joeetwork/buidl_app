@@ -8,6 +8,7 @@ import WalletButton from '../shared/wallet-button';
 import Image from 'next/image';
 import { PAGES } from '@/constants';
 import { usePathname } from 'next/navigation';
+import { UserType } from './user-type';
 
 export function Navbar() {
   const pathname = usePathname();
@@ -40,7 +41,7 @@ export function Navbar() {
       </div>
       <div className="flex-none space-x-2">
         <WalletButton />
-        <ClusterUiSelect />
+        <UserType />
       </div>
     </div>
   );
