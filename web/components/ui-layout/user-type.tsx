@@ -2,33 +2,23 @@
 
 import { useAccounts } from '@/hooks/get-accounts';
 import { useInitialiseUser } from '@/hooks/initialize-user';
-import React, { useEffect, useState } from 'react';
-import * as anchor from '@coral-xyz/anchor';
-import { AnchorEscrow } from '@buidl/anchor';
-
-type UserProps = anchor.IdlAccounts<AnchorEscrow>['user'] | null;
+import React from 'react';
 
 export function UserType() {
   const { initializeUser } = useInitialiseUser();
   const { userAccount } = useAccounts();
 
-  const [account, setAccount] = useState<UserProps>();
-
   const handleSubmit = (role: string) => {
-    if (account && role) {
+    if (userAccount.data && role) {
       initializeUser.mutateAsync({
-        name: account.username,
-        about: account.about,
+        name: userAccount.data.username,
+        about: userAccount.data.about,
         role,
-        pfp: account.pfp,
-        links: account.links,
+        pfp: userAccount.data.pfp,
+        links: userAccount.data.links,
       });
     }
   };
-
-  useEffect(() => {
-    setAccount(userAccount.data);
-  }, [userAccount.data?.role]);
 
   const USERTYPES = ['Freelancer', 'Client'];
 

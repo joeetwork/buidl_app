@@ -5,11 +5,14 @@ import { PublicKey } from '@solana/web3.js';
 import { useQuery } from '@tanstack/react-query';
 import { useCluster } from '@/components/cluster/cluster-data-access';
 import { useProgram } from './get-program';
+import { usePathname, useRouter } from 'next/navigation';
 
 export function useAccounts() {
   const { cluster } = useCluster();
   const { program, programId } = useProgram();
   const { publicKey } = useWallet();
+  const pathname = usePathname();
+  const router = useRouter();
 
   const userAccounts = useQuery({
     queryKey: ['userAccounts'],
@@ -30,6 +33,10 @@ export function useAccounts() {
         )[0];
 
         const res = await program.account.user.fetch(userPDA);
+
+        if (pathname === '/requests' && res.role === 'Client') {
+          router.push('/');
+        }
 
         return res ?? {};
       }

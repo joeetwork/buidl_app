@@ -19,7 +19,10 @@ export default function DashboardNav() {
     <div className="w-full bg-blue-600 flex justify-around px-32">
       {nav.map((item, idx) => {
         return (
-          <Link key={idx} href={item}>
+          <Link
+            key={idx}
+            href={item === 'Contracts' ? '/' : item.toLowerCase()}
+          >
             {item}
           </Link>
         );

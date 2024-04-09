@@ -3,10 +3,10 @@ import { ChangeEvent } from 'react';
 export type FilteredProps = 'twitter' | 'discord' | 'telegram';
 
 export interface UserLinkProps {
-  twitter: 'twitter' | null;
-  discord: 'discord' | null;
-  telegram: 'telegram' | null;
-  github: 'github' | null;
+  twitter: string | null;
+  discord: string | null;
+  telegram: string | null;
+  github: string | null;
 }
 
 export interface LinksProps {

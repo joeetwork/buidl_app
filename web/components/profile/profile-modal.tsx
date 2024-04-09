@@ -18,7 +18,6 @@ import {
 
 function Links({ userAccountLinks, onInputChange }: LinksProps) {
   const [selectedContacts, setSelectedContacts] = useState<FilteredProps[]>([]);
-  const [linkValue, setLinkValues] = useState<UserLinkProps>();
 
   const handleCommunicationMethodChange = (img: FilteredProps) => {
     setSelectedContacts((prevContacts) => {
@@ -40,9 +39,7 @@ function Links({ userAccountLinks, onInputChange }: LinksProps) {
     userLinks.forEach(([key, value]) => {
       handleCommunicationMethodChange(key as FilteredProps);
     });
-
-    setLinkValues(userAccountLinks);
-  }, [userAccountLinks]);
+  }, []);
 
   return (
     <div className="w-full px-6">
@@ -73,7 +70,7 @@ function Links({ userAccountLinks, onInputChange }: LinksProps) {
           selectedContacts.map((contact, i) => (
             <Input
               key={i}
-              value={linkValue?.[contact] ?? ''}
+              value={userAccountLinks?.[contact] ?? ''}
               name={contact}
               label={`${contact.charAt(0).toUpperCase()}${contact.slice(1)}`}
               onChange={onInputChange}
@@ -82,7 +79,7 @@ function Links({ userAccountLinks, onInputChange }: LinksProps) {
         <Input
           label="Github"
           name="github"
-          value={linkValue?.github || ''}
+          value={userAccountLinks?.github || ''}
           onChange={(e) => onInputChange(e)}
         />
       </div>
@@ -114,18 +111,19 @@ function Roles({ roles, role, userAccountRole, handleRole }: RolesProps) {
 export default function ProfileModal({ show, hideModal }: ProfileModalProps) {
   const { initializeUser } = useInitialiseUser();
   const { userAccount } = useAccounts();
-  const [name, setName] = useState('');
-  const [about, setAbout] = useState('');
-  const [role, setRole] = useState<string | undefined>();
-  const [pfp, setPfp] = useState<string>('');
-  const [github, setGithub] = useState<string | null>(null);
+  const [name, setName] = useState<string>(userAccount.data?.username ?? '');
+  const [about, setAbout] = useState<string>(userAccount.data?.about ?? '');
+  const [role, setRole] = useState<string>(userAccount.data?.role ?? '');
+  const [pfp, setPfp] = useState<string>(userAccount.data?.pfp ?? '');
 
-  const [links, setLinks] = useState<UserLinkProps>({
-    discord: null,
-    telegram: null,
-    twitter: null,
-    github: null,
-  });
+  const [links, setLinks] = useState<UserLinkProps>(
+    userAccount.data?.links ?? {
+      discord: null,
+      telegram: null,
+      twitter: null,
+      github: null,
+    }
+  );
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -148,15 +146,13 @@ export default function ProfileModal({ show, hideModal }: ProfileModalProps) {
   };
 
   const handleSubmit = () => {
-    if (role) {
-      initializeUser.mutateAsync({
-        name,
-        about,
-        role,
-        pfp,
-        links,
-      });
-    }
+    initializeUser.mutateAsync({
+      name: name,
+      about: about,
+      role: role,
+      pfp: pfp,
+      links: links,
+    });
   };
 
   const renderUsername =
@@ -174,7 +170,7 @@ export default function ProfileModal({ show, hideModal }: ProfileModalProps) {
       <div className="pt-4 px-8">
         <div className="flex flex-col gap-4 pb-4 items-center">
           <div className="mr-auto">
-            <Avatar onFileUpload={handleFileUpload} src={pfp} />
+            <Avatar onFileUpload={handleFileUpload} src={pfp ?? ''} />
           </div>
           <div className="w-full">
             <Input
@@ -200,10 +196,7 @@ export default function ProfileModal({ show, hideModal }: ProfileModalProps) {
             />
           </div>
 
-          <Links
-            userAccountLinks={userAccount.data?.links as UserLinkProps}
-            onInputChange={handleInputChange}
-          />
+          <Links userAccountLinks={links} onInputChange={handleInputChange} />
         </div>
         <div className="w-full text-end mt-4">
           <button onClick={handleSubmit} className="btn">
