@@ -5,27 +5,24 @@ import * as anchor from '@coral-xyz/anchor';
 import { AnchorEscrow } from '@buidl/anchor';
 import EscrowsDisplay from '../shared/escrow-display';
 import { useClientAccounts, useDevAccounts } from '@/hooks/get-accounts';
-import { useValidateClient } from '@/hooks/validate';
-import { useCancel } from '@/hooks/cancel';
-import { useExchange } from '@/hooks/exchange';
-import { useUpload } from '@/hooks/upload';
-import { useRequests } from '@/hooks/requests';
-import Input from '../shared/input';
+import Close from './close';
+import Validate from './validate';
+import Request from './request';
+import Exchange from './exchange';
+import Upload from './upload';
+
+type Escrow =
+  | {
+      account: anchor.IdlAccounts<AnchorEscrow>['escrow'];
+      publicKey: PublicKey;
+    }
+  | null
+  | undefined;
 
 function Client() {
   const { clientEscrows } = useClientAccounts();
-  const { validateWithClient } = useValidateClient();
-  const { cancel } = useCancel();
   const [escrow, setEscrow] = useState<Escrow>();
   const [selectedEscrow, setSelectedEscrow] = useState<PublicKey | null>(null);
-
-  const handleAcceptClick = (escrow: PublicKey) => {
-    validateWithClient.mutateAsync(escrow);
-  };
-
-  const handleCancelClick = (escrow: PublicKey) => {
-    cancel.mutateAsync(escrow);
-  };
 
   useEffect(() => {
     setEscrow(clientEscrows.data?.find((e) => e.publicKey === selectedEscrow));
@@ -41,72 +38,23 @@ function Client() {
 
       {escrow?.account.status === 'request' ||
       escrow?.account.status === 'close' ? (
-        <div className="card-actions justify-end">
-          <button
-            onClick={() => handleCancelClick(escrow.publicKey)}
-            className="btn btn-primary"
-          >
-            Cancel
-          </button>
-        </div>
+        <Close pubKey={escrow.publicKey} />
       ) : null}
 
       {escrow?.account.status === 'validate' ? (
-        <div className="card-actions justify-end">
-          <button
-            onClick={() => window.open(escrow.account.uploadWork)}
-            className={'btn btn-primary'}
-            disabled={!escrow.account.uploadWork}
-          >
-            Check Uploaded work
-          </button>
-          <button
-            onClick={() => handleAcceptClick(escrow.publicKey)}
-            className="btn btn-primary"
-          >
-            Validate
-          </button>
-        </div>
+        <Validate
+          pubKey={escrow.publicKey}
+          uploadWork={escrow.account.uploadWork}
+        />
       ) : null}
     </>
   );
 }
 
-interface EscrowProps {
-  escrow: PublicKey;
-  initializer: PublicKey;
-}
-
 function Freelancer() {
   const { devEscrows } = useDevAccounts();
-  const { exchange } = useExchange();
-  const { uploadWork } = useUpload();
-  const { declineRequest, acceptRequest } = useRequests();
-  const [link, setLink] = useState('');
   const [escrow, setEscrow] = useState<Escrow>();
   const [selectedEscrow, setSelectedEscrow] = useState<PublicKey | null>(null);
-
-  const handleExchange = (data: EscrowProps) => {
-    exchange.mutateAsync(data);
-  };
-
-  const handleUpload = (data: EscrowProps) => {
-    if (link) {
-      uploadWork.mutateAsync({
-        escrow: data.escrow,
-        initializer: data?.initializer,
-        link,
-      });
-    }
-  };
-
-  const handleDecline = (data: EscrowProps) => {
-    declineRequest.mutateAsync(data);
-  };
-
-  const handleAccept = (data: EscrowProps) => {
-    acceptRequest.mutateAsync(data);
-  };
 
   useEffect(() => {
     setEscrow(devEscrows.data?.find((e) => e.publicKey === selectedEscrow));
@@ -121,81 +69,29 @@ function Freelancer() {
       />
       <div className="card-actions">
         {escrow?.account.status === 'request' ? (
-          <div className="flex gap-4">
-            <button
-              className="btn btn-primary"
-              onClick={() =>
-                handleAccept({
-                  escrow: escrow.publicKey,
-                  initializer: escrow.account.initializer,
-                })
-              }
-            >
-              accept
-            </button>
-            <button
-              className="btn btn-primary"
-              onClick={() =>
-                handleDecline({
-                  escrow: escrow.publicKey,
-                  initializer: escrow.account.initializer,
-                })
-              }
-            >
-              decline
-            </button>
-          </div>
+          <Request
+            escrow={escrow.publicKey}
+            initializer={escrow.account.initializer}
+          />
         ) : null}
 
         {escrow?.account.status === 'exchange' ? (
-          <button
-            className="btn btn-primary"
-            onClick={() =>
-              handleExchange({
-                escrow: escrow.publicKey,
-                initializer: escrow.account.initializer,
-              })
-            }
-            disabled={exchange.isPending}
-          >
-            Exchange
-          </button>
+          <Exchange
+            escrow={escrow.publicKey}
+            initializer={escrow.account.initializer}
+          />
         ) : null}
 
         {escrow?.account.status === 'upload' ? (
-          <div>
-            <Input
-              value={link}
-              label="Upload work"
-              onChange={(e) => setLink(e.target.value)}
-            />
-
-            <button
-              className="btn btn-primary"
-              onClick={() =>
-                handleUpload({
-                  escrow: escrow.publicKey,
-                  initializer: escrow.account.initializer,
-                })
-              }
-              disabled={uploadWork.isPending}
-            >
-              Upload Work
-            </button>
-          </div>
+          <Upload
+            escrow={escrow.publicKey}
+            initializer={escrow.account.initializer}
+          />
         ) : null}
       </div>
     </>
   );
 }
-
-type Escrow =
-  | {
-      account: anchor.IdlAccounts<AnchorEscrow>['escrow'];
-      publicKey: PublicKey;
-    }
-  | null
-  | undefined;
 
 export default function Status() {
   const [isClient, setIsClient] = useState(true);
