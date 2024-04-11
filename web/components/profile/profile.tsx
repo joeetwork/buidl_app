@@ -6,8 +6,6 @@ import Avatar from '../shared/avatar';
 import Image from 'next/image';
 import HistoryModal from './history-modal';
 import ProfileModal from './profile-modal';
-import Freelancer from './freelancer';
-import Client from './client';
 
 export default function Profile() {
   const { userAccount } = useAccounts();
@@ -52,70 +50,54 @@ export default function Profile() {
           </div>
         </div>
 
-        <div className="flex flex-col md:grid md:grid-cols-5 gap-4 pb-4 min-h-[500px]">
-          <div className="grid grid-rows-12 gap-4 md:col-span-2 bg-red-800 p-6 lg:p-2 xl:p-6">
-            <div className="row-span-5">
-              <h1 className="text-xl">Bio</h1>
-              <p className="text-sm mt-2">
-                {userAccount.data?.about ?? 'Edit profile to add a bio'}
-              </p>
-            </div>
+        <div className="flex flex-col gap-4 pb-4">
+          <div className="flex flex-col bg-gray-800 p-4 rounded">
+            <h1 className="text-xl">Bio</h1>
+            <p className="text-sm mt-2">
+              {userAccount.data?.about ?? 'Edit profile to add a bio'}
+            </p>
+          </div>
 
-            <div className="row-span-2">
-              <h1 className="text-xl">Role</h1>
+          <div className="flex flex-col bg-gray-800 p-4 rounded">
+            <h1 className="text-xl">Role</h1>
+            <div>
               <button className="btn">{userAccount.data?.role}</button>
-            </div>
-
-            <div className="row-span-5">
-              {userAccount.data?.links &&
-                Object.values(userAccount.data?.links).some(Boolean) && (
-                  <>
-                    <h1 className="text-xl">Links</h1>
-                    <div className="flex flex-col mt-2 gap-4">
-                      {Object.entries(userAccount.data?.links).map(
-                        ([link, value]) =>
-                          value && (
-                            <div key={link} className="flex items-center gap-2">
-                              <Image
-                                src={`/${link}.png`}
-                                alt={link}
-                                width={30}
-                                height={30}
-                              />
-                              <p>{value}</p>
-                            </div>
-                          )
-                      )}
-                    </div>
-                  </>
-                )}
             </div>
           </div>
 
-          <div className="contents md:grid md:grid-row-2 gap-4 md:col-span-3">
-            <div className="flex flex-col gap-14 md:row-span-1 bg-gray-800">
-              <h2 className="mt-2 ml-2">Status</h2>
-              {userAccount.data?.role === 'freelancer' ? (
-                <Freelancer />
-              ) : (
-                <Client />
-              )}
-            </div>
-
-            <div className="flex flex-col md:row-span-1 bg-gray-800">
-              <p className="mt-2 ml-2">History</p>
-              <div className="flex justify-evenly my-auto">
-                <button className="btn" onClick={() => showHistory('client')}>
-                  Client History
-                </button>
-                <button
-                  className="btn"
-                  onClick={() => showHistory('freelancer')}
-                >
-                  Freelance History
-                </button>
-                <button className="btn">Voting History</button>
+          {userAccount.data?.links &&
+            Object.values(userAccount.data?.links).some(Boolean) && (
+              <div className="flex flex-col bg-gray-800 p-4 rounded">
+                <h1 className="text-xl">Links</h1>
+                <div className="flex flex-col mt-2 gap-4">
+                  {Object.entries(userAccount.data?.links).map(
+                    ([link, value]) =>
+                      value && (
+                        <div key={link} className="flex items-center gap-2">
+                          <Image
+                            src={`/${link}.png`}
+                            alt={link}
+                            width={30}
+                            height={30}
+                          />
+                          <p>{value}</p>
+                        </div>
+                      )
+                  )}
+                </div>
               </div>
+            )}
+
+          <div className="flex flex-col bg-gray-800 p-4 rounded">
+            <h1 className="text-xl">History</h1>
+            <div className="flex justify-evenly my-auto">
+              <button className="btn" onClick={() => showHistory('client')}>
+                Client History
+              </button>
+              <button className="btn" onClick={() => showHistory('freelancer')}>
+                Freelance History
+              </button>
+              <button className="btn">Voting History</button>
             </div>
           </div>
         </div>
