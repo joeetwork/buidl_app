@@ -8,6 +8,7 @@ import OfferAmount from './offer-amount';
 import SelectCollection from '../shared/select-collection.tsx';
 import Input from '../shared/input';
 import TextArea from '../shared/text-area';
+import { useAccounts } from '@/hooks/get-accounts';
 
 export default function Offer() {
   const { name, pubkey } = useParams();
@@ -17,9 +18,14 @@ export default function Offer() {
   const [collection, setCollection] = useState<PublicKey | null>(null);
   const [validator, setValidator] = useState('');
   const [showCollection, setShowCollection] = useState(true);
+  const { userAccount } = useAccounts();
 
   const handleSubmit = () => {
-    if (amount) {
+    if (
+      amount &&
+      userAccount.data &&
+      !Object.values(userAccount.data.links).every((value) => value === null)
+    ) {
       initializeEscrow.mutateAsync({
         initializerAmount: amount * 1000000,
         collection,
@@ -27,6 +33,13 @@ export default function Offer() {
         validator: validator ? new PublicKey(validator) : null,
         taker: new PublicKey(pubkey),
       });
+    }
+
+    if (
+      userAccount.data &&
+      Object.values(userAccount.data.links).every((value) => value === null)
+    ) {
+      console.log('display modal to add link');
     }
   };
 
