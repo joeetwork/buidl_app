@@ -36,17 +36,17 @@ function Client() {
         onClick={(e) => setSelectedEscrow(e)}
       />
 
-      {escrow?.account.status === 'request' ||
-      escrow?.account.status === 'close' ? (
+      {(escrow?.account.status === 'request' ||
+        escrow?.account.status === 'close') && (
         <Close pubKey={escrow.publicKey} />
-      ) : null}
+      )}
 
-      {escrow?.account.status === 'validate' ? (
+      {escrow?.account.status === 'validate' && (
         <Validate
           pubKey={escrow.publicKey}
           uploadWork={escrow.account.uploadWork}
         />
-      ) : null}
+      )}
     </>
   );
 }
@@ -68,26 +68,26 @@ function Freelancer() {
         onClick={(e) => setSelectedEscrow(e)}
       />
       <div className="card-actions">
-        {escrow?.account.status === 'request' ? (
+        {escrow?.account.status === 'request' && (
           <Request
             escrow={escrow.publicKey}
             initializer={escrow.account.initializer}
           />
-        ) : null}
+        )}
 
-        {escrow?.account.status === 'exchange' ? (
+        {escrow?.account.status === 'exchange' && (
           <Exchange
             escrow={escrow.publicKey}
             initializer={escrow.account.initializer}
           />
-        ) : null}
+        )}
 
-        {escrow?.account.status === 'upload' ? (
+        {escrow?.account.status === 'upload' && (
           <Upload
             escrow={escrow.publicKey}
             initializer={escrow.account.initializer}
           />
-        ) : null}
+        )}
       </div>
     </>
   );
