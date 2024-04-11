@@ -21,9 +21,9 @@ export default function Request({ escrow, initializer }: RequestProps) {
   };
 
   return (
-    <div className="flex gap-4">
+    <div className="flex w-full justify-between">
       <button
-        className="btn btn-primary"
+        className="btn btn-primary w-[49%]"
         onClick={() =>
           handleAccept({
             escrow,
@@ -34,7 +34,7 @@ export default function Request({ escrow, initializer }: RequestProps) {
         accept
       </button>
       <button
-        className="btn btn-primary"
+        className="btn btn-primary  w-[49%]"
         onClick={() =>
           handleDecline({
             escrow,

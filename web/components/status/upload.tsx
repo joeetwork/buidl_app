@@ -25,7 +25,7 @@ export default function Upload({ escrow, initializer }: UploadProps) {
   };
 
   return (
-    <div>
+    <div className="w-full flex flex-col gap-2">
       <Input
         value={link}
         label="Upload work"
@@ -33,7 +33,7 @@ export default function Upload({ escrow, initializer }: UploadProps) {
       />
 
       <button
-        className="btn btn-primary"
+        className="btn btn-primary w-full"
         onClick={() =>
           handleUpload({
             escrow,

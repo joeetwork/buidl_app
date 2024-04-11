@@ -17,15 +17,18 @@ export default function Validate({ pubKey, uploadWork }: ValidateProps) {
   };
 
   return (
-    <div className="card-actions justify-end">
+    <div className="flex w-full justify-between">
       <button
         onClick={() => window.open(uploadWork)}
-        className={'btn btn-primary'}
+        className={'btn btn-primary w-[49%]'}
         disabled={!uploadWork}
       >
         Check Uploaded work
       </button>
-      <button onClick={() => handleClick(pubKey)} className="btn btn-primary">
+      <button
+        onClick={() => handleClick(pubKey)}
+        className="btn btn-primary w-[49%]"
+      >
         Validate
       </button>
     </div>

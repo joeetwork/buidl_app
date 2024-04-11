@@ -16,13 +16,11 @@ export default function Close({ pubKey }: CloseProps) {
   };
 
   return (
-    <div className="card-actions justify-end">
-      <button
-        onClick={() => handleCancelClick(pubKey)}
-        className="btn btn-primary"
-      >
-        Cancel
-      </button>
-    </div>
+    <button
+      onClick={() => handleCancelClick(pubKey)}
+      className="btn btn-primary w-full"
+    >
+      Cancel
+    </button>
   );
 }
