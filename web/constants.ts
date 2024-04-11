@@ -8,6 +8,14 @@ export const PAGES = [
   { label: 'Profile', path: '/profile' },
 ];
 
+export const SUBPAGES = [
+  { label: 'Contracts', path: '/contracts' },
+
+  { label: 'Requests', path: '/requests' },
+
+  { label: 'Vote', path: '/vote' },
+];
+
 export const ROLES = ['Client', 'Collection', 'Validator'];
 
 export const FREELANCEROLES = ['Dev', 'Collection', 'Validator'];

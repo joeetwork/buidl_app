@@ -7,12 +7,18 @@ import { Toaster } from 'react-hot-toast';
 import { Navbar } from './navbar';
 import { Footer } from './footer';
 import DashboardNav from './dashboard-nav';
+import { usePathname } from 'next/navigation';
+import { SUBPAGES } from '@/constants';
 
 export function UiLayout({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
+
   return (
     <div className="h-full flex flex-col">
       <Navbar />
-      <DashboardNav />
+      {SUBPAGES.map((page) => {
+        return pathname.startsWith(page.path) && <DashboardNav />;
+      })}
       <main className="flex-grow mx-4">
         <Suspense
           fallback={
