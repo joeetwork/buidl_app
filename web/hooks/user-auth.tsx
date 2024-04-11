@@ -41,7 +41,7 @@ export function useAuth() {
             await initializeUser.mutateAsync({
               name: publicKey?.toString() ?? '',
               about: '',
-              role: 'Voter',
+              role: 'Client',
               pfp: null,
               links: {
                 discord: null,
