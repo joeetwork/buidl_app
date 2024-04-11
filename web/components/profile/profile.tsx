@@ -58,13 +58,6 @@ export default function Profile() {
             </p>
           </div>
 
-          <div className="flex flex-col bg-gray-800 p-4 rounded">
-            <h1 className="text-xl">Role</h1>
-            <div>
-              <button className="btn">{userAccount.data?.role}</button>
-            </div>
-          </div>
-
           {userAccount.data?.links &&
             Object.values(userAccount.data?.links).some(Boolean) && (
               <div className="flex flex-col bg-gray-800 p-4 rounded">
@@ -91,12 +84,18 @@ export default function Profile() {
           <div className="flex flex-col bg-gray-800 p-4 rounded">
             <h1 className="text-xl">History</h1>
             <div className="flex justify-evenly my-auto">
-              <button className="btn" onClick={() => showHistory('client')}>
-                Client History
-              </button>
-              <button className="btn" onClick={() => showHistory('freelancer')}>
-                Freelance History
-              </button>
+              {userAccount.data?.role === 'Client' ? (
+                <button className="btn" onClick={() => showHistory('client')}>
+                  Client History
+                </button>
+              ) : (
+                <button
+                  className="btn"
+                  onClick={() => showHistory('freelancer')}
+                >
+                  Freelance History
+                </button>
+              )}
               <button className="btn">Voting History</button>
             </div>
           </div>

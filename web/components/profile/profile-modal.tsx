@@ -12,7 +12,6 @@ import {
   FilteredProps,
   LinksProps,
   ProfileModalProps,
-  RolesProps,
   UserLinkProps,
 } from '@/types/profile';
 
@@ -87,33 +86,11 @@ function Links({ userAccountLinks, onInputChange }: LinksProps) {
   );
 }
 
-function Roles({ roles, role, userAccountRole, handleRole }: RolesProps) {
-  return (
-    <div className="Role">
-      Role
-      <div className="grid grid-cols-3 gap-2 mt-2">
-        {roles.map((userRole) => (
-          <button
-            key={userRole}
-            className={`btn ${
-              !role && userAccountRole === userRole && 'btn-primary'
-            } ${role === userRole && 'btn-primary'}`}
-            onClick={() => handleRole(userRole)}
-          >
-            {userRole}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export default function ProfileModal({ show, hideModal }: ProfileModalProps) {
   const { initializeUser } = useInitialiseUser();
   const { userAccount } = useAccounts();
   const [name, setName] = useState<string>(userAccount.data?.username ?? '');
   const [about, setAbout] = useState<string>(userAccount.data?.about ?? '');
-  const [role, setRole] = useState<string>(userAccount.data?.role ?? '');
   const [pfp, setPfp] = useState<string>(userAccount.data?.pfp ?? '');
 
   const [links, setLinks] = useState<UserLinkProps>(
@@ -141,15 +118,11 @@ export default function ProfileModal({ show, hideModal }: ProfileModalProps) {
     }
   };
 
-  const handleRole = (selectedRole: string) => {
-    setRole(selectedRole);
-  };
-
   const handleSubmit = () => {
     initializeUser.mutateAsync({
       name: name,
       about: about,
-      role: role,
+      role: userAccount.data?.role ?? 'Client',
       pfp: pfp,
       links: links,
     });
@@ -185,14 +158,6 @@ export default function ProfileModal({ show, hideModal }: ProfileModalProps) {
               label="Bio"
               onChange={(e) => setAbout(e.target.value)}
               placeholder={'Tell us about yourself/your company'}
-            />
-          </div>
-          <div className="w-full">
-            <Roles
-              roles={['Freelancer', 'Client', 'Voter']}
-              role={role}
-              userAccountRole={userAccount.data?.role}
-              handleRole={handleRole}
             />
           </div>
 
