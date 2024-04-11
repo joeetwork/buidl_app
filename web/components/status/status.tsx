@@ -7,7 +7,6 @@ import EscrowsDisplay from '../shared/escrow-display';
 import { useClientAccounts, useDevAccounts } from '@/hooks/get-accounts';
 import Close from './close';
 import Validate from './validate';
-import Request from './request';
 import Exchange from './exchange';
 import Upload from './upload';
 
@@ -30,6 +29,9 @@ function Client() {
 
   return (
     <>
+      <div className="flex justify-between w-full">
+        <h3 className="font-bold text-lg">Active Contracts</h3>
+      </div>
       <EscrowsDisplay
         escrows={clientEscrows.data}
         escrow={escrow?.account}
@@ -64,19 +66,15 @@ function Freelancer() {
 
   return (
     <>
+      <div className="flex justify-between w-full">
+        <h3 className="font-bold text-lg">Active Contracts</h3>
+      </div>
       <EscrowsDisplay
         escrows={devEscrows.data}
         escrow={escrow?.account}
         onClick={(e) => setSelectedEscrow(e)}
       />
       <div className="card-actions w-full">
-        {escrow?.account.status === 'request' && (
-          <Request
-            escrow={escrow.publicKey}
-            initializer={escrow.account.initializer}
-          />
-        )}
-
         {escrow?.account.status === 'exchange' && (
           <Exchange
             escrow={escrow.publicKey}

@@ -20,7 +20,7 @@ export default function DashboardNav() {
       {nav.map((item, idx) => {
         return (
           <Link key={idx} href={item.toLowerCase()}>
-            {item}
+            {item === 'Contracts' ? 'Active' : item}
           </Link>
         );
       })}
