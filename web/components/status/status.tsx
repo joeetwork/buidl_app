@@ -33,7 +33,12 @@ function Client() {
         <h3 className="font-bold text-lg">Active Contracts</h3>
       </div>
       <EscrowsDisplay
-        escrows={clientEscrows.data}
+        escrows={clientEscrows.data?.filter(
+          (escrow) =>
+            escrow.account.status === 'request' ||
+            escrow?.account.status === 'close' ||
+            escrow?.account.status === 'validate'
+        )}
         escrow={escrow?.account}
         onClick={(e) => setSelectedEscrow(e)}
       />
@@ -70,7 +75,11 @@ function Freelancer() {
         <h3 className="font-bold text-lg">Active Contracts</h3>
       </div>
       <EscrowsDisplay
-        escrows={devEscrows.data}
+        escrows={devEscrows.data?.filter(
+          (escrow) =>
+            escrow.account.status === 'exchange' ||
+            escrow?.account.status === 'upload'
+        )}
         escrow={escrow?.account}
         onClick={(e) => setSelectedEscrow(e)}
       />
