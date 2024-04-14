@@ -1,3 +1,4 @@
+import { SUBPAGES } from '@/constants';
 import { useAccounts } from '@/hooks/get-accounts';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
@@ -9,7 +10,7 @@ export default function DashboardNav() {
   useEffect(() => {
     const NAV =
       userAccount.data?.role === 'Freelancer'
-        ? ['Contracts', 'Requests', 'Vote']
+        ? ['Requests', 'Claim', 'Submit', 'Vote']
         : ['Contracts', 'Vote'];
 
     setNav(NAV);

@@ -16,8 +16,8 @@ export function UiLayout({ children }: { children: ReactNode }) {
   return (
     <div className="h-full flex flex-col">
       <Navbar />
-      {SUBPAGES.map((page) => {
-        return pathname.startsWith(page.path) && <DashboardNav />;
+      {SUBPAGES.map((page, i) => {
+        return pathname.startsWith(page.path) && <DashboardNav key={i} />;
       })}
       <main className="flex-grow mx-4">
         <Suspense

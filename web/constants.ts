@@ -13,6 +13,10 @@ export const SUBPAGES = [
 
   { label: 'Requests', path: '/requests' },
 
+  { label: 'Claim', path: '/claim' },
+
+  { label: 'Submit', path: '/submit' },
+
   { label: 'Vote', path: '/vote' },
 ];
 

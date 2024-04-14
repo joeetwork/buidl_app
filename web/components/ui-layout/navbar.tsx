@@ -8,9 +8,11 @@ import Image from 'next/image';
 import { PAGES } from '@/constants';
 import { usePathname } from 'next/navigation';
 import { UserType } from './user-type';
+import { useAccounts } from '@/hooks/get-accounts';
 
 export function Navbar() {
   const pathname = usePathname();
+  const { userAccount } = useAccounts();
 
   return (
     <div className="navbar bg-base-300 text-neutral-content flex-col md:flex-row space-y-2 md:space-y-0">
@@ -30,7 +32,12 @@ export function Navbar() {
             <li key={path}>
               <Link
                 className={pathname.startsWith(path) ? 'active' : ''}
-                href={path}
+                href={
+                  userAccount.data?.role === 'Freelancer' &&
+                  path === '/contracts'
+                    ? '/requests'
+                    : path
+                }
               >
                 {label}
               </Link>
