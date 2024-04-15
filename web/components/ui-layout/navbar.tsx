@@ -42,21 +42,30 @@ export function Navbar() {
           />
         </Link>
         <ul className="menu menu-horizontal px-1 space-x-2">
-          {PAGES.map(({ label, path }) => (
-            <li key={path}>
-              <Link
-                className={pathname.startsWith(path) ? 'active' : ''}
-                href={
-                  userAccount.data?.role === 'Freelancer' &&
-                  path === '/contracts'
-                    ? '/requests'
-                    : path
-                }
-              >
-                {label}
-              </Link>
-            </li>
-          ))}
+          {PAGES.map(({ label, path }) => {
+            return (
+              <li key={path}>
+                <Link
+                  className={
+                    pathname.startsWith(path)
+                      ? 'active'
+                      : '' ||
+                        (pathname === '/requests' && path === '/contracts')
+                      ? 'active'
+                      : ''
+                  }
+                  href={
+                    userAccount.data?.role === 'Freelancer' &&
+                    path === '/contracts'
+                      ? '/requests'
+                      : path
+                  }
+                >
+                  {label}
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </div>
       <div className="flex-none space-x-2">
