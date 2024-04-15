@@ -32,7 +32,9 @@ export default function ExploreUi() {
         const updatedUsersMap = prevUsers ? new Map(prevUsers) : new Map();
 
         (userAccounts.data as UserAccounts).forEach((user) => {
-          updatedUsersMap.set(user.initializer.toString(), user);
+          if (user.role === 'Freelancer' && user.about) {
+            updatedUsersMap.set(user.initializer.toString(), user);
+          }
         });
 
         return updatedUsersMap;

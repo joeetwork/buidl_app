@@ -5,7 +5,6 @@ import React from 'react';
 
 import WalletButton from '../shared/wallet-button';
 import Image from 'next/image';
-import { PAGES } from '@/constants';
 import { usePathname } from 'next/navigation';
 import { UserType } from './user-type';
 import { useAccounts } from '@/hooks/get-accounts';
@@ -13,6 +12,21 @@ import { useAccounts } from '@/hooks/get-accounts';
 export function Navbar() {
   const pathname = usePathname();
   const { userAccount } = useAccounts();
+
+  const PAGES =
+    userAccount.data?.role === 'Freelancer'
+      ? [
+          { label: 'Contracts', path: '/contracts' },
+
+          { label: 'Profile', path: '/profile' },
+        ]
+      : [
+          { label: 'Contracts', path: '/contracts' },
+
+          { label: 'Explore', path: '/explore' },
+
+          { label: 'Profile', path: '/profile' },
+        ];
 
   return (
     <div className="navbar bg-base-300 text-neutral-content flex-col md:flex-row space-y-2 md:space-y-0">
