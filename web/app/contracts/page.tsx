@@ -1,5 +1,5 @@
-import Status from '@/components/status/status';
+import ActiveContracts from '@/components/status/active-contracts';
 
 export default function Page() {
-  return <Status />;
+  return <ActiveContracts />;
 }
