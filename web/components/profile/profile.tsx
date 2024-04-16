@@ -27,8 +27,8 @@ export default function Profile() {
 
   return (
     <>
-      <div className="flex flex-col gap-4 mx-[8%] h-full">
-        <div className="bg-gradient-to-b from-emerald-500 via-transparent to-transparent row-span-2 relative w-full flex-2">
+      <div className="flex flex-col gap-4 h-full">
+        <div className="bg-gradient-to-b from-emerald-500 via-transparent to-transparent row-span-2 relative w-full flex-2 px-[8%]">
           <div className="ml-6 mt-6">
             <Avatar src={pfp} />
           </div>
@@ -50,7 +50,7 @@ export default function Profile() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 pb-4">
+        <div className="flex flex-col gap-4 pb-4 mx-[8%]">
           <div className="flex flex-col bg-gray-800 p-4 rounded">
             <h1 className="text-xl">Bio</h1>
             <p className="text-sm mt-2">

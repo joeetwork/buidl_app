@@ -19,7 +19,7 @@ export function UiLayout({ children }: { children: ReactNode }) {
       {SUBPAGES.map((page, i) => {
         return pathname.startsWith(page.path) && <DashboardNav key={i} />;
       })}
-      <main className="flex-grow mx-4">
+      <main className="flex-grow">
         <Suspense
           fallback={
             <div className="text-center my-32">
