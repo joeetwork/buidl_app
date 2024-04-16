@@ -5,7 +5,7 @@ import * as anchor from '@coral-xyz/anchor';
 import { AnchorEscrow } from '@buidl/anchor';
 import { Assets } from '@/types/search-assets';
 
-interface EscrowActionsProps {
+interface ValidateActionsProps {
   onAcceptClick: () => void;
   onDeclineClick: () => void;
   escrow?: anchor.IdlAccounts<AnchorEscrow>['escrow'] | null;
@@ -13,13 +13,13 @@ interface EscrowActionsProps {
   isPending: boolean;
 }
 
-export default function EscrowActions({
+export default function ValidateActions({
   onAcceptClick,
   onDeclineClick,
   escrow,
   collections,
   isPending,
-}: EscrowActionsProps) {
+}: ValidateActionsProps) {
   const handleAcceptClick = () => {
     onAcceptClick();
   };

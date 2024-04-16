@@ -25,6 +25,10 @@ export default function EscrowsDisplay({
     onClick(e, i);
   };
 
+  const date = escrow?.voteDeadline
+    ? new Date(escrow.voteDeadline.toString() * 1000).getHours()
+    : 0;
+
   return (
     <>
       <div
@@ -58,9 +62,7 @@ export default function EscrowsDisplay({
           </span>
         </div>
         <div className="flex justify-between">
-          <div className="rounded bg-black p-4 w-[49%]">
-            {escrow?.voteDeadline}
-          </div>
+          <div className="rounded bg-black p-4 w-[49%]">{date} Hrs</div>
           <button
             onClick={() => window.open(escrow?.uploadWork)}
             className={'btn btn-primary w-[49%]'}

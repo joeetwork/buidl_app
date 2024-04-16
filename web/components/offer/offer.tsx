@@ -18,7 +18,7 @@ export default function Offer() {
   const [about, setAbout] = useState('');
   const [collection, setCollection] = useState<PublicKey | null>(null);
   const [validator, setValidator] = useState('');
-  const [showCollection, setShowCollection] = useState(true);
+  const [showCollection, setShowCollection] = useState(false);
   const { userAccount } = useAccounts();
   const [offerModal, setOfferModal] = useState(false);
 

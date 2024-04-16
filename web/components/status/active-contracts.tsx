@@ -1,29 +1,20 @@
 'use client';
-import React, { useEffect, useState } from 'react';
-import { PublicKey } from '@solana/web3.js';
-import * as anchor from '@coral-xyz/anchor';
-import { AnchorEscrow } from '@buidl/anchor';
+import React, { useState } from 'react';
 import EscrowsDisplay from '../shared/escrow-display';
 import { useClientAccounts } from '@/hooks/get-accounts';
-import Close from './close';
-import Validate from './validate';
-
-type Escrow =
-  | {
-      account: anchor.IdlAccounts<AnchorEscrow>['escrow'];
-      publicKey: PublicKey;
-    }
-  | null
-  | undefined;
+import CloseActions from './close-actions';
+import ValidateActions from './validate-actions';
 
 export default function ActiveContracts() {
   const { clientEscrows } = useClientAccounts();
-  const [escrow, setEscrow] = useState<Escrow>();
-  const [selectedEscrow, setSelectedEscrow] = useState<PublicKey | null>(null);
+  const [selectedEscrow, setSelectedEscrow] = useState<number>(-1);
 
-  useEffect(() => {
-    setEscrow(clientEscrows.data?.find((e) => e.publicKey === selectedEscrow));
-  }, [clientEscrows.data, selectedEscrow]);
+  const escrow = clientEscrows.data?.filter(
+    (escrow) =>
+      escrow.account.status === 'request' ||
+      escrow?.account.status === 'close' ||
+      escrow?.account.status === 'validate'
+  );
 
   return (
     <div className="h-full">
@@ -38,21 +29,19 @@ export default function ActiveContracts() {
               escrow?.account.status === 'close' ||
               escrow?.account.status === 'validate'
           )}
-          escrow={escrow?.account}
-          onClick={(e) => setSelectedEscrow(e)}
+          escrow={escrow && escrow[selectedEscrow]?.account}
+          onClick={(e, i) => setSelectedEscrow(i)}
         />
 
         <div className="card-actions w-full">
-          {(escrow?.account.status === 'request' ||
-            escrow?.account.status === 'close') && (
-            <Close pubKey={escrow.publicKey} />
-          )}
+          {escrow &&
+            (escrow[selectedEscrow]?.account.status === 'request' ||
+              escrow[selectedEscrow]?.account.status === 'close') && (
+              <CloseActions escrow={escrow && escrow[selectedEscrow]} />
+            )}
 
-          {escrow?.account.status === 'validate' && (
-            <Validate
-              pubKey={escrow.publicKey}
-              uploadWork={escrow.account.uploadWork}
-            />
+          {escrow && escrow[selectedEscrow]?.account.status === 'validate' && (
+            <ValidateActions escrow={escrow && escrow[selectedEscrow]} />
           )}
         </div>
       </div>

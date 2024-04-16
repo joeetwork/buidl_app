@@ -1,29 +1,16 @@
 'use client';
-import React, { useEffect, useState } from 'react';
-import { PublicKey } from '@solana/web3.js';
+import React, { useState } from 'react';
 import EscrowsDisplay from '../shared/escrow-display';
 import { useDevAccounts } from '@/hooks/get-accounts';
-
-import * as anchor from '@coral-xyz/anchor';
-import { AnchorEscrow } from '@buidl/anchor';
-import Exchange from './exchange';
-
-type Escrow =
-  | {
-      account: anchor.IdlAccounts<AnchorEscrow>['escrow'];
-      publicKey: PublicKey;
-    }
-  | null
-  | undefined;
+import ExchangeActions from './exchange-actions';
 
 export default function Claim() {
   const { devEscrows } = useDevAccounts();
-  const [escrow, setEscrow] = useState<Escrow>();
-  const [selectedEscrow, setSelectedEscrow] = useState<PublicKey | null>(null);
+  const [selectedEscrow, setSelectedEscrow] = useState<number>(-1);
 
-  useEffect(() => {
-    setEscrow(devEscrows.data?.find((e) => e.publicKey === selectedEscrow));
-  }, [devEscrows.data, selectedEscrow]);
+  const escrow = devEscrows.data?.filter(
+    (escrow) => escrow.account.status === 'exchange'
+  );
 
   return (
     <div className="h-full">
@@ -33,18 +20,13 @@ export default function Claim() {
         </div>
         <EscrowsDisplay
           escrows={devEscrows.data?.filter(
-            (escrow) => escrow?.account.status === 'upload'
+            (escrow) => escrow?.account.status === 'exchange'
           )}
-          escrow={escrow?.account}
-          onClick={(e) => setSelectedEscrow(e)}
+          escrow={escrow && escrow[selectedEscrow]?.account}
+          onClick={(e, i) => setSelectedEscrow(i)}
         />
         <div className="card-actions w-full">
-          {escrow?.account.status === 'upload' && (
-            <Exchange
-              escrow={escrow.publicKey}
-              initializer={escrow.account.initializer}
-            />
-          )}
+          <ExchangeActions escrow={escrow && escrow[selectedEscrow]} />
         </div>
       </div>
     </div>

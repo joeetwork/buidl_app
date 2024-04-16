@@ -102,7 +102,7 @@ export function useClientAccounts() {
   };
 }
 
-export function useDevAccounts(contract?: PublicKey | null) {
+export function useDevAccounts() {
   const { program, programId } = useProgram();
   const { publicKey } = useWallet();
 
