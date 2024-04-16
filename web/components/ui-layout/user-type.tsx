@@ -2,13 +2,11 @@
 
 import { useAccounts } from '@/hooks/get-accounts';
 import { useInitialiseUser } from '@/hooks/initialize-user';
-import React, { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import React from 'react';
 
 export function UserType() {
   const { initializeUser } = useInitialiseUser();
   const { userAccount } = useAccounts();
-  const router = useRouter();
 
   const handleSubmit = (role: string) => {
     if (userAccount.data && role) {
@@ -21,16 +19,6 @@ export function UserType() {
       });
     }
   };
-
-  useEffect(() => {
-    if (userAccount.data?.role === 'Client' && initializeUser.isSuccess) {
-      router.push('/contracts');
-    }
-
-    if (userAccount.data?.role === 'Freelancer' && initializeUser.isSuccess) {
-      router.push('/requests');
-    }
-  }, [initializeUser.isSuccess]);
 
   const USERTYPES = ['Freelancer', 'Client'];
 
