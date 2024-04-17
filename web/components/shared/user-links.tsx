@@ -28,7 +28,7 @@ export function UserLinks({ userAccountLinks, onInputChange }: LinksProps) {
     userLinks.forEach(([key, value]) => {
       handleCommunicationMethodChange(key as FilteredProps);
     });
-  }, []);
+  }, [userAccountLinks]);
 
   return (
     <div className="w-full px-6">

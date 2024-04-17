@@ -1,6 +1,6 @@
 'use client';
 
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import { useInitialiseUser } from '@/hooks/initialize-user';
 import { useAccounts } from '@/hooks/get-accounts';
 import { AppModal } from '../shared/app-modal';
@@ -51,6 +51,18 @@ export default function ProfileModal({ show, hideModal }: ProfileModalProps) {
       links: links,
     });
   };
+
+  useEffect(() => {
+    setName(userAccount.data?.username ?? '');
+    setAbout(userAccount.data?.about ?? '');
+    setPfp(userAccount.data?.pfp ?? '');
+    setLinks(userAccount.data?.links ?? '');
+  }, [
+    userAccount.data?.username,
+    userAccount.data?.about,
+    userAccount.data?.pfp,
+    userAccount.data?.links,
+  ]);
 
   const renderUsername =
     userAccount.data?.username === userAccount.data?.initializer?.toString()

@@ -45,10 +45,6 @@ export default function Offer() {
     }
   };
 
-  const handleInputChange = useCallback((v: string) => {
-    setValidator(v);
-  }, []);
-
   return (
     <>
       <div className="h-full">
@@ -85,7 +81,7 @@ export default function Offer() {
               />
             ) : (
               <Input
-                onChange={(e) => handleInputChange(e.target.value)}
+                onChange={(e) => setValidator(e.target.value)}
                 contained={true}
                 label="Add Validator"
                 placeholder="SoliRxTzQ3sbz4it..."
