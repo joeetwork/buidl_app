@@ -31,11 +31,14 @@ export function Navbar() {
   return (
     <div className="navbar bg-base-300 text-neutral-content flex-col md:flex-row space-y-2 md:space-y-0">
       <div className="flex-1">
-        <Link className="btn btn-ghost normal-case text-xl w-1/5" href="/">
+        <Link
+          className="h-auto w-[13%] lg:w-[10%] xl:w-[6%] 2xl:w-[3%] ml-2 rounded hover:ring hover:ring-primary"
+          href="/"
+        >
           <Image
-            style={{ width: '100%', height: 'auto' }}
+            className="w-full h-auto rounded"
             alt="Solana Logo"
-            src="/solana-logo.png"
+            src="/gigd.png"
             width={0}
             height={0}
             sizes="100vw"
