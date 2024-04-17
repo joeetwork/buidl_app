@@ -39,8 +39,6 @@ export function AppModal({
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         hide();
-      } else if (event.key === ' ' || event.code === 'Space') {
-        event.preventDefault();
       }
     };
 
