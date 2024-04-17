@@ -27,7 +27,12 @@ export default function HistoryModal({
             >
               <div className="card-body">
                 <h2 className="text-center font-bold">Upload</h2>
-                <p>Amount: {work.account.amount.toString()}</p>
+                <p>
+                  Amount:{' '}
+                  {`$${(
+                    Number(work.account.amount.toString()) / 1000000
+                  ).toFixed(2)}`}
+                </p>
                 <p className="w-full break-words">
                   About: {work.account.about}
                 </p>
