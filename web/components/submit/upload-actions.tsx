@@ -38,6 +38,7 @@ export default function UploadActions({ escrow }: UploadActionsProps) {
       <Input
         value={link}
         label="Upload work"
+        contained={true}
         onChange={(e) => setLink(e.target.value)}
       />
 
