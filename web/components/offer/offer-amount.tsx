@@ -59,7 +59,7 @@ export default function OfferAmount({
         </div>
 
         <button
-          className="flex items-center gap-4 btn m-auto focus:outline-none tooltip before:max-w-none"
+          className="flex items-center gap-4 btn bg-black text-white m-auto focus:outline-none tooltip before:max-w-none"
           data-tip={'More Tokens coming soon'}
         >
           <Image

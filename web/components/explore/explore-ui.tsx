@@ -87,7 +87,9 @@ export default function ExploreUi() {
                               : user.username
                           }/${user.initializer}`}
                         >
-                          <button className="btn">Make offer</button>
+                          <button className="btn bg-black text-white">
+                            Make offer
+                          </button>
                         </Link>
                       </div>
                     </div>

@@ -42,7 +42,7 @@ export default function Profile() {
             </div>
 
             <button
-              className="w-[40%] ml-auto btn"
+              className="w-[40%] ml-auto btn bg-black text-white"
               onClick={() => setProfileModal(true)}
             >
               Edit Profile
@@ -85,18 +85,23 @@ export default function Profile() {
             <h1 className="text-xl font-bold">History</h1>
             <div className="flex justify-evenly my-auto">
               {userAccount.data?.role === 'Client' ? (
-                <button className="btn" onClick={() => showHistory('client')}>
+                <button
+                  className="btn bg-black text-white"
+                  onClick={() => showHistory('client')}
+                >
                   Client History
                 </button>
               ) : (
                 <button
-                  className="btn"
+                  className="btn bg-black text-white"
                   onClick={() => showHistory('freelancer')}
                 >
                   Freelance History
                 </button>
               )}
-              <button className="btn">Voting History</button>
+              <button className="btn bg-black text-white">
+                Voting History
+              </button>
             </div>
           </div>
         </div>
