@@ -2,7 +2,7 @@
 .anchor
 .DS_Store
 target
-!target/types
+!target/types/anchor_escrow.ts
 **/*.rs.bk
 node_modules
 test-ledger
