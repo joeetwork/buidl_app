@@ -43,7 +43,7 @@ export function UserLinks({ userAccountLinks, onInputChange }: LinksProps) {
                 checked={selectedContacts.includes(contact)}
                 onChange={() => handleCommunicationMethodChange(contact)}
               />
-              <div className="swap-on ring ring-green-600 rounded-full p-2">
+              <div className="swap-on ring ring-teal-400 rounded-full p-2">
                 <Image src={`/${img}.png`} alt={img} width={40} height={40} />
               </div>
 
