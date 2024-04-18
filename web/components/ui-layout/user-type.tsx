@@ -23,11 +23,11 @@ export function UserType() {
   };
 
   useEffect(() => {
-    if (userAccount.data?.role === 'Client') {
+    if (userAccount.data?.role === 'Client' && initializeUser.isSuccess) {
       router.push('/contracts');
     }
 
-    if (userAccount.data?.role === 'Freelancer') {
+    if (userAccount.data?.role === 'Freelancer' && initializeUser.isSuccess) {
       router.push('/requests');
     }
   }, [initializeUser.isSuccess]);
@@ -36,7 +36,7 @@ export function UserType() {
 
   return (
     <div className="dropdown dropdown-end">
-      <label tabIndex={0} className="btn btn-primary rounded-btn">
+      <label tabIndex={0} className="btn bg-teal-600 text-white rounded-btn">
         {userAccount.data?.role}
       </label>
       <ul
@@ -46,8 +46,8 @@ export function UserType() {
         {USERTYPES.map((name) => (
           <li key={name}>
             <button
-              className={`btn btn-sm ${
-                userAccount.data?.role === name ? 'btn-primary' : 'btn-ghost'
+              className={`btn btn-sm text-white ${
+                userAccount.data?.role === name ? 'bg-teal-600' : 'btn-ghost'
               }`}
               onClick={() => handleSubmit(name)}
             >
