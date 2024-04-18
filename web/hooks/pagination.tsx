@@ -34,7 +34,7 @@ export function usePagination({
                   dataSize: 1485,
                   memcmp: {
                     offset: 448,
-                    bytes: base58.encode(Buffer.from(true)),
+                    bytes: base58.encode(Buffer.from('true')),
                   },
                 },
               ]
