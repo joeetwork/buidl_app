@@ -37,7 +37,11 @@ export default function DashboardNav() {
           <Link
             key={idx}
             href={path.toLowerCase()}
-            className={`text-lg ${pathname.startsWith(path) && 'text-white'}`}
+            className={`text-lg  ${
+              pathname.startsWith(path)
+                ? 'text-white font-bold'
+                : 'text-gray-300'
+            }`}
           >
             {label === 'Contracts' ? 'Active' : label}
           </Link>

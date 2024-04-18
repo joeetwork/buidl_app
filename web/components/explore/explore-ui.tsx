@@ -66,27 +66,28 @@ export default function ExploreUi() {
                 return (
                   <div
                     key={user?.initializer.toString()}
-                    className="card w-full bg-base-100 shadow-xl"
+                    className="card bg-teal-700 w-full shadow-xl"
                   >
                     <div className="card-body items-center text-center">
                       <Avatar src={user.pfp ?? ''} />
-                      <h2 className="card-title">
+                      <h2 className="card-title text-white">
                         {user?.username === user.initializer.toString()
                           ? 'Guest'
                           : user.username}
                       </h2>
-                      <p className="w-full break-words">{user?.about}</p>
+                      <p className="w-full break-words text-white">
+                        {user?.about}
+                      </p>
                       <div className="card-actions">
                         <Link
+                          className="text-white"
                           href={`offer/${
                             user.username === user.initializer.toString()
                               ? 'guest'
                               : user.username
                           }/${user.initializer}`}
                         >
-                          <button className="btn btn-primary">
-                            Make offer
-                          </button>
+                          <button className="btn">Make offer</button>
                         </Link>
                       </div>
                     </div>

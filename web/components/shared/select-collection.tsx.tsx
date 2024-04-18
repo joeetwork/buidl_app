@@ -37,8 +37,8 @@ export default function SelectCollection({
 
   return (
     <div
-      className={`bg-gray-500 rounded-lg p-4 w-full hover:ring ${
-        isHighlighted ? 'ring ring-gray-400 ' : 'hover:ring-gray-700'
+      className={`bg-teal-700 rounded-lg p-4 w-full hover:ring ${
+        isHighlighted ? 'ring ring-teal-400 ' : 'hover:ring-teal-600'
       }`}
     >
       <div className="w-full">

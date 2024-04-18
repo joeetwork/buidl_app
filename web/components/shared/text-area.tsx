@@ -22,8 +22,8 @@ export default function TextArea({
     <div
       className={
         contained
-          ? `bg-gray-500 rounded-lg p-4 w-full hover:ring ${
-              isHighlighted ? 'ring ring-gray-400' : 'hover:ring-gray-700'
+          ? `bg-teal-700 rounded-lg p-4 w-full hover:ring ${
+              isHighlighted ? 'ring ring-teal-400' : 'hover:ring-teal-600'
             }`
           : ''
       }
@@ -32,7 +32,7 @@ export default function TextArea({
         <span className="label-text cursor-default">{label}</span>
       </div>
       <textarea
-        className={`textarea textarea-lg w-full resize-none bg-gray-500 ${
+        className={`textarea textarea-lg w-full resize-none bg-teal-700 ${
           contained && 'focus:outline-none p-0'
         }`}
         name={label.toLowerCase()}

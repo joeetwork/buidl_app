@@ -43,7 +43,7 @@ export default function Avatar({ onFileUpload, src }: AvatarProps) {
 
   return (
     <div className="avatar">
-      <div className="w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+      <div className="w-24 rounded-full ring ring-teal-400 ring-offset-base-100 ring-offset-2">
         {onFileUpload && (
           <>
             <input

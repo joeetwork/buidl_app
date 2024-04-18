@@ -32,7 +32,7 @@ export function Navbar() {
     <div className="navbar bg-base-300 text-neutral-content flex-col md:flex-row space-y-2 md:space-y-0">
       <div className="flex-1">
         <Link
-          className="h-auto w-[13%] lg:w-[10%] xl:w-[6%] 2xl:w-[3%] ml-2 rounded hover:ring hover:ring-primary"
+          className="h-auto w-[13%] lg:w-[10%] xl:w-[6%] 2xl:w-[3%] ml-2 rounded hover:ring hover:ring-teal-600"
           href="/"
         >
           <Image
@@ -44,19 +44,19 @@ export function Navbar() {
             sizes="100vw"
           />
         </Link>
-        <ul className="menu menu-horizontal px-1 space-x-2">
+        <ul className="flex pl-4 space-x-2">
           {PAGES.map(({ label, path }) => {
             return (
               <li key={path}>
                 <Link
-                  className={
+                  className={`p-2 rounded-lg hover:transition-colors hover:bg-opacity-80 hover:bg-teal-400 text-white ${
                     pathname.startsWith(path)
-                      ? 'active'
+                      ? 'bg-opacity-80 bg-teal-600'
                       : '' ||
                         (pathname === '/requests' && path === '/contracts')
-                      ? 'active'
+                      ? 'bg-opacity-80 bg-teal-600'
                       : ''
-                  }
+                  }`}
                   href={
                     userAccount.data?.role === 'Freelancer' &&
                     path === '/contracts'

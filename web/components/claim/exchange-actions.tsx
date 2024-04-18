@@ -29,7 +29,7 @@ export default function Exchange({ escrow }: ExchangeActionsProps) {
 
   return (
     <button
-      className="btn btn-primary w-full"
+      className="btn bg-black text-white w-full"
       onClick={() =>
         handleExchange({
           escrow: escrow?.publicKey,

@@ -36,8 +36,8 @@ export default function OfferAmount({
 
   return (
     <div
-      className={`bg-gray-500 rounded-lg p-4 hover:ring ${
-        isHighlighted ? 'ring ring-gray-400 ' : 'hover:ring-gray-700'
+      className={`bg-teal-700 rounded-lg p-4 hover:ring ${
+        isHighlighted ? 'ring ring-teal-400 ' : 'hover:ring-teal-600'
       }`}
     >
       <div className="w-full">
@@ -53,7 +53,7 @@ export default function OfferAmount({
             onBlur={() => setIsHighlighted(false)}
             type="text"
             placeholder="0"
-            className="input input-ghost input-lg p-0 text-4xl bg-gray-500 focus:outline-none w-full"
+            className="input input-ghost input-lg p-0 text-4xl bg-teal-700 focus:outline-none w-full"
           />
           {inputValue && <p>{`$${Number(inputValue).toFixed(2)}`}</p>}
         </div>

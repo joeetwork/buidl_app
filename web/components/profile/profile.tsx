@@ -51,8 +51,8 @@ export default function Profile() {
         </div>
 
         <div className="flex flex-col gap-4 pb-4 mx-[8%]">
-          <div className="flex flex-col bg-gray-800 p-4 rounded">
-            <h1 className="text-xl">Bio</h1>
+          <div className="flex flex-col bg-teal-800 p-4 rounded-lg">
+            <h1 className="text-xl font-bold">Bio</h1>
             <p className="text-sm mt-2">
               {userAccount.data?.about ?? 'Edit profile to add a bio'}
             </p>
@@ -60,8 +60,8 @@ export default function Profile() {
 
           {userAccount.data?.links &&
             Object.values(userAccount.data?.links).some(Boolean) && (
-              <div className="flex flex-col bg-gray-800 p-4 rounded">
-                <h1 className="text-xl">Links</h1>
+              <div className="flex flex-col bg-teal-800 p-4 rounded-lg">
+                <h1 className="text-xl font-bold">Links</h1>
                 <div className="flex flex-col mt-2 gap-4">
                   {Object.entries(userAccount.data?.links).map(
                     ([link, value]) =>
@@ -81,8 +81,8 @@ export default function Profile() {
               </div>
             )}
 
-          <div className="flex flex-col bg-gray-800 p-4 rounded">
-            <h1 className="text-xl">History</h1>
+          <div className="flex flex-col bg-teal-800 p-4 rounded-lg">
+            <h1 className="text-xl font-bold">History</h1>
             <div className="flex justify-evenly my-auto">
               {userAccount.data?.role === 'Client' ? (
                 <button className="btn" onClick={() => showHistory('client')}>

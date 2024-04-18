@@ -43,7 +43,7 @@ export default function UploadActions({ escrow }: UploadActionsProps) {
       />
 
       <button
-        className="btn btn-primary w-full"
+        className="btn bg-black text-white w-full"
         onClick={() =>
           handleUpload({
             escrow: escrow?.publicKey,

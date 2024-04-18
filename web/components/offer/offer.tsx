@@ -96,7 +96,7 @@ export default function Offer() {
             />
 
             <button
-              className="btn btn-primary mt-2 w-full mx-4"
+              className="btn bg-black text-white mt-2 w-full mx-4"
               onClick={handleSubmit}
               disabled={
                 showCollection

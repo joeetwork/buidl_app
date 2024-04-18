@@ -25,7 +25,7 @@ export default function CloseActions({ escrow }: CloseActionsProps) {
   return (
     <button
       onClick={() => handleCancelClick(escrow?.publicKey)}
-      className="btn btn-primary w-full"
+      className="btn bg-black text-white w-full"
       disabled={
         !(
           escrow?.account?.status === 'close' ||

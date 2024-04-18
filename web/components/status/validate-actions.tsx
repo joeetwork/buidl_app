@@ -26,14 +26,14 @@ export default function ValidateActions({ escrow }: ValidateActionsProps) {
     <div className="flex w-full justify-between">
       <button
         onClick={() => window.open(escrow?.account?.uploadWork)}
-        className={'btn btn-primary w-[49%]'}
+        className={'btn bg-black text-white w-[49%]'}
         disabled={!escrow?.account?.uploadWork}
       >
         Check Uploaded work
       </button>
       <button
         onClick={() => handleClick(escrow?.publicKey)}
-        className="btn btn-primary w-[49%]"
+        className="btn bg-black text-white w-[49%]"
         disabled={
           escrow?.account?.status !== 'validate' || validateWithClient.isPending
         }

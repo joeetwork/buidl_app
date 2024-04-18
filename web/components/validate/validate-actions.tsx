@@ -32,7 +32,7 @@ export default function ValidateActions({
     <div className="flex w-full justify-between">
       <button
         onClick={() => handleAcceptClick()}
-        className="btn btn-primary w-[49%]"
+        className="btn bg-black text-white w-[49%]"
         disabled={
           collections
             ? escrow?.status !== 'validate' ||
@@ -46,7 +46,7 @@ export default function ValidateActions({
 
       <button
         onClick={() => handleDeclineClick()}
-        className="btn btn-primary w-[49%]"
+        className="btn bg-black text-white w-[49%]"
         disabled={
           collections
             ? escrow?.status !== 'validate' ||

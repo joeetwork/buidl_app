@@ -25,8 +25,8 @@ export default function Input({
     <div
       className={
         contained
-          ? `bg-gray-500 rounded-lg p-4 w-full hover:ring ${
-              isHighlighted ? 'ring ring-gray-400 ' : 'hover:ring-gray-700'
+          ? `bg-teal-700 rounded-lg p-4 w-full hover:ring ${
+              isHighlighted ? 'ring ring-teal-400 ' : 'hover:ring-teal-600'
             }`
           : ''
       }
@@ -43,9 +43,9 @@ export default function Input({
           onBlur={() => setIsHighlighted(false)}
           type="text"
           placeholder={placeholder}
-          className={`input input-ghost bg-gray-500 w-full ${
+          className={`input input-ghost bg-teal-700 w-full ${
             contained &&
-            'input-md p-0 text-lg bg-gray-500 focus:outline-none w-full'
+            'input-md p-0 text-lg bg-teal-700 focus:outline-none w-full'
           }`}
         />
       </div>

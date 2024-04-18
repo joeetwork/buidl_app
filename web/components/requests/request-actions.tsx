@@ -48,7 +48,7 @@ export default function RequestActions({ escrow }: RequestActionsProps) {
             initializer: escrow?.account?.initializer,
           })
         }
-        className="btn btn-primary w-[49%]"
+        className="btn bg-black text-white w-[49%]"
         disabled={
           escrow?.account?.status !== 'request' || acceptRequest.isPending
         }
@@ -63,7 +63,7 @@ export default function RequestActions({ escrow }: RequestActionsProps) {
             initializer: escrow?.account?.initializer,
           })
         }
-        className="btn btn-primary w-[49%]"
+        className="btn bg-black text-white w-[49%]"
         disabled={
           escrow?.account?.status !== 'request' || declineRequest.isPending
         }
