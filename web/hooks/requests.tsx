@@ -4,7 +4,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey, SystemProgram } from '@solana/web3.js';
 import { useMutation } from '@tanstack/react-query';
 import { useTransactionToast } from '@/components/shared/use-transaction-toast';
-import { useAccounts } from './get-accounts';
+import { useDevAccounts } from './get-accounts';
 import { useCluster } from '@/components/cluster/cluster-data-access';
 
 import { usePDAs } from './get-PDAs';
@@ -13,14 +13,15 @@ import {
   TOKEN_PROGRAM_ID,
   getAssociatedTokenAddressSync,
 } from '@solana/spl-token';
+import { useProgram } from './get-program';
 
 export function useRequests() {
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
-  const { program } = useAccounts();
+  const { program } = useProgram();
   const { publicKey } = useWallet();
   const { mint } = usePDAs();
-  const { devEscrows } = useAccounts();
+  const { devEscrows } = useDevAccounts();
 
   interface RequestProps {
     escrow: PublicKey;

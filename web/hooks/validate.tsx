@@ -3,7 +3,7 @@
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useTransactionToast } from '@/components/shared/use-transaction-toast';
-import { useAccounts } from './get-accounts';
+import { useClientAccounts } from './get-accounts';
 import { useCluster } from '@/components/cluster/cluster-data-access';
 import { Metaplex, PublicKey } from '@metaplex-foundation/js';
 import * as anchor from '@coral-xyz/anchor';
@@ -12,42 +12,25 @@ import {
   TOKEN_PROGRAM_ID,
   getAssociatedTokenAddress,
 } from '@solana/spl-token';
+import { useProgram } from './get-program';
+import { useCollection } from './get-collection';
 
 interface ValidateProps {
   escrow: PublicKey;
   nftAddress?: PublicKey;
 }
 
-export function useValidate(collection?: PublicKey) {
+export function useValidateUser() {
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
-  const { program } = useAccounts();
+  const { program } = useProgram();
   const { publicKey } = useWallet();
-  const { connection } = useConnection();
-  const { hiringEscrows, devEscrows } = useAccounts();
 
-  const validatorCollectionEscrows = useQuery({
-    queryKey: ['validatorCollectionEscrows', { collection }],
-    queryFn: () => {
-      if (collection) {
-        return program.account.escrow.all([
-          {
-            memcmp: {
-              offset: 122,
-              bytes: collection.toBase58(),
-            },
-          },
-        ]);
-      }
-      return null;
-    },
-  });
-
-  const validatorUserEscrows = useQuery({
-    queryKey: ['validatorUserEscrows', { publicKey }],
-    queryFn: () => {
+  const userEscrows = useQuery({
+    queryKey: ['userEscrows', { publicKey }],
+    queryFn: async () => {
       if (publicKey) {
-        return program.account.escrow.all([
+        const res = await program.account.escrow.all([
           {
             memcmp: {
               offset: 123,
@@ -55,6 +38,183 @@ export function useValidate(collection?: PublicKey) {
             },
           },
         ]);
+        return res.length > 0 ? res : [];
+      }
+      return null;
+    },
+  });
+
+  const acceptWithUser = useMutation({
+    mutationKey: ['acceptWithUser', 'validate', { cluster }],
+    mutationFn: async ({ escrow }: ValidateProps) => {
+      if (publicKey) {
+        const validatePDA = PublicKey.findProgramAddressSync(
+          [Buffer.from('validate'), publicKey?.toBuffer(), escrow.toBuffer()],
+          program.programId
+        )[0];
+
+        return program.methods
+          .acceptWithUser()
+          .accounts({
+            user: publicKey,
+            escrowState: escrow,
+            validateState: validatePDA,
+            systemProgram: anchor.web3.SystemProgram.programId,
+          })
+          .rpc({
+            skipPreflight: true,
+          });
+      }
+      return null;
+    },
+    onSuccess: (tx) => {
+      transactionToast(tx ?? '');
+      return userEscrows.refetch();
+    },
+  });
+
+  const declineWithUser = useMutation({
+    mutationKey: ['declineWithUser', 'validate', { cluster }],
+    mutationFn: async ({ escrow }: ValidateProps) => {
+      if (publicKey) {
+        const validatePDA = PublicKey.findProgramAddressSync(
+          [Buffer.from('validate'), publicKey?.toBuffer(), escrow.toBuffer()],
+          program.programId
+        )[0];
+
+        return program.methods
+          .declineWithUser()
+          .accounts({
+            user: publicKey,
+            escrowState: escrow,
+            validateState: validatePDA,
+            systemProgram: anchor.web3.SystemProgram.programId,
+          })
+          .rpc({
+            skipPreflight: true,
+          });
+      }
+      return null;
+    },
+    onSuccess: (tx) => {
+      transactionToast(tx ?? '');
+      return userEscrows.refetch();
+    },
+  });
+
+  const countVote = useQuery({
+    queryKey: ['countVote', { userEscrows }],
+    queryFn: async () => {
+      userEscrows.data?.forEach((escrow) => {
+        if (
+          escrow.account.status === 'validate' &&
+          escrow.account.voteDeadline &&
+          escrow.account.voteDeadline.toNumber() < new Date().getTime() / 1000
+        ) {
+          fetch('/api/signer', {
+            method: 'POST',
+            body: JSON.stringify({
+              escrow: escrow,
+            }),
+          });
+          userEscrows.refetch();
+        }
+      });
+    },
+  });
+
+  return {
+    acceptWithUser,
+    declineWithUser,
+    userEscrows,
+    countVote,
+  };
+}
+
+export function useValidateClient() {
+  const { cluster } = useCluster();
+  const transactionToast = useTransactionToast();
+  const { program } = useProgram();
+  const { publicKey } = useWallet();
+  const { clientEscrows } = useClientAccounts();
+
+  const validateWithClient = useMutation({
+    mutationKey: ['validateWithClient', { cluster }],
+    mutationFn: async (escrow: PublicKey) => {
+      if (publicKey) {
+        const validatePDA = PublicKey.findProgramAddressSync(
+          [Buffer.from('validate'), publicKey?.toBuffer(), escrow.toBuffer()],
+          program.programId
+        )[0];
+
+        return program.methods
+          .validateWithEmployer()
+          .accounts({
+            user: publicKey,
+            escrowState: escrow,
+            validateState: validatePDA,
+            systemProgram: anchor.web3.SystemProgram.programId,
+          })
+          .rpc({
+            skipPreflight: true,
+          });
+      }
+      return null;
+    },
+    onSuccess: (tx) => {
+      transactionToast(tx ?? '');
+      return clientEscrows.refetch();
+    },
+  });
+
+  const countVote = useQuery({
+    queryKey: ['countVote'],
+    queryFn: async () => {
+      clientEscrows.data?.forEach((escrow) => {
+        if (
+          escrow.account.status === 'validate' &&
+          escrow.account.voteDeadline &&
+          escrow.account.voteDeadline.toNumber() < new Date().getTime() / 1000
+        ) {
+          fetch('/api/signer', {
+            method: 'POST',
+            body: JSON.stringify({
+              escrow: escrow,
+            }),
+          });
+          clientEscrows.refetch();
+        }
+      });
+    },
+  });
+
+  return {
+    validateWithClient,
+    countVote,
+  };
+}
+
+export function useValidateCollection(collection?: PublicKey | null) {
+  const { cluster } = useCluster();
+  const transactionToast = useTransactionToast();
+  const { program } = useProgram();
+  const { publicKey } = useWallet();
+  const { connection } = useConnection();
+  const { collections } = useCollection(collection);
+
+  const collectionEscrows = useQuery({
+    queryKey: ['collectionEscrows', { collection }],
+    queryFn: async () => {
+      if (collection) {
+        const res = await program.account.escrow.all([
+          {
+            memcmp: {
+              offset: 122,
+              bytes: collection.toBase58(),
+            },
+          },
+        ]);
+        return res.length > 0 ? res : [];
       }
       return null;
     },
@@ -101,7 +261,7 @@ export function useValidate(collection?: PublicKey) {
     },
     onSuccess: (tx) => {
       transactionToast(tx ?? '');
-      return validatorCollectionEscrows.refetch();
+      return collectionEscrows.refetch();
     },
   });
 
@@ -146,190 +306,36 @@ export function useValidate(collection?: PublicKey) {
     },
     onSuccess: (tx) => {
       transactionToast(tx ?? '');
-      return validatorCollectionEscrows.refetch();
+      return collectionEscrows.refetch();
     },
   });
 
-  const acceptWithUser = useMutation({
-    mutationKey: ['acceptWithUser', 'validate', { cluster }],
-    mutationFn: async ({ escrow }: ValidateProps) => {
-      if (publicKey) {
-        const validatePDA = PublicKey.findProgramAddressSync(
-          [Buffer.from('validate'), publicKey?.toBuffer(), escrow.toBuffer()],
-          program.programId
-        )[0];
-
-        return program.methods
-          .acceptWithUser()
-          .accounts({
-            user: publicKey,
-            escrowState: escrow,
-            validateState: validatePDA,
-            systemProgram: anchor.web3.SystemProgram.programId,
-          })
-          .rpc({
-            skipPreflight: true,
-          });
-      }
-      return null;
-    },
-    onSuccess: (tx) => {
-      transactionToast(tx ?? '');
-      return validatorUserEscrows.refetch();
-    },
-  });
-
-  const declineWithUser = useMutation({
-    mutationKey: ['declineWithUser', 'validate', { cluster }],
-    mutationFn: async ({ escrow }: ValidateProps) => {
-      if (publicKey) {
-        const validatePDA = PublicKey.findProgramAddressSync(
-          [Buffer.from('validate'), publicKey?.toBuffer(), escrow.toBuffer()],
-          program.programId
-        )[0];
-
-        return program.methods
-          .declineWithUser()
-          .accounts({
-            user: publicKey,
-            escrowState: escrow,
-            validateState: validatePDA,
-            systemProgram: anchor.web3.SystemProgram.programId,
-          })
-          .rpc({
-            skipPreflight: true,
-          });
-      }
-      return null;
-    },
-    onSuccess: (tx) => {
-      transactionToast(tx ?? '');
-      return validatorUserEscrows.refetch();
-    },
-  });
-
-  const validateWithEmployer = useMutation({
-    mutationKey: ['validateWithEmployer', { cluster }],
-    mutationFn: async (escrow: PublicKey) => {
-      if (publicKey) {
-        const validatePDA = PublicKey.findProgramAddressSync(
-          [Buffer.from('validate'), publicKey?.toBuffer(), escrow.toBuffer()],
-          program.programId
-        )[0];
-
-        return program.methods
-          .validateWithEmployer()
-          .accounts({
-            user: publicKey,
-            escrowState: escrow,
-            validateState: validatePDA,
-            systemProgram: anchor.web3.SystemProgram.programId,
-          })
-          .rpc({
-            skipPreflight: true,
-          });
-      }
-      return null;
-    },
-    onSuccess: (tx) => {
-      transactionToast(tx ?? '');
-      return hiringEscrows.refetch();
-    },
-  });
-
-  const countVote = useQuery({
-    queryKey: [
-      'countVote',
-      { validatorCollectionEscrows, validatorUserEscrows },
-    ],
-    queryFn: async () => {
-      if (validatorCollectionEscrows.data) {
-        validatorCollectionEscrows.data?.forEach((escrow) => {
-          if (
-            escrow.account.status === 'validate' &&
-            escrow.account.voteDeadline &&
-            escrow.account.voteDeadline.toNumber() < new Date().getTime() / 1000
-          ) {
-            fetch('/api/signer', {
-              method: 'POST',
-              body: JSON.stringify({
-                escrow: escrow,
-              }),
-            });
-            validatorCollectionEscrows.refetch();
-          }
-        });
-      } else if (validatorUserEscrows.data) {
-        if (validatorUserEscrows.data) {
-          validatorUserEscrows.data?.forEach((escrow) => {
-            if (
-              escrow.account.status === 'validate' &&
-              escrow.account.voteDeadline &&
-              escrow.account.voteDeadline.toNumber() <
-                new Date().getTime() / 1000
-            ) {
-              fetch('/api/signer', {
-                method: 'POST',
-                body: JSON.stringify({
-                  escrow: escrow,
-                }),
-              });
-              validatorUserEscrows.refetch();
-            }
-          });
-        }
-      } else if (hiringEscrows.data) {
-        if (hiringEscrows.data) {
-          hiringEscrows.data?.forEach((escrow) => {
-            if (
-              escrow.account.status === 'validate' &&
-              escrow.account.voteDeadline &&
-              escrow.account.voteDeadline.toNumber() <
-                new Date().getTime() / 1000
-            ) {
-              fetch('/api/signer', {
-                method: 'POST',
-                body: JSON.stringify({
-                  escrow: escrow,
-                }),
-              });
-              hiringEscrows.refetch();
-            }
-          });
-        }
-      }
-      else if (devEscrows.data) {
-        if (devEscrows.data) {
-          devEscrows.data?.forEach((escrow) => {
-            if (
-              escrow.account.status === 'validate' &&
-              escrow.account.voteDeadline &&
-              escrow.account.voteDeadline.toNumber() <
-                new Date().getTime() / 1000
-            ) {
-              fetch('/api/signer', {
-                method: 'POST',
-                body: JSON.stringify({
-                  escrow: escrow,
-                }),
-              });
-              devEscrows.refetch();
-            }
-          });
-        }
-      }
-      return null;
-    },
-  });
+  // const countVote = useQuery({
+  //   queryKey: ['countVote', { collectionEscrows }],
+  //   queryFn: async () => {
+  //     collectionEscrows.data?.forEach((escrow) => {
+  //       if (
+  //         escrow.account.status === 'validate' &&
+  //         escrow.account.voteDeadline &&
+  //         escrow.account.voteDeadline.toNumber() < new Date().getTime() / 1000
+  //       ) {
+  //         fetch('/api/signer', {
+  //           method: 'POST',
+  //           body: JSON.stringify({
+  //             escrow: escrow,
+  //           }),
+  //         });
+  //         collectionEscrows.refetch();
+  //       }
+  //     });
+  //   },
+  // });
 
   return {
     acceptWithCollection,
     declineWithCollection,
-    acceptWithUser,
-    declineWithUser,
-    validatorCollectionEscrows,
-    validatorUserEscrows,
-    validateWithEmployer,
-    countVote,
+    collectionEscrows,
+    collections,
+    // countVote,
   };
 }

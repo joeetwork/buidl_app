@@ -1,33 +1,46 @@
-import React from 'react';
+'use client';
+
+import React, { ChangeEvent, useState } from 'react';
 
 interface TextAreaProps {
-  label?: string;
-  value: string;
-  name?: string;
-  onChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  label: string;
+  value?: string;
+  onChange: (e: ChangeEvent<HTMLTextAreaElement>) => void;
+  placeholder?: string;
+  contained?: boolean;
 }
 
 export default function TextArea({
   label,
-  value,
-  name,
   onChange,
+  placeholder,
+  contained = false,
 }: TextAreaProps) {
-  return (
-    <label className="form-control w-full max-w-xs">
-      {label && (
-        <div className="label">
-          <span className="label-text">{label}</span>
-        </div>
-      )}
+  const [isHighlighted, setIsHighlighted] = useState(false);
 
+  return (
+    <div
+      className={
+        contained
+          ? `bg-teal-700 rounded-lg p-4 w-full hover:ring ${
+              isHighlighted ? 'ring ring-teal-400' : 'hover:ring-teal-600'
+            }`
+          : ''
+      }
+    >
+      <div className="w-full">
+        <span className="label-text cursor-default">{label}</span>
+      </div>
       <textarea
-        placeholder="About"
-        name={name}
-        className="textarea textarea-bordered textarea-md w-full max-w-xs"
-        onChange={(e) => onChange(e)}
-        value={value}
+        className={`textarea textarea-lg w-full resize-none bg-teal-700 ${
+          contained && 'focus:outline-none p-0'
+        }`}
+        name={label.toLowerCase()}
+        onFocus={() => setIsHighlighted(true)}
+        onBlur={() => setIsHighlighted(false)}
+        placeholder={placeholder}
+        onChange={onChange}
       />
-    </label>
+    </div>
   );
 }

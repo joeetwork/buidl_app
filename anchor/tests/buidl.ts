@@ -1,6 +1,6 @@
 import * as anchor from '@coral-xyz/anchor';
 import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet';
-import { IDL } from '../target/types/anchor_escrow';
+import { IDL } from '../types/anchor_escrow';
 import {
   PublicKey,
   SystemProgram,
@@ -65,16 +65,14 @@ describe('anchor-escrow', () => {
   const taker = anchor.web3.Keypair.generate();
 
   // Random Seed
-  const seed: anchor.BN = new anchor.BN(
-    Math.floor(Math.random() * 100000000)
-  );
+  const seed: anchor.BN = new anchor.BN(Math.floor(Math.random() * 100000000));
 
   const escrow = PublicKey.findProgramAddressSync(
-    [Buffer.from("escrow"), seed.toArrayLike(Buffer, "le", 8)],
+    [Buffer.from('escrow'), seed.toArrayLike(Buffer, 'le', 8)],
     program.programId
   )[0];
 
-let vault = null;
+  let vault = null;
 
   it('Initialize program state', async () => {
     // 1. Airdrop 1 SOL to payer
@@ -150,7 +148,7 @@ let vault = null;
       initializerAmount
     );
 
-   vault = getAssociatedTokenAddressSync(mint, escrow, true);
+    vault = getAssociatedTokenAddressSync(mint, escrow, true);
 
     const fetchedInitializerTokenAccount = await getAccount(
       connection,
@@ -186,10 +184,8 @@ let vault = null;
     console.log(
       `https://solana.fm/tx/${result}?cluster=http%253A%252F%252Flocalhost%253A8899%252F`
     );
-    
-    let fetchedEscrowState = await program.account.escrowState.fetch(
-      escrow
-    );
+
+    let fetchedEscrowState = await program.account.escrowState.fetch(escrow);
 
     // Check that the values in the escrow account match what we expect.
     assert.ok(fetchedEscrowState.initializer.equals(initializer.publicKey));

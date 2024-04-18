@@ -2,10 +2,12 @@ use anchor_lang::prelude::*;
 
 mod contexts;
 use contexts::*;
-mod states;
 mod constant;
+mod states;
 
-declare_id!("6FJ5uuAfaAVEr8hY7JD2BjFoAC8n6FMRgziif9VFN2v7");
+use crate::states::UserLinks;
+
+declare_id!("DBfxok82ngQ6MMHfL2ik5vjCHBDFUePBwsV5N7z4Dd63");
 
 #[program]
 pub mod anchor_escrow {
@@ -19,25 +21,31 @@ pub mod anchor_escrow {
         validator: Option<Pubkey>,
         taker: Pubkey,
         verified_collection: Option<Pubkey>,
-        about: String
+        about: String,
     ) -> Result<()> {
-
-        ctx.accounts
-        .initialize_escrow(
-            seed, 
-            &ctx.bumps, 
-            initializer_amount, 
+        ctx.accounts.initialize_escrow(
+            seed,
+            &ctx.bumps,
+            initializer_amount,
             taker,
             verified_collection,
             validator,
-            about
+            about,
         )?;
 
         ctx.accounts.deposit(initializer_amount)
     }
 
-    pub fn initialize_user(ctx: Context<InitializeUser>, username: String, about: String, role: String) -> Result<()> {
-        ctx.accounts.initialize_user(username, about, role)
+    pub fn initialize_user(
+        ctx: Context<InitializeUser>,
+        username: String,
+        about: String,
+        role: String,
+        pfp: Option<String>,
+        links: UserLinks,
+    ) -> Result<()> {
+        ctx.accounts
+            .initialize_user(username, about, role, pfp, links)
     }
 
     pub fn cancel(ctx: Context<Cancel>) -> Result<()> {

@@ -3,7 +3,7 @@
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useMutation } from '@tanstack/react-query';
 import { useTransactionToast } from '@/components/shared/use-transaction-toast';
-import { useAccounts } from './get-accounts';
+import { useClientAccounts } from './get-accounts';
 import { useCluster } from '@/components/cluster/cluster-data-access';
 import { usePDAs } from './get-PDAs';
 import {
@@ -11,14 +11,15 @@ import {
   getAssociatedTokenAddressSync,
 } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
+import { useProgram } from './get-program';
 
 export function useCancel() {
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
-  const { program } = useAccounts();
+  const { program } = useProgram();
   const { publicKey } = useWallet();
   const { mint } = usePDAs();
-  const { hiringEscrows } = useAccounts();
+  const { clientEscrows } = useClientAccounts();
 
   const cancel = useMutation({
     mutationKey: ['escrow', 'cancel', { cluster }],
@@ -48,7 +49,7 @@ export function useCancel() {
     },
     onSuccess: (tx) => {
       transactionToast(tx);
-      return hiringEscrows.refetch();
+      return clientEscrows.refetch();
     },
     onError: (err) => {
       return console.log(err);

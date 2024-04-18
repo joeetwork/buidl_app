@@ -4,11 +4,11 @@ import { PublicKey } from '@solana/web3.js';
 import * as anchor from '@coral-xyz/anchor';
 
 import { getAssociatedTokenAddressSync } from '@solana/spl-token';
-import { useAccounts } from './get-accounts';
 import { useWallet } from '@solana/wallet-adapter-react';
+import { useProgram } from './get-program';
 
 export function usePDAs() {
-  const { program } = useAccounts();
+  const { program } = useProgram();
   const { publicKey } = useWallet();
 
   const mint = new PublicKey('4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU');

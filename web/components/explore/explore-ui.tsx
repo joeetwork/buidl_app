@@ -1,68 +1,104 @@
 'use client';
 
-import { useAccounts } from '@/hooks/get-accounts';
-import React, { useCallback, useState } from 'react';
-import { PublicKey } from '@solana/web3.js';
-import ExploreModal from './explore-modal';
+import { usePagination } from '@/hooks/pagination';
+import React, { useEffect, useState } from 'react';
+import * as anchor from '@coral-xyz/anchor';
+import { AnchorEscrow } from '@buidl/anchor';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import Loadie from '../shared/loadie';
 import Link from 'next/link';
+import Avatar from '../shared/avatar';
+
+type UserMap =
+  | Map<string, anchor.IdlAccounts<AnchorEscrow>['user']>
+  | undefined;
+type UserAccounts = anchor.IdlAccounts<AnchorEscrow>['user'][];
 
 export default function ExploreUi() {
-  const { userAccounts } = useAccounts();
-  const [showModal, setShowModal] = useState(false);
-  const [taker, setTaker] = useState<PublicKey>();
-  const [title, setTitle] = useState('');
+  const [page, setPage] = useState(1);
+  const [users, setUsers] = useState<UserMap>();
+  const { userAccounts, maxAccounts } = usePagination({
+    page: page,
+    perPage: 8,
+  });
 
-  const handleShowModal = (taker: PublicKey, name: string) => {
-    setShowModal(true);
-    setTaker(taker);
-    setTitle(name);
+  const handleClick = () => {
+    setPage((prevPage) => prevPage + 1);
   };
 
-  const handleHideModal = useCallback(() => {
-    setShowModal(false);
-  }, [setShowModal]);
+  useEffect(() => {
+    if (userAccounts.data) {
+      setUsers((prevUsers) => {
+        const updatedUsersMap = prevUsers ? new Map(prevUsers) : new Map();
+
+        (userAccounts.data as UserAccounts).forEach((user) => {
+          if (user.role === 'Freelancer' && user.about) {
+            updatedUsersMap.set(user.initializer.toString(), user);
+          }
+        });
+
+        return updatedUsersMap;
+      });
+    }
+  }, [userAccounts.data]);
 
   return (
     <div>
       <div>
-        <h1 className="text-center font-bold text-xl mt-4">Discover the skills you require</h1>
+        <h1 className="text-center font-bold text-xl mt-4">
+          Discover the skills you require
+        </h1>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 items-stretch w-10/12 m-auto max-[480px]:grid-cols-1 max-[480px]:gap-y-4 max-[768px]:grid-cols-2">
-        {userAccounts.data?.map((user) => {
-          return (
-            <div
-              key={user.publicKey.toString()}
-              className="card w-full bg-base-100 shadow-xl"
-            >
-              <div className="card-body items-center text-center">
-                <h2 className="card-title">{user.account.username}</h2>
-                <p className="w-full break-words">{user.account.about}</p>
-                <div className="card-actions">
-                  <button
-                    onClick={() =>
-                      handleShowModal(
-                        user.account.initializerKey,
-                        user.account.username
-                      )
-                    }
-                    className="btn btn-primary"
+      <InfiniteScroll
+        dataLength={maxAccounts}
+        next={handleClick}
+        hasMore={maxAccounts !== users?.size}
+        loader={
+          <div className="w-full text-center py-4">
+            <Loadie />
+          </div>
+        }
+      >
+        <div className="grid grid-cols-3 gap-4 items-stretch w-10/12 m-auto max-[480px]:grid-cols-1 max-[480px]:gap-y-4 max-[768px]:grid-cols-2">
+          {users && users?.size > 0
+            ? [...users.values()].map((user) => {
+                return (
+                  <div
+                    key={user?.initializer.toString()}
+                    className="card bg-teal-700 w-full shadow-xl"
                   >
-                    Make offer
-                  </button>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      <ExploreModal
-        show={showModal}
-        hideModal={handleHideModal}
-        taker={taker}
-        title={title}
-      />
+                    <div className="card-body items-center text-center">
+                      <Avatar src={user.pfp ?? ''} />
+                      <h2 className="card-title text-white">
+                        {user?.username === user.initializer.toString()
+                          ? 'Guest'
+                          : user.username}
+                      </h2>
+                      <p className="w-full break-words text-white">
+                        {user?.about}
+                      </p>
+                      <div className="card-actions">
+                        <Link
+                          className="text-white"
+                          href={`offer/${
+                            user.username === user.initializer.toString()
+                              ? 'guest'
+                              : user.username
+                          }/${user.initializer}`}
+                        >
+                          <button className="btn bg-black text-white">
+                            Make offer
+                          </button>
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            : null}
+        </div>
+      </InfiniteScroll>
     </div>
   );
 }
