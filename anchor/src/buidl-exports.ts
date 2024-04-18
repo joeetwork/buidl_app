@@ -1,7 +1,7 @@
 import { Program } from '@coral-xyz/anchor';
 import { Cluster, PublicKey } from '@solana/web3.js';
-import { IDL as BuidlIDL } from '../target/types/anchor_escrow';
-import type { AnchorEscrow } from '../target/types/anchor_escrow';
+import { IDL as BuidlIDL } from '../types/anchor_escrow';
+import type { AnchorEscrow } from '../types/anchor_escrow';
 
 export { AnchorEscrow, BuidlIDL };
 export type BuidlProgram = Program<AnchorEscrow>;
