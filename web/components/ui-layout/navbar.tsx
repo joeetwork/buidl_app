@@ -49,12 +49,10 @@ export function Navbar() {
             return (
               <li key={path}>
                 <Link
-                  className={`p-2 rounded-lg hover:transition-colors hover:bg-opacity-80 hover:bg-teal-400 text-white ${
-                    pathname.startsWith(path)
-                      ? 'bg-opacity-80 bg-teal-600'
-                      : '' ||
-                        (pathname === '/requests' && path === '/contracts')
-                      ? 'bg-opacity-80 bg-teal-600'
+                  className={`p-2 rounded-lg hover:transition-colors hover:bg-opacity-80 hover:bg-teal-400 hover:text-white ${
+                    pathname.startsWith(path) ||
+                    (pathname === '/requests' && path === '/contracts')
+                      ? 'bg-opacity-80 bg-teal-600 text-white'
                       : ''
                   }`}
                   href={
