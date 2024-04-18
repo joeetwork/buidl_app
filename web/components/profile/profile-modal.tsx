@@ -56,7 +56,14 @@ export default function ProfileModal({ show, hideModal }: ProfileModalProps) {
     setName(userAccount.data?.username ?? '');
     setAbout(userAccount.data?.about ?? '');
     setPfp(userAccount.data?.pfp ?? '');
-    setLinks(userAccount.data?.links ?? '');
+    setLinks(
+      userAccount.data?.links ?? {
+        telegram: null,
+        twitter: null,
+        discord: null,
+        github: null,
+      }
+    );
   }, [
     userAccount.data?.username,
     userAccount.data?.about,
