@@ -1,9 +1,11 @@
+use std::str::FromStr;
 use anchor_lang::prelude::*;
 use anchor_spl::token::{ Mint, TokenAccount};
 use anchor_spl::metadata::MetadataAccount;
 
-use crate::states::{Escrow, Validate};
-use crate::constant::seeds::{METADATA, VALIDATE};
+use crate::states::{Escrow, Validate, User};
+use crate::constant::seeds::{METADATA, VALIDATE, USER};
+use crate::constant::gigd_dao::COLLECTION_ID;
 
 #[derive(Accounts)]
 pub struct ValidateWithCollection<'info> {
@@ -40,6 +42,13 @@ pub struct ValidateWithCollection<'info> {
     pub escrow_state: Box<Account<'info, Escrow>>,
 
     #[account(
+        mut,
+        seeds = [USER.as_ref(), user.key().as_ref()],
+        bump,
+    )]
+    pub user_state: Box<Account<'info, User>>,
+
+    #[account(
         init,
         seeds = [VALIDATE.as_ref(), user.key().as_ref(), escrow_state.key().as_ref()],
         bump,
@@ -55,17 +64,34 @@ impl<'info> ValidateWithCollection<'info> {
     pub fn vote_accept(
          &mut self
      ) -> Result<()> {
-        self.escrow_state.amount_of_voters = self.escrow_state.amount_of_voters.checked_add(1).unwrap();
-        self.escrow_state.validator_count = self.escrow_state.validator_count.checked_add(1).unwrap();
+       if self.escrow_state.verified_collection == Pubkey::from_str(COLLECTION_ID).ok() && self.user_state.points >= 5000 {
+           self.escrow_state.amount_of_voters = self.escrow_state.amount_of_voters.checked_add(1).unwrap();
+           self.escrow_state.validator_count = self.escrow_state.validator_count.checked_add(1).unwrap();
+           self.user_state.points += 250;
+        }   
 
+        if self.escrow_state.verified_collection != Pubkey::from_str(COLLECTION_ID).ok() {
+            self.escrow_state.amount_of_voters = self.escrow_state.amount_of_voters.checked_add(1).unwrap();
+            self.escrow_state.validator_count = self.escrow_state.validator_count.checked_add(1).unwrap();
+            self.user_state.points += 250;
+        }
         Ok(())
      }
 
      pub fn vote_decline(
         &mut self
     ) -> Result<()> {
-        self.escrow_state.amount_of_voters = self.escrow_state.amount_of_voters.checked_add(1).unwrap();
-        self.escrow_state.validator_count = self.escrow_state.validator_count.checked_sub(1).unwrap();
+        if self.escrow_state.verified_collection == Pubkey::from_str(COLLECTION_ID).ok() && self.user_state.points >= 5000 {
+           self.escrow_state.amount_of_voters = self.escrow_state.amount_of_voters.checked_add(1).unwrap();
+           self.escrow_state.validator_count = self.escrow_state.validator_count.checked_sub(1).unwrap();
+           self.user_state.points += 250;
+        }
+
+        if self.escrow_state.verified_collection != Pubkey::from_str(COLLECTION_ID).ok() {
+            self.escrow_state.amount_of_voters = self.escrow_state.amount_of_voters.checked_add(1).unwrap();
+            self.escrow_state.validator_count = self.escrow_state.validator_count.checked_sub(1).unwrap();
+            self.user_state.points += 250;
+        }
 
        Ok(())
     }

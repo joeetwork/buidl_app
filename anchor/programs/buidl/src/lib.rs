@@ -43,9 +43,10 @@ pub mod anchor_escrow {
         role: String,
         pfp: Option<String>,
         links: UserLinks,
+        points: u64
     ) -> Result<()> {
         ctx.accounts
-            .initialize_user(username, about, role, pfp, links)
+            .initialize_user(username, about, role, pfp, links, points)
     }
 
     pub fn cancel(ctx: Context<Cancel>) -> Result<()> {

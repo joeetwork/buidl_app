@@ -8,6 +8,7 @@ pub struct User {
     pub role: String,
     pub pfp: Option<String>,
     pub links: UserLinks,
+    pub points: u64
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
@@ -24,5 +25,5 @@ const PFP: usize = 1 + STRING;
 const LINKS: usize = (1 + STRING) * 4;
 
 impl Space for User {
-    const INIT_SPACE: usize = 8 + 32 + STRING + STRING + ROLE + PFP + LINKS;
+    const INIT_SPACE: usize = 8 + 32 + STRING + STRING + ROLE + PFP + LINKS + 8;
 }

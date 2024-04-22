@@ -29,6 +29,7 @@ impl<'info> InitializeUser<'info> {
         role: String,
         pfp: Option<String>,
         links: UserLinks,
+        points: u64
     ) -> Result<()> {
         self.user_state.set_inner(User {
             initializer: self.initializer.key(),
@@ -37,6 +38,7 @@ impl<'info> InitializeUser<'info> {
             role,
             pfp,
             links,
+            points
         });
 
         Ok(())

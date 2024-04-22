@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use anchor_lang::prelude::*;
 
-use crate::constant::CLOSE;
+use crate::constant::{CLOSE, COLLECTION_ID};
 use crate::states::Escrow;
 use crate::constant::escrow_status::EXCHANGE;
 
@@ -27,7 +27,7 @@ impl<'info> CountVote<'info> {
 
             self.escrow_state.vote_deadline = Some(current_time + seconds_in_7_days);
 
-            self.escrow_state.verified_collection = Pubkey::from_str("ffdf").ok();
+            self.escrow_state.verified_collection = Pubkey::from_str(COLLECTION_ID).ok();
         }
 
         if self.escrow_state.validator_count > 0 && self.escrow_state.vote_deadline.unwrap() < current_time {

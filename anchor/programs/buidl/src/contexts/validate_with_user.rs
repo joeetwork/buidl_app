@@ -1,8 +1,8 @@
 use anchor_lang::prelude::*;
 
 use crate::constant::escrow_status::{EXCHANGE, CLOSE};
-use crate::states::{Escrow, Validate};
-use crate::constant::seeds::VALIDATE;
+use crate::states::{Escrow, Validate, User};
+use crate::constant::seeds::{VALIDATE, USER};
 
 #[derive(Accounts)]
 pub struct ValidateWithUser<'info> {
@@ -15,6 +15,13 @@ pub struct ValidateWithUser<'info> {
         constraint = escrow_state.vote_deadline.unwrap() > Clock::get()?.unix_timestamp
     )]
     pub escrow_state: Box<Account<'info, Escrow>>,
+
+    #[account(
+        mut,
+        seeds = [USER.as_ref(), user.key().as_ref()],
+        bump,
+    )]
+    pub user_state: Box<Account<'info, User>>,
 
     #[account(
         init,
@@ -34,6 +41,7 @@ impl<'info> ValidateWithUser<'info> {
      ) -> Result<()> {
         self.escrow_state.amount_of_voters = self.escrow_state.amount_of_voters.checked_add(1).unwrap();
         self.escrow_state.status = EXCHANGE.to_string();
+        self.user_state.points += 500;
 
         Ok(())
      }
@@ -43,6 +51,7 @@ impl<'info> ValidateWithUser<'info> {
     ) -> Result<()> {
           self.escrow_state.amount_of_voters = self.escrow_state.amount_of_voters.checked_add(1).unwrap();
           self.escrow_state.status = CLOSE.to_string();
+          self.user_state.points += 500;
 
        Ok(())
     }
